@@ -1,0 +1,12 @@
+﻿public enum Mode{
+	TEACHER, STUDENT
+}
+
+public enum Activity{
+	OPEN_CLOSED_VOWEL, 
+	CONSONANT_DIGRAPHS, 
+	CONSONANT_BLENDS, 
+	VOWEL_DIGRAPHS, 
+	MAGIC_E, 
+	R_CONTROLLED_VOWEL
+};
