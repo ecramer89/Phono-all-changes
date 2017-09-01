@@ -333,10 +333,8 @@ public class ArduinoLetterController : MonoBehaviour{
 					handleSyllableDivisionMode (lc, indexOfLetterBarCell);
 				}
 				else if (SessionsDirector.IsStudentMode) {
-					handleStudentMode (letterIsNew,
-					isPartOfCompletedGrapheme,
-					indexOfLetterBarCell, 
-					newLetter, parent, lc);
+					studentActivityController.AssignNewColorToLetter (indexOfLetterBarCell, parent, asInteractiveLetter, lc, letterGrid);
+
 
 				} else if (SessionsDirector.IsTeacherMode) {
 					handleTeacherMode (isPartOfCompletedGrapheme, letterIsNew, 

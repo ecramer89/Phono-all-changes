@@ -130,6 +130,51 @@ public class StudentActivityController : MonoBehaviour
 		        
 
 		}
+
+
+	public void AssignNewColorToLetter(
+		int indexOfLetterBarCell, 
+		LetterSoundComponent parent,
+		InteractiveLetter asInteractiveLetter,
+		LetterSoundComponent asLetterSoundComponent,
+		LetterGridController letterGrid){
+		if(IsErroneous(indexOfLetterBarCell)){
+			Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors();
+			letterGrid.UpdateLetter (indexOfLetterBarCell, errorColors[0]); 
+			asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
+			asInteractiveLetter.SetFlashDurations (1, 1);
+			asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
+			return;
+		} 
+
+
+		//correct letter; see whether it's part of a multi-letter unit.
+		LetterSoundComponent targetComponent = 
+			GetTargetLetterSoundComponentFor(indexOfLetterBarCell);
+
+		if (targetComponent != null && targetComponent.IsComposite()) {
+			if(parent != null && targetComponent.AsString.Equals(parent.AsString) || 
+				(SessionsDirector.instance.IsMagicERule && IsSubmissionCorrect())) {
+				letterGrid.UpdateLetter (indexOfLetterBarCell, asLetterSoundComponent.GetColour()); 
+				asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), SessionsDirector.colourCodingScheme.GetColorsForOff());
+				asInteractiveLetter.SetFlashDurations (1, .5f);
+				asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
+				return;
+
+			}
+
+			letterGrid.UpdateLetter (indexOfLetterBarCell, SessionsDirector.instance.CurrentActivityColorRules.GetColorForPortionOfTargetComposite ()); 
+
+			//If it isn't blends, then should flash.
+			//todo abstract this into the color coding scheme as well.
+			if (!SessionsDirector.instance.IsConsonantBlends) {
+				asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), targetComponent.GetColour ());
+				asInteractiveLetter.SetFlashDurations (.5f, 1);
+				asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME);
+			}
+		}
+
+		}
 	
         
 		public void PlayInstructions ()
