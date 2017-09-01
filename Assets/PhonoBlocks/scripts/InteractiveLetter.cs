@@ -9,12 +9,11 @@ public class InteractiveLetter : MonoBehaviour
 {
     //changed file!
 		String letter;
-		Color defaultColour;
-
+		Color colorDerivedFromUserInput; //the 
 		public Color DefaultColour {
 				get {
 
-						return defaultColour;
+						return colorDerivedFromUserInput;
 				}
 		}
 
@@ -168,7 +167,7 @@ public class InteractiveLetter : MonoBehaviour
 			yield return new WaitForSeconds (durationOfFlash);
 		}
 		//restore default color
-		UpdateDisplayColour (defaultColour);
+		UpdateDisplayColour (colorDerivedFromUserInput);
 		flashCounter = 0;
 	}
 		
@@ -187,7 +186,7 @@ public class InteractiveLetter : MonoBehaviour
 
 		public void RevertToDefaultColour ()
 		{
-				UpdateDisplayColour (defaultColour);
+				UpdateDisplayColour (colorDerivedFromUserInput);
 
 		}
 
@@ -249,9 +248,9 @@ public class InteractiveLetter : MonoBehaviour
 
 		public void UpdateDefaultColour (UnityEngine.Color c_)
 		{
-				if (defaultColour == Color.clear)
-						defaultColour = Color.white;
-				defaultColour = c_;
+				if (colorDerivedFromUserInput == Color.clear)
+						colorDerivedFromUserInput = Color.white;
+				colorDerivedFromUserInput = c_;
 
 		}
 
@@ -314,7 +313,7 @@ public class InteractiveLetter : MonoBehaviour
 								if (selectHighlight)
 										selectHighlight.enabled = false;
 						} else
-								UpdateDisplayColour (defaultColour);
+								UpdateDisplayColour (colorDerivedFromUserInput);
 						if (notifyObservers && LetterSelectedDeSelected != null)
 								LetterSelectedDeSelected (false, gameObject);
 				}

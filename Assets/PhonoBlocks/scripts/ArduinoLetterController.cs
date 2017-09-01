@@ -9,7 +9,7 @@ using Extensions;
 //todo this thing has a cached reference to the study activity controller. it doesn't need to check whether its student mode.
 //or receive the sac as an argumenrt
 public class ArduinoLetterController : MonoBehaviour{
-	
+		public static ArduinoLetterController instance;
 		public StudentActivityController studentActivityController;
 		public String EMPTY_USER_WORD;
 		List<InteractiveLetter> lettersToFlash = new List<InteractiveLetter> ();
@@ -85,6 +85,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				letterGrid.InitializeBlankLetterSpaces (maxUserLetters);
 			
 				AssignInteractiveLettersToTangibleCounterParts ();
+				instance = this;
 				
 		}
 
@@ -117,7 +118,13 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter)
 		{
-				letterGrid.UpdateLetter (atPosition, newLetter + "");
+			ChangeTheLetterOfASingleCell (atPosition, newLetter + "");
+
+		}
+
+		public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter)
+		{
+			letterGrid.UpdateLetter (atPosition, newLetter);
 
 		}
 

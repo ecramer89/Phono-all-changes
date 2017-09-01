@@ -71,8 +71,16 @@ public class HintController : MonoBehaviour
 						//AudioSourceController.PushClip (sound_out_word);
 						break;
 
-				case 1: //level two hint
+		case 1: //level two hint
+
+			UserInputRouter.instance.BlockAllUIInput ();
+			ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
+			StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
+
+
 						//currProblem.PlaySoundedOutWord ();
+
+			/*
 						studentActivityController.EnterGuidedLetterPlacementMode();
 						targetLetters = studentActivityController.TargetLetters;
 						StringBuilder blanksSB = new StringBuilder();
@@ -81,7 +89,7 @@ public class HintController : MonoBehaviour
 						}
 						UserInputRouter.instance.DisplayLettersOf(blanksSB.ToString());
 						targetLetterIndex = 0;
-						studentActivityController.SkipToNextLetterToHint();
+						studentActivityController.SkipToNextLetterToHint();*/
 						break;
 				}
 			
@@ -89,6 +97,23 @@ public class HintController : MonoBehaviour
 				StudentsDataHandler.instance.LogEvent ("requested_hint", currHintIdx + "", "NA");
 			
 		}
+
+
+
+			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
+				int letterindex = 0;
+				while(letterindex < studentActivityController.TargetLetters.Length){
+					LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
+					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters[letterindex]);
+					ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
+					letterindex++;
+					yield return new WaitForSeconds (letterindex < studentActivityController.TargetLetters.Length - 1 ? 2 : 5 );
+				}
+		          
+				UserInputRouter.instance.UnBlockAllUIInput();
+				//ArduinoLetterController.instance.
+				ArduinoLetterController.instance.RevertLettersToDefaultColour ();
+			}
 
 		   public void DisplayAndPlaySoundOfCurrentTargetLetter(){
 		   if (targetLetterIndex < targetLetters.Length) {

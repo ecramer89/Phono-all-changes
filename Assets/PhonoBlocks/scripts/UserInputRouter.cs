@@ -50,6 +50,12 @@ public class UserInputRouter : MonoBehaviour
 		public CheckedWordImageController checkedWordImageController;
 		public StudentActivityController studentActivityController;
 		bool acceptUIInput = true;
+		public void BlockAllUIInput(){
+			acceptUIInput = false;
+		}
+		public void UnBlockAllUIInput(){
+			acceptUIInput = true;
+		}
 		bool currentWordViolatesPhonotactics = false; //either the arduino controlled letters or one of the affixes was placed incorrectly.
 		//dont add to the history.
 	    
@@ -235,7 +241,9 @@ public class UserInputRouter : MonoBehaviour
 
 		/* if it is activity mode, then we delegate control of the new letter to the student activity controller. otherwise just update all of the letters*/
 		public void HandleNewUserInputLetter (char newLetter, int atPosition, ArduinoLetterController alc)
-		{
+	{       if (!acceptUIInput)
+			return;
+
 				if (sessionManager != null && SessionsDirector.IsStudentMode)
 			
 						studentActivityController.HandleNewArduinoLetter (newLetter, atPosition);
@@ -278,7 +286,7 @@ public class UserInputRouter : MonoBehaviour
 
 				}
 
-
+		/*
 	        if (hintLetterTimer > 0) hintLetterTimer--;
 	        if(hintLetterTimer==0)
 	        {
@@ -286,7 +294,7 @@ public class UserInputRouter : MonoBehaviour
 	            arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters(true);
 	            //replace colours and letters that are there
 	            hintLetterTimer = -1;
-	        }
+	        }*/
 
 		}
 

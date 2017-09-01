@@ -19,6 +19,8 @@ public class StudentActivityController : MonoBehaviour
 		public void EnterGuidedLetterPlacementMode(){
 			state = State.HINT_PLACE_EACH_LETTER;
 		}
+
+
 		HintController hintController;
 		ArduinoLetterController arduinoLetterController;
 		Problem currProblem;
