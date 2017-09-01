@@ -88,12 +88,12 @@ public class HintController : MonoBehaviour
 					letterindex++;
 					if (letterindex > numLetters) break;
 					if (letterindex == numLetters)
-						yield return new WaitForSeconds (5);
+				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_FULL_CORRECT_WORD);
 					else {
 						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters [letterindex]);
 						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
-						yield return new WaitForSeconds (2);
+						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
 				UserInputRouter.instance.UnBlockAllUIInput();

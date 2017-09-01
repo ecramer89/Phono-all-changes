@@ -145,8 +145,8 @@ public class StudentActivityController : MonoBehaviour
 			Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors();
 			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors[0]);
 			asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
-			asInteractiveLetter.SetFlashDurations (FlashParameters.Durations.ERROR_OFF, FlashParameters.Durations.ERROR_ON);
-			asInteractiveLetter.SetNumFlashCycles (FlashParameters.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
+			asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
+			asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
 			return;
 		} 
 			
@@ -168,8 +168,8 @@ public class StudentActivityController : MonoBehaviour
 						if (childInstantiatedTargetSpellingRule()) {
 							asInteractiveLetter.UpdateInputDerivedAndDisplayColor (asLetterSoundComponent.GetColour ());
 							asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), SessionsDirector.colourCodingScheme.GetColorsForOff());
-							asInteractiveLetter.SetFlashDurations (FlashParameters.Durations.HINT_TARGET_COLOR, FlashParameters.Durations.HINT_OFF);
-							asInteractiveLetter.SetNumFlashCycles (FlashParameters.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
+							asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF);
+							asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
 							return;
 
 						}
@@ -179,8 +179,8 @@ public class StudentActivityController : MonoBehaviour
 
 						if (!SessionsDirector.instance.IsConsonantBlends) {
 							asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), targetComponent.GetColour ());
-							asInteractiveLetter.SetFlashDurations (FlashParameters.Durations.CORRECT_TARGET_COLOR, FlashParameters.Durations.CORRECT_OFF);
-							asInteractiveLetter.SetNumFlashCycles (FlashParameters.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME);
+							asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.CORRECT_TARGET_COLOR, Parameters.Flash.Durations.CORRECT_OFF);
+							asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME);
 						}
 
 						return;
