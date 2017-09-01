@@ -143,12 +143,12 @@ public class LetterGridController : MonoBehaviour
 			
 		}
 
-		public void SetAllLettersToBlank ()
+		/*public void SetAllLettersToBlank ()
 		{
 				SetLettersToBlank (0, transform.childCount);
-		}
+		}*/
 
-		public void SetLettersToBlank (int startingFrom, int number)
+		/*public void SetLettersToBlank (int startingFrom, int number)
 		{
 				for (int i=startingFrom; i<startingFrom+number; i++) {
 						UpdateLetter (i, " ", Color.white);
@@ -156,9 +156,14 @@ public class LetterGridController : MonoBehaviour
 				}
 
 
-		}
+		}*/
+		
+	public Texture2D GetAppropriatelyScaledImageForLetter(String letter){
+		return CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
 
-		public InteractiveLetter UpdateLetter (int position, String letter, Color newNonLockColour)
+	}
+
+		/*public InteractiveLetter UpdateLetter (int position, String letter, Color newNonLockColour)
 		{
 				
 				InteractiveLetter l = GetInteractiveLetter (position);
@@ -171,7 +176,7 @@ public class LetterGridController : MonoBehaviour
 			
 				return l;
 		
-		}
+		}*/
 
 		public UITexture CreateLetterHighlightCell ()
 		{
@@ -196,11 +201,11 @@ public class LetterGridController : MonoBehaviour
 				
 		}
 
-		public InteractiveLetter UpdateLetter (int position, String letter)
+		/*public InteractiveLetter UpdateLetter (int position, String letter)
 		{     
 				return UpdateLetter (position, letter, Color.white);
 
-		}
+		}*/
 
 		public InteractiveLetter UpdateLetter (int position, Color c, bool isNewDefault=true)
 		{

@@ -85,7 +85,7 @@ public class WordHistoryController : MonoBehaviour
 		public void ClearWordHistory ()
 		{
 				words.Clear ();
-				lettersOfWordInHistory.SetAllLettersToBlank ();
+				//lettersOfWordInHistory.SetAllLettersToBlank ();
 
 
 		}
