@@ -165,7 +165,7 @@ public class LetterGridController : MonoBehaviour
 				bool attemptErasure = letter.Equals (" ");
 	
 				Texture2D letterImage = CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
-				l.UpdateLetter (letter, letterImage, newNonLockColour);
+				l.UpdateInputLetterAndInputDerivedColor (letter, letterImage, newNonLockColour);
 			
 
 			
@@ -217,7 +217,7 @@ public class LetterGridController : MonoBehaviour
 		{
 
 				InteractiveLetter l = GetInteractiveLetter (position);
-				l.UpdateLetterImage (img);
+				l.UpdateDisplayImageButNotInputLetter (img);
 				return l;
 
 		}
@@ -262,7 +262,7 @@ public class LetterGridController : MonoBehaviour
 
 				InteractiveLetter l = ut.gameObject.AddComponent<InteractiveLetter> ();
 				l.Trigger = b;
-				l.UpdateLetter (letter, tex2dCopy, c);
+				l.UpdateInputLetterAndInputDerivedColor (letter, tex2dCopy, c);
 	
 				ut.gameObject.name = position;
 				ut.MakePixelPerfect ();

@@ -143,7 +143,7 @@ public class StudentActivityController : MonoBehaviour
 
 		if(IsErroneous(indexOfLetterBarCell)){
 			Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors();
-			asInteractiveLetter.UpdateDefaultColorAndDisplay (errorColors[0]);
+			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors[0]);
 			asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
 			asInteractiveLetter.SetFlashDurations (FlashParameters.Durations.ERROR_OFF, FlashParameters.Durations.ERROR_ON);
 			asInteractiveLetter.SetNumFlashCycles (FlashParameters.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
@@ -166,7 +166,7 @@ public class StudentActivityController : MonoBehaviour
 				if(childCompletedPortionOfTargetSpellingRule()){
 
 						if (childInstantiatedTargetSpellingRule()) {
-							asInteractiveLetter.UpdateDefaultColorAndDisplay (asLetterSoundComponent.GetColour ());
+							asInteractiveLetter.UpdateInputDerivedAndDisplayColor (asLetterSoundComponent.GetColour ());
 							asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), SessionsDirector.colourCodingScheme.GetColorsForOff());
 							asInteractiveLetter.SetFlashDurations (FlashParameters.Durations.HINT_TARGET_COLOR, FlashParameters.Durations.HINT_OFF);
 							asInteractiveLetter.SetNumFlashCycles (FlashParameters.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
@@ -175,7 +175,7 @@ public class StudentActivityController : MonoBehaviour
 						}
 
 
-						asInteractiveLetter.UpdateDefaultColorAndDisplay (SessionsDirector.instance.CurrentActivityColorRules.GetColorForPortionOfTargetComposite ());
+						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (SessionsDirector.instance.CurrentActivityColorRules.GetColorForPortionOfTargetComposite ());
 
 						if (!SessionsDirector.instance.IsConsonantBlends) {
 							asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), targetComponent.GetColour ());
@@ -186,7 +186,7 @@ public class StudentActivityController : MonoBehaviour
 						return;
 					}
 
-					asInteractiveLetter.UpdateDefaultColorAndDisplay(asLetterSoundComponent.GetColour());
+					asInteractiveLetter.UpdateInputDerivedAndDisplayColor(asLetterSoundComponent.GetColour());
 			}
 
 	  

@@ -182,7 +182,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		public void RevertASingleLetterToDefaultColour (int atPosition)
 		{
 				InteractiveLetter l = letterGrid.GetLetterCell (atPosition).GetComponent<InteractiveLetter> ();
-				l.RevertToDefaultColour ();
+				l.RevertToInputDerivedColor ();
 		}
 
 

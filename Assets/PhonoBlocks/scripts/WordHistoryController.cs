@@ -65,7 +65,7 @@ public class WordHistoryController : MonoBehaviour
 				foreach (InteractiveLetter l in newWord) {
 					
 						
-			     GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (l.Letter (), l.Image (), (position++) + "", (SessionsDirector.IsSyllableDivisionActivity?l.SelectColour:l.DefaultColour));
+			     GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (l.InputLetter (), l.CurrentDisplayImage (), (position++) + "", (SessionsDirector.IsSyllableDivisionActivity?l.SelectColour:l.ColorDerivedFromInput));
 				
 
 						letterInWord.AddComponent<BoxCollider> ();
@@ -73,7 +73,7 @@ public class WordHistoryController : MonoBehaviour
 				
 						UIDragPanelContents drag = letterInWord.GetComponent<UIDragPanelContents> ();
 						drag.draggablePanel = gameObject.GetComponent<UIDraggablePanel> ();
-						currentWordAsString.Append (l.Letter ());
+						currentWordAsString.Append (l.InputLetter ());
 						
 				}
 				wordHistoryGrid.GetComponent<UIGrid> ().Reposition ();

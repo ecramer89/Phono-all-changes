@@ -7,13 +7,13 @@ using System;
 //but isn't responsible for using this data to do anything.
 public class InteractiveLetter : MonoBehaviour
 {
-    //changed file!
-		String letter;
-		Color colorDerivedFromUserInput; //the 
-		public Color DefaultColour {
+   
+		String inputLetter;
+		Color colorDerivedFromInput; //the 
+		public Color ColorDerivedFromInput {
 				get {
 
-						return colorDerivedFromUserInput;
+						return colorDerivedFromInput;
 				}
 		}
 
@@ -121,24 +121,24 @@ public class InteractiveLetter : MonoBehaviour
 		}
 
 
-		public String Letter ()
+		public String InputLetter ()
 		{
-				return letter;
+				return inputLetter;
 		}
 	
-		public Texture2D Image ()
+		public Texture2D CurrentDisplayImage ()
 		{
 				return (Texture2D)gameObject.GetComponent<UITexture> ().mainTexture;
 		}
 
-		public UnityEngine.Color CurrentColor ()
+		public UnityEngine.Color CurrentDisplayColor ()
 		{
 				return gameObject.GetComponent<UITexture> ().color;
 		}
 
 		public bool IsBlank ()
 		{
-				return letter [0] == ' ';
+				return inputLetter [0] == ' ';
 		}
 
 	public void StartFlash(){
@@ -167,7 +167,7 @@ public class InteractiveLetter : MonoBehaviour
 			yield return new WaitForSeconds (durationOfFlash);
 		}
 		//restore default color
-		UpdateDisplayColour (colorDerivedFromUserInput);
+		UpdateDisplayColour (colorDerivedFromInput);
 		flashCounter = 0;
 	}
 		
@@ -184,13 +184,13 @@ public class InteractiveLetter : MonoBehaviour
 			
 		}
 
-		public void RevertToDefaultColour ()
+		public void RevertToInputDerivedColor ()
 		{
-				UpdateDisplayColour (colorDerivedFromUserInput);
+				UpdateDisplayColour (colorDerivedFromInput);
 
 		}
 
-		public void UpdateDefaultColorAndDisplay(UnityEngine.Color c){
+		public void UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
 			UpdateDefaultColour (c);
 			UpdateDisplayColour (c);
 		}
@@ -201,56 +201,47 @@ public class InteractiveLetter : MonoBehaviour
  
         //on the screen, blank letters are just clear.
         //but we issue the black (0,0,0) colour to the arduino.
-        if (letter [0] == ' ')
+		if (IsBlank())
 						c_ = Color.black;
-       
-
 				if (UserInputRouter.instance != null)
 				if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER && UserInputRouter.instance.IsArduinoMode ()) 
 						UserInputRouter.instance.arduinoLetterInterface.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c_);
 
 
 		}
+	public void UpdateInputLetterAndInputDerivedColor (String letter, Texture2D img, UnityEngine.Color c)
+	{
+		UpdateInputLetterButNotInputDerivedColor (letter, img);
+		UpdateInputDerivedAndDisplayColor (c);
+	}
 
-		public void UpdateLetter (String letter_, Texture2D img_, UnityEngine.Color c_)
+
+		
+		public void UpdateDisplayImageButNotInputLetter (Texture2D img)
 		{
-				UpdateLetter (letter_, img_);
-				UpdateDefaultColour (c_);
-
-			
+				gameObject.GetComponent<UITexture> ().mainTexture = img;
 		}
 
-
-		//update the letter images; then after they make any change it will just update them all again
-		public void UpdateLetterImage (Texture2D img_)
-		{
-				gameObject.GetComponent<UITexture> ().mainTexture = img_;
-
-
-		}
-
-		public void UpdateLetter (String letter_, Texture2D img_)
+		public void UpdateInputLetterButNotInputDerivedColor (String letter, Texture2D img)
 		{
 			
-				letter = letter_;
+				inputLetter = letter;
 
 				//de-select this cell if it was selected
 				if (isSelected)
 						DeSelect ();
 			
 			
-				gameObject.GetComponent<UITexture> ().mainTexture = img_;
+				gameObject.GetComponent<UITexture> ().mainTexture = img;
 			
 
 		}
 
 
 
-		public void UpdateDefaultColour (UnityEngine.Color c_)
+		public void UpdateDefaultColour (UnityEngine.Color c)
 		{
-				if (colorDerivedFromUserInput == Color.clear)
-						colorDerivedFromUserInput = Color.white;
-				colorDerivedFromUserInput = c_;
+			colorDerivedFromInput = c == Color.clear ? Color.white : c;
 
 		}
 
@@ -313,7 +304,7 @@ public class InteractiveLetter : MonoBehaviour
 								if (selectHighlight)
 										selectHighlight.enabled = false;
 						} else
-								UpdateDisplayColour (colorDerivedFromUserInput);
+								UpdateDisplayColour (colorDerivedFromInput);
 						if (notifyObservers && LetterSelectedDeSelected != null)
 								LetterSelectedDeSelected (false, gameObject);
 				}
