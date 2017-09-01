@@ -254,7 +254,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		{
 			
 		        string userControlledLettersAsString = studentActivityController.UserChangesAsString;
-				Debug.Log ("user controlled letters are " + userControlledLettersAsString);
+
 				return LetterSoundComponentFactoryManager.Decode (userControlledLettersAsString, SessionsDirector.IsSyllableDivisionActivity);
 		
 		}
@@ -300,60 +300,33 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 
 
-		bool flash;
-		int timesToFlash;
-		Color newDefaultColor;
-	    Color flashColor;
-	    InteractiveLetter asInteractiveLetter;
-
 
 		void UpdateInterfaceLetter (
-				LetterSoundComponent lc, 
+				LetterSoundComponent asLetterSoundComponent, 
 				LetterGridController letterGridController, 
 				int indexOfLetterBarCell, 
 				LetterSoundComposite parent = null)
 	{          
 		   
-				flash = false;
-				timesToFlash = 0;
-		        bool isPartOfCompletedGrapheme = !ReferenceEquals (parent, null);
-				char newLetter = lc.AsString [0];
-				newDefaultColor = lc.GetColour ();
-		        asInteractiveLetter = letterGridController.GetInteractiveLetter (indexOfLetterBarCell);
+				InteractiveLetter asInteractiveLetter = letterGridController.GetInteractiveLetter (indexOfLetterBarCell);
 
 	
-		        bool letterIsNew = !((parent != null ? parent : lc).Equals (asInteractiveLetter.LetterSoundComponentIsPartOf));
+		        bool letterIsNew = !((parent != null ? parent : asLetterSoundComponent).Equals (asInteractiveLetter.LetterSoundComponentIsPartOf));
+				asInteractiveLetter.LetterSoundComponentIsPartOf = parent != null ? parent : asLetterSoundComponent; 
+	
 
-
-				flashColor = SessionsDirector.colourCodingScheme.GetColorsForOff ();
-		        flash = false;
-
-
-				if (SessionsDirector.IsSyllableDivisionActivity) {
-					handleSyllableDivisionMode (lc, indexOfLetterBarCell);
-				}
-				else if (SessionsDirector.IsStudentMode) {
-					studentActivityController.AssignNewColorToLetter (indexOfLetterBarCell, parent, asInteractiveLetter, lc, letterGrid);
-
-
-				} else if (SessionsDirector.IsTeacherMode) {
-					handleTeacherMode (isPartOfCompletedGrapheme, letterIsNew, 
-				     newLetter, lc, indexOfLetterBarCell, parent);
-				}
-
-		     
-		        asInteractiveLetter.LetterSoundComponentIsPartOf = parent != null ? parent : lc; 
-
-		      //flash only if letter is new and not a blank
-			        
-				if (letterIsNew && newLetter != ' ') {
+				if (SessionsDirector.IsStudentMode) {
+					studentActivityController.AssignNewColorToLetter (indexOfLetterBarCell, parent, asInteractiveLetter, asLetterSoundComponent, letterGrid);
+				} 
+		    
+				if (letterIsNew && !asLetterSoundComponent.IsBlank()) {
 						asInteractiveLetter.StartFlash ();
 				}
 
 
 			}
 						
-
+	/*
 		void handleSyllableDivisionMode(
 				LetterSoundComponent lc,
 				int indexOfLetterBarCell
@@ -408,55 +381,7 @@ public class ArduinoLetterController : MonoBehaviour{
 
 
 		}
-
-
-		void handleStudentMode(
-				bool letterIsNew,
-				bool isPartOfCompletedGrapheme,
-				int indexOfLetterBarCell, 
-				char newLetter,
-				LetterSoundComponent parent,
-				LetterSoundComponent lc
-		){
-
-
-				if(studentActivityController.IsErroneous(indexOfLetterBarCell)){
-						Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors();
-						letterGrid.UpdateLetter (indexOfLetterBarCell, errorColors[0]); 
-						asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
-						asInteractiveLetter.SetFlashDurations (1, 1);
-						asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
-						return;
-				} 
-
-
-				//correct letter; see whether it's part of a multi-letter unit.
-				LetterSoundComponent targetComponent = 
-						studentActivityController.GetTargetLetterSoundComponentFor(indexOfLetterBarCell);
-
-		          if (targetComponent != null && targetComponent.IsComposite()) {
-						if(parent != null && targetComponent.AsString.Equals(parent.AsString) || 
-							(SessionsDirector.instance.IsMagicERule && studentActivityController.IsSubmissionCorrect())) {
-							letterGrid.UpdateLetter (indexOfLetterBarCell, newDefaultColor); 
-							asInteractiveLetter.SetFlashColors (newDefaultColor, SessionsDirector.colourCodingScheme.GetColorsForOff());
-							asInteractiveLetter.SetFlashDurations (1, .5f);
-							asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
-						    return;
-							
-						}
-
-					letterGrid.UpdateLetter (indexOfLetterBarCell, SessionsDirector.instance.CurrentActivityColorRules.GetColorForPortionOfTargetComposite ()); 
-
-					//If it isn't blends, then should flash.
-					//todo abstract this into the color coding scheme as well.
-					if (!SessionsDirector.instance.IsConsonantBlends) {
-						asInteractiveLetter.SetFlashColors (newDefaultColor, targetComponent.GetColour ());
-						asInteractiveLetter.SetFlashDurations (.5f, 1);
-						asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME);
-					}
-				}
-
-		}
+*/
 
 
 		//all of this is for testing; simulates arduino functionality.

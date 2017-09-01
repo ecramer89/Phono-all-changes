@@ -191,6 +191,11 @@ public class InteractiveLetter : MonoBehaviour
 
 		}
 
+		public void UpdateDefaultColorAndDisplay(UnityEngine.Color c){
+			UpdateDefaultColour (c);
+			UpdateDisplayColour (c);
+		}
+
 
 		public void ChangeColourOfTangibleCounterpartIfThereIsOne (UnityEngine.Color c_)
 		{

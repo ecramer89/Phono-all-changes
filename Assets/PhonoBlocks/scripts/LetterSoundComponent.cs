@@ -10,8 +10,7 @@ public abstract class LetterSoundComponent
 
 		protected int placeInWord;
 	
-
-	
+	   
 		protected int soundType;
 
 		public int SoundType {
@@ -65,6 +64,10 @@ public abstract class LetterSoundComponent
 
 			LetterSoundComponent oLSC = (LetterSoundComponent)other;
 			return AsString.Equals (oLSC.AsString);
+		}
+
+		public virtual bool IsBlank(){
+			return false;
 		}
 		
 		public bool LettersMatch (LetterSoundComponent other)
@@ -343,6 +346,10 @@ public class Blank : Letter
 		
 		     color = SessionsDirector.colourCodingScheme.GetColorsForOff ();
 		
+		}
+
+		public override bool IsBlank(){
+			return true;
 		}
 }
 
