@@ -111,7 +111,7 @@ public class HintController : MonoBehaviour
 				}
 		          
 				UserInputRouter.instance.UnBlockAllUIInput();
-				//ArduinoLetterController.instance.
+				ArduinoLetterController.instance.PlaceWordInLetterGrid (studentActivityController.UserChangesAsString);
 				ArduinoLetterController.instance.RevertLettersToDefaultColour ();
 			}
 
