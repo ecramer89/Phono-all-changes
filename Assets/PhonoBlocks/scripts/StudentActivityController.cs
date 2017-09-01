@@ -253,22 +253,6 @@ public class StudentActivityController : MonoBehaviour
 
 		}
 
-	   public void SkipToNextLetterToHint(){
-		if (IsErroneous (hintController.TargetLetterIndex)) {
-					hintController.DisplayAndPlaySoundOfCurrentTargetLetter ();
-				} else {
-						int alreadyCorrect = hintController.TargetLetterIndex; 
-						while (!IsErroneous(alreadyCorrect) && alreadyCorrect < hintController.NumTargetLetters) {
-								hintController.AdvanceTargetLetter ();
-								hintController.DisplayAndPlaySoundOfCurrentTargetLetter ();
-								alreadyCorrect++;
-						}
-
-						if (alreadyCorrect == hintController.NumTargetLetters)
-								state = State.MAIN_ACTIVITY;
-				}
-			
-		}
 	
 		public void HandleNewArduinoLetter (char letter, int atPosition)
 	    {    

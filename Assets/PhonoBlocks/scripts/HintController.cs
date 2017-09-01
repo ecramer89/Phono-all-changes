@@ -59,38 +59,19 @@ public class HintController : MonoBehaviour
 
 
 		public void ProvideHint (Problem currProblem)
-		{      //maybe make this a couroutine that can "iterate" thru each hint step
-				//each of which is an audio file, except for the last which involves a visual change as wellS
-				
-		//userInputRouter.DisplayLettersOf (currProblem.TargetWord (false));
+		{      
+	    
+			switch (currHintIdx) {
+					case 0:
+							currProblem.PlaySoundedOutWord ();
+							break;
 
-		       
-				switch (currHintIdx) {
-				case 0:
-						currProblem.PlaySoundedOutWord ();
-						//AudioSourceController.PushClip (sound_out_word);
-						break;
+				case 1: //level two hint
 
-		case 1: //level two hint
-
-			UserInputRouter.instance.BlockAllUIInput ();
-			ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
-			StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
-
-
-						//currProblem.PlaySoundedOutWord ();
-
-			/*
-						studentActivityController.EnterGuidedLetterPlacementMode();
-						targetLetters = studentActivityController.TargetLetters;
-						StringBuilder blanksSB = new StringBuilder();
-						for(int i=0;i<targetLetters.Length;i++){
-							blanksSB.Append(" ");
-						}
-						UserInputRouter.instance.DisplayLettersOf(blanksSB.ToString());
-						targetLetterIndex = 0;
-						studentActivityController.SkipToNextLetterToHint();*/
-						break;
+					UserInputRouter.instance.BlockAllUIInput ();
+					ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
+					StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
+					break;
 				}
 			
 
@@ -101,21 +82,26 @@ public class HintController : MonoBehaviour
 
 
 			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
-				int letterindex = 0;
-				while(letterindex < studentActivityController.TargetLetters.Length){
-					LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
-					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters[letterindex]);
-					ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
+				int letterindex = -1;
+				int numLetters = studentActivityController.TargetLetters.Length;
+				while(true){
 					letterindex++;
-					yield return new WaitForSeconds (letterindex < studentActivityController.TargetLetters.Length - 1 ? 2 : 5 );
+					if (letterindex > numLetters) break;
+					if (letterindex == numLetters)
+						yield return new WaitForSeconds (5);
+					else {
+						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
+						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters [letterindex]);
+						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
+						yield return new WaitForSeconds (2);
+					}
 				}
-		          
 				UserInputRouter.instance.UnBlockAllUIInput();
 				ArduinoLetterController.instance.PlaceWordInLetterGrid (studentActivityController.UserChangesAsString);
 				ArduinoLetterController.instance.RevertLettersToDefaultColour ();
 			}
 
-		   public void DisplayAndPlaySoundOfCurrentTargetLetter(){
+		   /*public void DisplayAndPlaySoundOfCurrentTargetLetter(){
 		   if (targetLetterIndex < targetLetters.Length) {
 						string next = targetLetters.Substring (0, targetLetterIndex + 1);
 						UserInputRouter.instance.DisplayLettersOf (next);
@@ -123,7 +109,7 @@ public class HintController : MonoBehaviour
 						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
 						AudioSourceController.PushClip (targetSound);
 				}
-			}
+			}*/
 
 		public void AdvanceTargetLetter(){
 			targetLetterIndex++;

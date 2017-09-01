@@ -4,11 +4,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-//to do... a more elegant way of handling different modes 
-//versus just swirtching out things like this.
-
-
-//...misnamed. is going to be the global controller.
+/*
+ * 
+ * the main purpose of this class is to block user inputs when UI feedback not allowed (e.g., when in level 2 hint- showing the 
+ * child all of the correct letters one at a time) and to decide which objects to delegate control to.
+ * this class needs to be eliminated and replaced with global state/events.
+ * 
+ * */
 public class UserInputRouter : MonoBehaviour
 {
 		static readonly string RESOURCES_WORD_IMAGE_PATH = "WordImages/";
@@ -41,12 +43,10 @@ public class UserInputRouter : MonoBehaviour
 		public GameObject checkedWordImageControllerGO;
 		public GameObject hintButtonGO;
 		public SessionsDirector sessionManager;
-		//public ArduinoAffixLetterController arduinoAndAffixLetterController;
 		public ArduinoLetterController arduinoLetterController;
 		UserStarGridController userStarController;
 		public WordHistoryController wordHistoryController;
 		public ArduinoUnityInterface arduinoLetterInterface;
-		//public ScreenKeyboardController screenKeyboardController;
 		public CheckedWordImageController checkedWordImageController;
 		public StudentActivityController studentActivityController;
 		bool acceptUIInput = true;
@@ -285,16 +285,6 @@ public class UserInputRouter : MonoBehaviour
 						selectTimer = -1;
 
 				}
-
-		/*
-	        if (hintLetterTimer > 0) hintLetterTimer--;
-	        if(hintLetterTimer==0)
-	        {
-				arduinoLetterController.PlaceWordInLetterGrid(studentActivityController.UserChangesAsString);
-	            arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters(true);
-	            //replace colours and letters that are there
-	            hintLetterTimer = -1;
-	        }*/
 
 		}
 
