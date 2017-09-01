@@ -18,14 +18,6 @@ public class InteractiveLetter : MonoBehaviour
 				}
 		}
 
-		bool isLocked = false;
-
-		public bool IsLocked {
-				get {
-						return isLocked;
-				}
-		}
-
 		bool isSelected = false;
 
 		public bool Selected {
@@ -62,7 +54,21 @@ public class InteractiveLetter : MonoBehaviour
 		BoxCollider trigger;
 		LetterSoundComponent lc;
 		int flashCounter = 0;
-		const int defaultTimesToFlash = 1;
+		Color[] flashColors = new Color[2];
+		public void SetFlashColors(Color a, Color b){
+			flashColors [0] = a;
+			flashColors [1] = b;
+		}
+		float[] flashDurations = new float[2];
+		public void SetFlashDurations(float a, float b){
+			flashDurations [0] = a;
+			flashDurations [1] = b;
+		}
+		int numFlashCycles;
+		public void SetNumFlashCycles(int numFlashCycles){
+			this.numFlashCycles = numFlashCycles;
+		}
+
 
 		const int NOT_AN_ARDUINO_CONTROLLED_LETTER = -1;
 		int idxAsArduinoControlledLetter = NOT_AN_ARDUINO_CONTROLLED_LETTER; //i.e., if it's a word history controlled letter. you have to "opt in" to be an arduino controlled letter.
@@ -136,35 +142,18 @@ public class InteractiveLetter : MonoBehaviour
 				return letter [0] == ' ';
 		}
 
-	private IEnumerator Flash(Color flashColor, int timesToFlash = defaultTimesToFlash){
-		timesToFlash *= 2;//i.e. times to appear in the flash color. since switching back to default color requires another
-		//invocation of the couroutine, must iterate twice as many times as requested times to flash
-		int default_color_mod = ((timesToFlash-1) % 2); //ensure that we always end on the new default color.
-		
-		while (flashCounter<timesToFlash) {
-			bool showingDefaultColor = flashCounter % 2 == default_color_mod;
-				if (showingDefaultColor) {
-				UpdateDisplayColour (defaultColour);
-			} else {
-				UpdateDisplayColour (flashColor);
-			}
-			flashCounter++;
-			
-			yield return new WaitForSeconds (showingDefaultColor ? 
-				TimingParameters.FLASH_DURATION_OF_DEFAULT_COLOR : 
-				TimingParameters.FLASH_DURATION_OF_FLASH_COLOR);
-		}
-		
-		flashCounter = 0;
-
-		}
-
-	//todo use this version after refactoring how the color cues work
-	private IEnumerator Flash(Color a, Color b, float durationA, float durationB, int numCycles){
-		int timesToFlash = numCycles * 2;//i.e. times to appear in the flash color. since switching back to default color requires another
+	public void StartFlash(){
+		IEnumerator coroutine = Flash();
+		StartCoroutine (coroutine);
+	}
+	private IEnumerator Flash(){
+		int timesToFlash = numFlashCycles * 2;//i.e. times to appear in the flash color. since switching back to default color requires another
 		//invocation of the couroutine, must iterate twice as many times as requested times to flash
 		float durationOfFlash;
-
+		Color a = flashColors [0];
+		Color b = flashColors [1];
+		float durationA = flashDurations [0];
+		float durationB = flashDurations [1];
 		while (flashCounter<timesToFlash) {
 
 			if (flashCounter % 2 == 0) {
@@ -182,14 +171,7 @@ public class InteractiveLetter : MonoBehaviour
 		UpdateDisplayColour (defaultColour);
 		flashCounter = 0;
 	}
-
-		public void StartFlash (Color flashOff, int timesToFlash = defaultTimesToFlash)
-		{      
-			IEnumerator coroutine = Flash (flashOff, timesToFlash);
-			StartCoroutine (coroutine);
-			
-		}
-
+		
 		public void UpdateDisplayColour (UnityEngine.Color c_)
 		{
 

@@ -227,7 +227,7 @@ public class StudentActivityController : MonoBehaviour
 			char actualChar = usersMostRecentChanges[atPosition];
 			return (int)actualChar != 32 && targetChar != actualChar;
 			}
-		return false;
+			return false;
 	    }
 
 		bool PositionIsOutsideBoundsOfTargetWord (int wordRelativeIndex)

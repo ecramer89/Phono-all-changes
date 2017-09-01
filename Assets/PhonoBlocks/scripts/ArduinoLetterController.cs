@@ -280,10 +280,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				int indexOfLetterBarCell = startingIndexOfUserLetters;
 
 				foreach (LetterSoundComponent p in letterSoundComponents) {
-				
-			            
-						if (indexOfLetterBarCell <= endingIndexOfUserLetters) { //no longer required because I fixed the bug in the LCFactoryManager that caused the error, but I'm leaving this here for redundant error protection...
-
+			
 								if (p is LetterSoundComposite) {
 										LetterSoundComposite l = (LetterSoundComposite)p;
 										foreach (LetterSoundComponent lc in l.Children) {
@@ -298,7 +295,7 @@ public class ArduinoLetterController : MonoBehaviour{
 										indexOfLetterBarCell++;
 								}
 
-						}
+						
 				}
 		}
 
@@ -346,14 +343,13 @@ public class ArduinoLetterController : MonoBehaviour{
 				     newLetter, lc, indexOfLetterBarCell, parent);
 				}
 
-		       //need to flash if the letter sound component that the interactive letter represents has changed from before.
-				letterGridController.UpdateLetter (indexOfLetterBarCell, newDefaultColor); 
+		     
 		        asInteractiveLetter.LetterSoundComponentIsPartOf = parent != null ? parent : lc; 
 
 		      //flash only if letter is new and not a blank
 			        
-			    if (flash && letterIsNew && !asInteractiveLetter.IsBlank()) {
-						asInteractiveLetter.StartFlash (flashColor, timesToFlash);
+				if (letterIsNew && newLetter != ' ') {
+						asInteractiveLetter.StartFlash ();
 				}
 
 
@@ -428,10 +424,10 @@ public class ArduinoLetterController : MonoBehaviour{
 
 				if(studentActivityController.IsErroneous(indexOfLetterBarCell)){
 						Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors();
-						newDefaultColor = errorColors[0];
-						flashColor = errorColors[1];
-						flash = letterIsNew;
-						timesToFlash=TimingParameters.TIMES_TO_FLASH_ERRORNEOUS_LETTER;
+						letterGrid.UpdateLetter (indexOfLetterBarCell, errorColors[0]); 
+						asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
+						asInteractiveLetter.SetFlashDurations (1, 1);
+						asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
 						return;
 				} 
 
@@ -443,24 +439,22 @@ public class ArduinoLetterController : MonoBehaviour{
 		          if (targetComponent != null && targetComponent.IsComposite()) {
 						if(parent != null && targetComponent.AsString.Equals(parent.AsString) || 
 							(SessionsDirector.instance.IsMagicERule && studentActivityController.IsSubmissionCorrect())) {
-							flash = true;
-							timesToFlash = TimingParameters.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME;
-						
+							letterGrid.UpdateLetter (indexOfLetterBarCell, newDefaultColor); 
+							asInteractiveLetter.SetFlashColors (newDefaultColor, SessionsDirector.colourCodingScheme.GetColorsForOff());
+							asInteractiveLetter.SetFlashDurations (1, .5f);
+							asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
 						    return;
 							
 						}
 
-
-					newDefaultColor = SessionsDirector.instance.
-						CurrentActivityColorRules.GetColorForPortionOfTargetComposite ();
+					letterGrid.UpdateLetter (indexOfLetterBarCell, SessionsDirector.instance.CurrentActivityColorRules.GetColorForPortionOfTargetComposite ()); 
 
 					//If it isn't blends, then should flash.
 					//todo abstract this into the color coding scheme as well.
 					if (!SessionsDirector.instance.IsConsonantBlends) {
-						//todo abstract flashing decisions into the color scheme
-						flash = true;
-						flashColor = targetComponent.GetColour ();
-						timesToFlash = TimingParameters.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME;
+						asInteractiveLetter.SetFlashColors (newDefaultColor, targetComponent.GetColour ());
+						asInteractiveLetter.SetFlashDurations (.5f, 1);
+						asInteractiveLetter.SetNumFlashCycles (TimingParameters.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME);
 					}
 				}
 
