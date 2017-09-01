@@ -149,8 +149,8 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 
 		public void ChangeDisplayColourOfASingleCell (int atPosition, Color newColour)
-		{
-				letterGrid.UpdateLetter (atPosition, newColour, false);
+	{       
+		letterGrid.GetInteractiveLetter (atPosition).UpdateDisplayColour (newColour);
 		}
 
 		void ChangeTheImageOfASingleCell (int atPosition, Texture2D newImage)

@@ -142,41 +142,13 @@ public class LetterGridController : MonoBehaviour
 						letterUnderlinesGrid.GetComponent<UIGrid> ().Reposition ();
 			
 		}
-
-		/*public void SetAllLettersToBlank ()
-		{
-				SetLettersToBlank (0, transform.childCount);
-		}*/
-
-		/*public void SetLettersToBlank (int startingFrom, int number)
-		{
-				for (int i=startingFrom; i<startingFrom+number; i++) {
-						UpdateLetter (i, " ", Color.white);
-			
-				}
-
-
-		}*/
 		
+
 	public Texture2D GetAppropriatelyScaledImageForLetter(String letter){
-		return CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
+		return letter == " " ? blankLetter : CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
 
 	}
 
-		/*public InteractiveLetter UpdateLetter (int position, String letter, Color newNonLockColour)
-		{
-				
-				InteractiveLetter l = GetInteractiveLetter (position);
-				bool attemptErasure = letter.Equals (" ");
-	
-				Texture2D letterImage = CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
-				l.UpdateInputLetterAndInputDerivedColor (letter, letterImage, newNonLockColour);
-			
-
-			
-				return l;
-		
-		}*/
 
 		public UITexture CreateLetterHighlightCell ()
 		{
@@ -201,31 +173,6 @@ public class LetterGridController : MonoBehaviour
 				
 		}
 
-		/*public InteractiveLetter UpdateLetter (int position, String letter)
-		{     
-				return UpdateLetter (position, letter, Color.white);
-
-		}*/
-
-		public InteractiveLetter UpdateLetter (int position, Color c, bool isNewDefault=true)
-		{
-				
-				InteractiveLetter l = GetInteractiveLetter (position);
-				if (isNewDefault)
-						l.UpdateDefaultColour (c);
-						l.UpdateDisplayColour (c);
-				return l;
-
-		}
-
-		public InteractiveLetter UpdateLetterImage (int position, Texture2D img)
-		{
-
-				InteractiveLetter l = GetInteractiveLetter (position);
-				l.UpdateDisplayImageButNotInputLetter (img);
-				return l;
-
-		}
 
 		public InteractiveLetter GetInteractiveLetter (int position)
 		{

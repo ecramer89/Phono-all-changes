@@ -85,9 +85,12 @@ public class WordHistoryController : MonoBehaviour
 		public void ClearWordHistory ()
 		{
 				words.Clear ();
-				//lettersOfWordInHistory.SetAllLettersToBlank ();
-
-
+				//set the letter and display color of each word in history to blank
+				List<InteractiveLetter> letters = lettersOfWordInHistory.GetLetters (false);
+				foreach (InteractiveLetter letter in letters) {
+					letter.UpdateInputLetterAndInputDerivedColor (" ", 
+				    lettersOfWordInHistory.GetAppropriatelyScaledImageForLetter(" "), Color.white);
+				}
 		}
 
 		Word CreateNewWordAndAddToList (string newWordAsString)
