@@ -200,16 +200,17 @@ public class UserInputRouter : MonoBehaviour
 		
 		//called by the check word button.
 		public void RequestCheckWord ()
-		{
+	{     
 				if (acceptUIInput) {
-						//if (arduinoLetterController.NoUserControlledLetters ())
-								return;
+				
 						if (TeacherMode ()) {
 								AddCurrentWordToHistory (true);
-						} else 
-								studentActivityController.HandleSubmittedAnswer ();
+			} else {
+				
+							studentActivityController.HandleSubmittedAnswer ();
 				}
 		}
+	}
 
 		public void AddCurrentWordToHistory (bool playSoundsAndShowImage)
 		{

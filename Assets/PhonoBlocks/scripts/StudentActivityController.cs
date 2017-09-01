@@ -293,8 +293,14 @@ public class StudentActivityController : MonoBehaviour
 				return wordRelativeIndex >= currProblem.TargetWord (true).Length; 
 		}
 
-		public virtual void HandleSubmittedAnswer ()
-		{      if (state == State.MAIN_ACTIVITY || state == State.HINT_PLACE_EACH_LETTER) {
+		public void HandleSubmittedAnswer ()
+		{      
+
+
+
+		Debug.Log("called handle submitted answer");
+
+		if (state == State.MAIN_ACTIVITY || state == State.HINT_PLACE_EACH_LETTER) {
 						StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, currProblem.TargetWord (false));
 				
 						currProblem.IncrementTimesAttempted ();
