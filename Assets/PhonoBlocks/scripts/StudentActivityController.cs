@@ -173,6 +173,10 @@ public class StudentActivityController : MonoBehaviour
 			return targetComponent != null && targetComponent.IsComposite();
 		};
 
+		//the vowel needs to be correct; the e needs to be there; there needs to be two consonants but it doesn't matter what they are
+		//if the regex matches vowel consonant e regex and if 
+		//the match to vowel regex matches target vowel and if
+
 		Func<bool> childInstantiatedTargetSpellingRule = () => {
 			return (parent != null && parent.Equals(targetComponent) || 
 					(SessionsDirector.instance.IsMagicERule && IsSubmissionCorrect()));
