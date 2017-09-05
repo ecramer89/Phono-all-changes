@@ -259,23 +259,20 @@ public class StudentActivityController : MonoBehaviour
 					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
 					arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
 					break;
-		case State.FORCE_CORRECT_LETTER_PLACEMENT:
-			InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);
-				if (IsErroneous (atPosition)) {
-					Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors ();
-					asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors [0]);
-					asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
-					asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
-					asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
-				} else {
-					//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
-					asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
-				}
-					break;
-				}
-				
-				
-
+				case State.FORCE_CORRECT_LETTER_PLACEMENT:
+					InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);
+					if (IsErroneous (atPosition)) {
+						Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors ();
+						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors [0]);
+						asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
+						asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
+						asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
+					} else {
+						//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
+						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
+					}
+						break;
+					}
 		}
 		
 
@@ -304,8 +301,7 @@ public class StudentActivityController : MonoBehaviour
 						currProblem.IncrementTimesAttempted ();
 	
 						if (IsSubmissionCorrect ()) {
-								//TO DO!!! then if this was the first time that student submitted an answer (get the data from the current student object)
-								//then play the good hint else play the less good hint
+
 								AudioSourceController.PushClip (correctSoundEffect);
 								if (currProblem.TimesAttempted > 1)
 										AudioSourceController.PushClip (youDidIt);
@@ -324,21 +320,25 @@ public class StudentActivityController : MonoBehaviour
 
 		protected void HandleIncorrectAnswer ()
 		{
-				
+		
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
 			    //allow the user to access a hint.
-				hintController.ActivateHintButton ();
-				AudioSourceController.PushClip (offerHint);
-				
+				switch(state){
+				case State.MAIN_ACTIVITY:
+					hintController.ActivateHintButton ();
+					AudioSourceController.PushClip (offerHint);
+					break;
+				case State.FORCE_CORRECT_LETTER_PLACEMENT:
+					break;
+			
+				}
 
 		}
 
 		public void CurrentProblemCompleted (bool userSubmittedCorrectAnswer)
 		{
 			
-
-
 				currProblem.SetTargetWordToEmpty ();
 				UserInputRouter.instance.AddCurrentWordToHistory (false);
 	
