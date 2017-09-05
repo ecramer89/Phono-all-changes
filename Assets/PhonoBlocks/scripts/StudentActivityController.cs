@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System;
+using System.Linq;
 
 public class StudentActivityController : MonoBehaviour
 {
@@ -10,7 +11,8 @@ public class StudentActivityController : MonoBehaviour
 		enum State
 		{
 				MAIN_ACTIVITY,
-		        FORCE_CORRECT_LETTER_PLACEMENT
+		        FORCE_CORRECT_LETTER_PLACEMENT,
+		        REMOVE_ALL_LETTERS
 			
 		}
 
@@ -20,7 +22,7 @@ public class StudentActivityController : MonoBehaviour
 			state = State.FORCE_CORRECT_LETTER_PLACEMENT;
 
 		}
-
+		
 
 		HintController hintController;
 		ArduinoLetterController arduinoLetterController;
@@ -67,6 +69,10 @@ public class StudentActivityController : MonoBehaviour
 	
 				}
 
+		}
+
+		bool allUserControlledLettersAreBlank(){
+			return usersMostRecentChanges.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
 		}
 
 		public void Initialize (GameObject hintButton, ArduinoLetterController arduinoLetterController)
@@ -235,7 +241,6 @@ public class StudentActivityController : MonoBehaviour
 						StudentsDataHandler.instance.UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs ();
 						AudioSourceController.PushClip (triumphantSoundForSessionDone);
 						
-				
 				} else {
 						SetUpNextProblem ();
 				}
@@ -272,6 +277,11 @@ public class StudentActivityController : MonoBehaviour
 						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
 					}
 						break;
+				case State.REMOVE_ALL_LETTERS:
+					if (letter != ' ')
+						return;
+						arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+						break;
 					}
 		}
 		
@@ -295,32 +305,39 @@ public class StudentActivityController : MonoBehaviour
 
 		public void HandleSubmittedAnswer ()
 		{     
+			if (state == State.REMOVE_ALL_LETTERS) {
+			   //go to next problem if all the letters were removed.
+				if(allUserControlledLettersAreBlank()) {
+					HandleEndOfActivity ();
+				}
+				
+			} else {
+				StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, currProblem.TargetWord (false));
+					
+				currProblem.IncrementTimesAttempted ();
+		
+				if (IsSubmissionCorrect ()) {
 
-						StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, currProblem.TargetWord (false));
-				
-						currProblem.IncrementTimesAttempted ();
-	
-						if (IsSubmissionCorrect ()) {
-
-								AudioSourceController.PushClip (correctSoundEffect);
-								if (currProblem.TimesAttempted > 1)
-										AudioSourceController.PushClip (youDidIt);
-								else
-										AudioSourceController.PushClip (excellent);
-								currProblem.PlayAnswer ();
-								CurrentProblemCompleted (true);
-				
-						} else {
-								HandleIncorrectAnswer ();				
-				
-						}
+					AudioSourceController.PushClip (correctSoundEffect);
+					if (currProblem.TimesAttempted > 1)
+						AudioSourceController.PushClip (youDidIt);
+					else
+						AudioSourceController.PushClip (excellent);
+					currProblem.PlayAnswer ();
+					CurrentProblemCompleted (true);
+					
+				} else {
+					HandleIncorrectAnswer ();				
+					
+				}
+			}
 				
 
 		}
 
 		protected void HandleIncorrectAnswer ()
 		{
-		
+		       
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
 			    //allow the user to access a hint.
@@ -339,10 +356,8 @@ public class StudentActivityController : MonoBehaviour
 		public void CurrentProblemCompleted (bool userSubmittedCorrectAnswer)
 		{
 			
-				currProblem.SetTargetWordToEmpty ();
+			   
 				UserInputRouter.instance.AddCurrentWordToHistory (false);
-	
-		   
 				UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
 
 				bool solvedOnFirstTry = currProblem.TimesAttempted == 1;
@@ -351,13 +366,13 @@ public class StudentActivityController : MonoBehaviour
 						UserInputRouter.instance.DisplayNewStarOnScreen (ProblemsRepository.instance.ProblemsCompleted-1);
 
 				}
-
-
+			
 				StudentsDataHandler.instance.RecordActivitySolved (userSubmittedCorrectAnswer, UserChangesAsString, solvedOnFirstTry);
 			
 				StudentsDataHandler.instance.SaveActivityDataAndClearForNext (currProblem.TargetWord (false), currProblem.InitialWord);
-
-
+		        
+		     
+				state = State.REMOVE_ALL_LETTERS;
       
 		}
 
