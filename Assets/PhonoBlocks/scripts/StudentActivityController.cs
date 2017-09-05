@@ -9,11 +9,17 @@ public class StudentActivityController : MonoBehaviour
 
 		enum State
 		{
-				MAIN_ACTIVITY
+				MAIN_ACTIVITY,
+		        FORCE_CORRECT_LETTER_PLACEMENT
 			
 		}
 
 		State state = State.MAIN_ACTIVITY;
+
+		public void EnterForcedCorrectLetterPlacementMode(){
+			state = State.FORCE_CORRECT_LETTER_PLACEMENT;
+
+		}
 
 
 		HintController hintController;
@@ -240,14 +246,7 @@ public class StudentActivityController : MonoBehaviour
 		public void UserRequestsHint ()
 		{
 		    hintController.ProvideHint (currProblem);
-
-
-			/*if (hintController.UsedLastHint ()) {
-				currProblem.PlayAnswer ();
-				arduinoLetterController.PlaceWordInLetterGrid (currProblem.TargetWord (false));
-			} else {
-				hintController.ProvideHint (currProblem);
-			}*/
+	
 
 		}
 
@@ -255,8 +254,27 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleNewArduinoLetter (char letter, int atPosition)
 	    {    
 				RecordUsersChange (atPosition, letter); 
-				arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-				arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
+				switch (state) {
+				case State.MAIN_ACTIVITY:
+					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+					arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
+					break;
+		case State.FORCE_CORRECT_LETTER_PLACEMENT:
+			InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);
+				if (IsErroneous (atPosition)) {
+					Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors ();
+					asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors [0]);
+					asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
+					asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
+					asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
+				} else {
+					//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
+					asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
+				}
+					break;
+				}
+				
+				
 
 		}
 		
@@ -281,7 +299,6 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleSubmittedAnswer ()
 		{     
 
-		if (state == State.MAIN_ACTIVITY) {
 						StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, currProblem.TargetWord (false));
 				
 						currProblem.IncrementTimesAttempted ();
@@ -301,7 +318,7 @@ public class StudentActivityController : MonoBehaviour
 								HandleIncorrectAnswer ();				
 				
 						}
-				}
+				
 
 		}
 

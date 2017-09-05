@@ -306,6 +306,9 @@ public class ArduinoLetterController : MonoBehaviour{
 				}
 		}
 
+		public InteractiveLetter GetInteractiveLetterAt(int position){
+		return letterGrid.GetInteractiveLetter (position);
+		}
 
 
 		void UpdateInterfaceLetter (

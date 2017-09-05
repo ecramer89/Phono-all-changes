@@ -61,16 +61,16 @@ public class HintController : MonoBehaviour
 					StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
 					break;
 
-					case 2: //level three hint
-						currProblem.PlayAnswer();
-						UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
-			            //place the target letters and colors in the grid
-					for(int letterIndex = 0; letterIndex < studentActivityController.TargetLetters.Length; letterIndex++){
-						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
-						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, studentActivityController.TargetLetters [letterIndex]);
-						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());
-					 }
-
+		case 2: //level three hint
+				currProblem.PlayAnswer ();
+				UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
+				            //place the target letters and colors in the grid
+				for (int letterIndex = 0; letterIndex < studentActivityController.TargetLetters.Length; letterIndex++) {
+					LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
+					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, studentActivityController.TargetLetters [letterIndex]);
+					ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());
+				}
+				studentActivityController.EnterForcedCorrectLetterPlacementMode ();
 					break;
 				}
 
