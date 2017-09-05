@@ -8,8 +8,7 @@ public class HintController : MonoBehaviour
 		public AudioClip sound_out_word;
 		GameObject hintButton;
 		int currHintIdx = 0;
-		public const int NUM_HINTS = 2;
-
+		const int NUM_HINTS=3;
 
 		public void Initialize (GameObject hintButton)
 		{
@@ -47,30 +46,32 @@ public class HintController : MonoBehaviour
 
 		public void ProvideHint (Problem currProblem)
 		{      
-	    
+			if (currHintIdx >= NUM_HINTS)
+				return;
+
+
 			switch (currHintIdx) {
 					case 0:
-			Debug.Log ("level 1 hint");
 							currProblem.PlaySoundedOutWord ();
-							break;
+					break;
 
 				    case 1: //level two hint
 
-					UserInputRouter.instance.BlockAllUIInput ();
-					ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
-					StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
+						UserInputRouter.instance.BlockAllUIInput ();
+						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
+						StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
 					break;
 
-		case 2: //level three hint
-				currProblem.PlayAnswer ();
-				UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
-				            //place the target letters and colors in the grid
-				for (int letterIndex = 0; letterIndex < studentActivityController.TargetLetters.Length; letterIndex++) {
-					LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
-					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, studentActivityController.TargetLetters [letterIndex]);
-					ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());
-				}
-				studentActivityController.EnterForcedCorrectLetterPlacementMode ();
+					case 2: //level three hint
+						currProblem.PlayAnswer ();
+						UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
+					            //place the target letters and colors in the grid
+						for (int letterIndex = 0; letterIndex < studentActivityController.TargetLetters.Length; letterIndex++) {
+							LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
+							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, studentActivityController.TargetLetters [letterIndex]);
+							ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());
+						}
+						studentActivityController.EnterForcedCorrectLetterPlacementMode ();
 					break;
 				}
 
@@ -85,10 +86,9 @@ public class HintController : MonoBehaviour
 
 
 			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
-		Debug.Log ("level 2 hint");
 				int letterindex = -1;
 				int numLetters = studentActivityController.TargetLetters.Length;
-				while(false){
+				while(true){
 					letterindex++;
 					if (letterindex > numLetters) break;
 					if (letterindex == numLetters)
@@ -111,16 +111,6 @@ public class HintController : MonoBehaviour
 			}
 
 
-		public bool UsedLastHint ()
-		{
-				return currHintIdx == NUM_HINTS;
-		}
-	
-		public bool OnLastHint ()
-		{
-		
-				return currHintIdx == NUM_HINTS - 1;
-		}
 
 
 
