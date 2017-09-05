@@ -7,20 +7,9 @@ public class HintController : MonoBehaviour
 		StudentActivityController studentActivityController;
 		public AudioClip sound_out_word;
 		GameObject hintButton;
-		int currHintIdx = -1;
+		int currHintIdx = 0;
 		public const int NUM_HINTS = 2;
 
-	    //for guided letter placement mode
-		string targetLetters="";
-	    public int NumTargetLetters{
-		get { return targetLetters.Length;}
-		}
-		string blanks="";
-		AudioClip[] targetLetterSounds;
-		int targetLetterIndex=0;
-		public int TargetLetterIndex {
-				get { return targetLetterIndex;}
-		}
 
 		public void Initialize (GameObject hintButton)
 		{
@@ -31,10 +20,8 @@ public class HintController : MonoBehaviour
 
 		public void Reset ()
 		{
-				currHintIdx = -1;
-				targetLetters = "";
-				targetLetterSounds = null;
-				targetLetterIndex=0;
+				currHintIdx = 0;
+	
 		}
 
 		public void DeActivateHintButton ()
@@ -63,16 +50,32 @@ public class HintController : MonoBehaviour
 	    
 			switch (currHintIdx) {
 					case 0:
+			Debug.Log ("level 1 hint");
 							currProblem.PlaySoundedOutWord ();
 							break;
 
-				case 1: //level two hint
+				    case 1: //level two hint
 
 					UserInputRouter.instance.BlockAllUIInput ();
 					ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
 					StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
 					break;
+
+					case 2: //level three hint
+						currProblem.PlayAnswer();
+						UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
+			            //place the target letters and colors in the grid
+					for(int letterIndex = 0; letterIndex < studentActivityController.TargetLetters.Length; letterIndex++){
+						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
+						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, studentActivityController.TargetLetters [letterIndex]);
+						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());
+					 }
+
+					break;
 				}
+
+				currHintIdx++;
+				DeActivateHintButton ();
 			
 
 				StudentsDataHandler.instance.LogEvent ("requested_hint", currHintIdx + "", "NA");
@@ -82,9 +85,10 @@ public class HintController : MonoBehaviour
 
 
 			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
+		Debug.Log ("level 2 hint");
 				int letterindex = -1;
 				int numLetters = studentActivityController.TargetLetters.Length;
-				while(true){
+				while(false){
 					letterindex++;
 					if (letterindex > numLetters) break;
 					if (letterindex == numLetters)
@@ -93,6 +97,11 @@ public class HintController : MonoBehaviour
 						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters [letterindex]);
 						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
+						/* play sound of target letter
+						 * string pathTo = "audio/sounded_out_words/" + targetLetters + "/" + targetLetters [targetLetterIndex];
+								AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
+								AudioSourceController.PushClip (targetSound);
+						 * */
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
@@ -101,19 +110,6 @@ public class HintController : MonoBehaviour
 				ArduinoLetterController.instance.RevertLettersToDefaultColour ();
 			}
 
-		   /*public void DisplayAndPlaySoundOfCurrentTargetLetter(){
-		   if (targetLetterIndex < targetLetters.Length) {
-						string next = targetLetters.Substring (0, targetLetterIndex + 1);
-						UserInputRouter.instance.DisplayLettersOf (next);
-						string pathTo = "audio/sounded_out_words/" + targetLetters + "/" + targetLetters [targetLetterIndex];
-						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
-						AudioSourceController.PushClip (targetSound);
-				}
-			}*/
-
-		public void AdvanceTargetLetter(){
-			targetLetterIndex++;
-		}
 
 		public bool UsedLastHint ()
 		{
@@ -126,12 +122,6 @@ public class HintController : MonoBehaviour
 				return currHintIdx == NUM_HINTS - 1;
 		}
 
-		public void AdvanceHint ()
-		{
-
-				if (currHintIdx < NUM_HINTS)
-						currHintIdx++;
-		}
 
 
 }

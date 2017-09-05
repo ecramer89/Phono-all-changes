@@ -9,16 +9,11 @@ public class StudentActivityController : MonoBehaviour
 
 		enum State
 		{
-				MAIN_ACTIVITY,
-				REMOVE_ALL_LETTERS,
-				HINT_PLACE_EACH_LETTER
+				MAIN_ACTIVITY
 			
 		}
 
 		State state = State.MAIN_ACTIVITY;
-		public void EnterGuidedLetterPlacementMode(){
-			state = State.HINT_PLACE_EACH_LETTER;
-		}
 
 
 		HintController hintController;
@@ -244,12 +239,15 @@ public class StudentActivityController : MonoBehaviour
 
 		public void UserRequestsHint ()
 		{
-				if (hintController.UsedLastHint ()) {
-						currProblem.PlayAnswer ();
-						arduinoLetterController.PlaceWordInLetterGrid (currProblem.TargetWord (false));
-						CurrentProblemCompleted (false);
-				} else 
-						hintController.ProvideHint (currProblem);
+		    hintController.ProvideHint (currProblem);
+
+
+			/*if (hintController.UsedLastHint ()) {
+				currProblem.PlayAnswer ();
+				arduinoLetterController.PlaceWordInLetterGrid (currProblem.TargetWord (false));
+			} else {
+				hintController.ProvideHint (currProblem);
+			}*/
 
 		}
 
@@ -280,13 +278,9 @@ public class StudentActivityController : MonoBehaviour
 		}
 
 		public void HandleSubmittedAnswer ()
-		{      
+		{     
 
-
-
-		Debug.Log("called handle submitted answer");
-
-		if (state == State.MAIN_ACTIVITY || state == State.HINT_PLACE_EACH_LETTER) {
+		if (state == State.MAIN_ACTIVITY) {
 						StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, currProblem.TargetWord (false));
 				
 						currProblem.IncrementTimesAttempted ();
@@ -314,22 +308,18 @@ public class StudentActivityController : MonoBehaviour
 		{
 				
 				AudioSourceController.PushClip (incorrectSoundEffect);
+				AudioSourceController.PushClip (notQuiteIt);
+			    //allow the user to access a hint.
+				hintController.ActivateHintButton ();
+				AudioSourceController.PushClip (offerHint);
 				
-				if (!hintController.HintButtonActive ()) {
-						hintController.ActivateHintButton ();
-						AudioSourceController.PushClip (notQuiteIt);
-						AudioSourceController.PushClip (offerHint);
-				}
-
-				hintController.AdvanceHint ();
 
 		}
 
 		public void CurrentProblemCompleted (bool userSubmittedCorrectAnswer)
 		{
 			
-		     
-				state = State.REMOVE_ALL_LETTERS;
+
 
 				currProblem.SetTargetWordToEmpty ();
 				UserInputRouter.instance.AddCurrentWordToHistory (false);
