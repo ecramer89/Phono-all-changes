@@ -244,12 +244,12 @@ public class UserInputRouter : MonoBehaviour
 	{       if (!acceptUIInput)
 			return;
 
-				if (sessionManager != null && SessionsDirector.IsStudentMode)
-			
-						studentActivityController.HandleNewArduinoLetter (newLetter, atPosition);
-				else 
-
-						arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
+		if (sessionManager != null && SessionsDirector.IsStudentMode)
+			studentActivityController.HandleNewArduinoLetter (newLetter, atPosition);
+		else {
+			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, newLetter);
+			arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
+		}
 
 		}
 

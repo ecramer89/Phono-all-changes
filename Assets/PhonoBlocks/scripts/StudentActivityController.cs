@@ -255,6 +255,7 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleNewArduinoLetter (char letter, int atPosition)
 	    {    
 				RecordUsersChange (atPosition, letter); 
+				arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
 				arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
 
 		}

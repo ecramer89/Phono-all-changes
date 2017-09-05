@@ -107,7 +107,6 @@ public class ArduinoLetterController : MonoBehaviour{
 				if (atPosition < maxUserLetters && atPosition >= StartingIndex) {
 						if (IsUpper (newLetter))
 								newLetter = ToLower (newLetter);
-						ChangeTheLetterOfASingleCell (atPosition, newLetter);
 						UserInputRouter.instance.HandleNewUserInputLetter (newLetter,
 			                                          atPosition, this);
 				}
