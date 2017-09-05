@@ -228,7 +228,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		{
 		
 				UserWord newLetterSoundComponents = GetNewColoursAndSoundsFromDecoder ();
-				AssignNewColoursAndSoundsToLetters (newLetterSoundComponents, letterGrid, flash);
+				AssignNewColoursAndSoundsToLetters (newLetterSoundComponents, flash);
 				return newLetterSoundComponents;
 		
 		}
@@ -281,7 +281,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				return screenIndex + 1;
 		}
 
-		void AssignNewColoursAndSoundsToLetters (UserWord letterSoundComponents, LetterGridController letterGridController, bool flash)
+		void AssignNewColoursAndSoundsToLetters (UserWord letterSoundComponents, bool flash)
 		{   
 				
 				int indexOfLetterBarCell = startingIndexOfUserLetters;
@@ -293,12 +293,12 @@ public class ArduinoLetterController : MonoBehaviour{
 										foreach (LetterSoundComponent lc in l.Children) {
 						                //the individual letters that compose a multi letter unit, for example the "b" in blend "bl"
 												
-												UpdateInterfaceLetter (lc, letterGridController, indexOfLetterBarCell, l);
+												UpdateInterfaceLetter (lc, indexOfLetterBarCell, l);
 												indexOfLetterBarCell++;
 										}
 								} else {
 									
-										UpdateInterfaceLetter (p, letterGridController, indexOfLetterBarCell);
+										UpdateInterfaceLetter (p, indexOfLetterBarCell);
 										indexOfLetterBarCell++;
 								}
 
@@ -307,18 +307,17 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 
 		public InteractiveLetter GetInteractiveLetterAt(int position){
-		return letterGrid.GetInteractiveLetter (position);
+			return letterGrid.GetInteractiveLetter (position);
 		}
 
 
 		void UpdateInterfaceLetter (
-				LetterSoundComponent asLetterSoundComponent, 
-				LetterGridController letterGridController, 
+				LetterSoundComponent asLetterSoundComponent,  
 				int indexOfLetterBarCell, 
 				LetterSoundComposite parent = null)
 	{          
 		   
-				InteractiveLetter asInteractiveLetter = letterGridController.GetInteractiveLetter (indexOfLetterBarCell);
+				InteractiveLetter asInteractiveLetter = letterGrid.GetInteractiveLetter (indexOfLetterBarCell);
 
 	
 		        bool letterIsNew = !((parent != null ? parent : asLetterSoundComponent).Equals (asInteractiveLetter.LetterSoundComponentIsPartOf));
