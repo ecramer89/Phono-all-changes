@@ -84,7 +84,6 @@ public class HintController : MonoBehaviour
 		}
 
 
-
 			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
 				int letterindex = -1;
 				int numLetters = studentActivityController.TargetLetters.Length;
@@ -97,11 +96,11 @@ public class HintController : MonoBehaviour
 						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters [letterindex]);
 						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
-						/* play sound of target letter
-						 * string pathTo = "audio/sounded_out_words/" + targetLetters + "/" + targetLetters [targetLetterIndex];
-								AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
-								AudioSourceController.PushClip (targetSound);
-						 * */
+						string pathTo = "audio/sounded_out_words/" + studentActivityController.TargetLetters + "/" 
+							+ studentActivityController.TargetLetters [letterindex];
+						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
+						AudioSourceController.PushClip (targetSound);
+					
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
