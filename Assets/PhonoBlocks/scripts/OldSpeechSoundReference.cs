@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SpeechSoundReference : MonoBehaviour
+public class OldSpeechSoundReference : MonoBehaviour
 {
 
 		public static readonly int MAX_BLEND_LENGTH = 3;

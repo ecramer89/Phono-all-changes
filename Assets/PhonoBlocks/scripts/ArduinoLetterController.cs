@@ -468,7 +468,7 @@ public class ArduinoLetterController : MonoBehaviour{
 						return true;
 				}
 
-				foreach (string s in SpeechSoundReference.Vowels()) {
+				foreach (string s in OldSpeechSoundReference.Vowels()) {
 					
 						if (Input.GetKeyDown (s)) {
 								SetTestLetter (s);
@@ -476,7 +476,7 @@ public class ArduinoLetterController : MonoBehaviour{
 						}
 				}
 
-				foreach (string s in SpeechSoundReference.Consonants()) {
+				foreach (string s in OldSpeechSoundReference.Consonants()) {
 				
 						if (Input.GetKeyDown (s)) {
 								//testLetter = s;

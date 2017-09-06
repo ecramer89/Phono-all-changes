@@ -124,10 +124,10 @@ public class SessionsDirector : MonoBehaviour
 		void Start ()
 		{     
 				instance = this;
-				SpeechSoundReference.Initialize ();
+				OldSpeechSoundReference.Initialize ();
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
-				LetterSoundComponentRegex.Test ();
+				Decoder.Decode ("game");
 
 		}
 

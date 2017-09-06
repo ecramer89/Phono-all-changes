@@ -33,10 +33,10 @@ public class LetterSoundComponentFactoryManager
 						int idx = 0;
 						foreach (char letter in letters) {
 							
-								if (SpeechSoundReference.IsVowel (letter)) {
+								if (OldSpeechSoundReference.IsVowel (letter)) {
 										result.Add (new Vowel (letter));
 
-								} else if (SpeechSoundReference.IsConsonant (letter)) {
+								} else if (OldSpeechSoundReference.IsConsonant (letter)) {
 										result.Add (new Consonant (letter));
 
 								} else
@@ -106,7 +106,7 @@ public class LetterSoundComponentFactoryManager
 
 				public List<LetterSoundComponent> ParseBlendsDigraphsAndLetters (string word)
 				{    
-						return FindUnitsOfLength (SpeechSoundReference.MAX_BLEND_LENGTH, word);
+						return FindUnitsOfLength (OldSpeechSoundReference.MAX_BLEND_LENGTH, word);
 
 				}
 
@@ -119,8 +119,8 @@ public class LetterSoundComponentFactoryManager
 						LetterSoundComponent first_syllable = null;
 						LetterSoundComponent second_syllable = null;
 						//find first syllable
-						int length_of_first_syllable = SpeechSoundReference.MAX_STABLE_SYLLABLE_LENGTH;
-						while (length_of_first_syllable>=SpeechSoundReference.MIN_STABLE_SYLLABLE_LENGTH) {
+						int length_of_first_syllable = OldSpeechSoundReference.MAX_STABLE_SYLLABLE_LENGTH;
+						while (length_of_first_syllable>=OldSpeechSoundReference.MIN_STABLE_SYLLABLE_LENGTH) {
 								if (length_of_first_syllable < word.Length) {
 										string longest_syllable = word.Substring (0, length_of_first_syllable);
 									
@@ -139,7 +139,7 @@ public class LetterSoundComponentFactoryManager
 						if (!ReferenceEquals (first_syllable, null)) {
 								int length_of_rest = word.Length - length_of_first_syllable;
 						
-								if (length_of_rest >= SpeechSoundReference.MIN_STABLE_SYLLABLE_LENGTH) {
+								if (length_of_rest >= OldSpeechSoundReference.MIN_STABLE_SYLLABLE_LENGTH) {
 										string candidate_syllable = word.Substring (length_of_first_syllable, length_of_rest);
 									
 										second_syllable = TryMakeSyllable (candidate_syllable);
@@ -162,7 +162,7 @@ public class LetterSoundComponentFactoryManager
 
 				LetterSoundComposite TryMakeSyllable (string candidate)
 				{
-						bool isSyll = SpeechSoundReference.IsStableSyllable (candidate);
+						bool isSyll = OldSpeechSoundReference.IsStableSyllable (candidate);
 						if (isSyll) {
 						
 								return StoreLettersInComposite (new StableSyllable (candidate), candidate);
@@ -219,14 +219,14 @@ public class LetterSoundComponentFactoryManager
 				LetterSoundComposite TryMakeTwoLetterSpeechSound (string candidate)
 				{
 					
-						int blendType = SpeechSoundReference.IsBlendAndWhichType (candidate);
-						if (blendType != SpeechSoundReference.NOT_A_BLEND) 
+						int blendType = OldSpeechSoundReference.IsBlendAndWhichType (candidate);
+						if (blendType != OldSpeechSoundReference.NOT_A_BLEND) 
 								return StoreLettersInComposite (new Blend (candidate), candidate);
-						if (SpeechSoundReference.IsConsonantDigraph (candidate))
+						if (OldSpeechSoundReference.IsConsonantDigraph (candidate))
 								return StoreLettersInComposite (new ConsonantDigraph (candidate), candidate);
-						if (SpeechSoundReference.IsVowelDigraph (candidate))
+						if (OldSpeechSoundReference.IsVowelDigraph (candidate))
 								return StoreLettersInComposite (new VowelDigraph (candidate), candidate);
-						if (SpeechSoundReference.IsVowelR (candidate))
+						if (OldSpeechSoundReference.IsVowelR (candidate))
 								return StoreLettersInComposite (new VowelR (candidate), candidate);
 						
 						return null;
@@ -442,11 +442,11 @@ public class LetterSoundComponentFactoryManager
 				{
 						
 						StableSyllable stable = null;
-						int length = SpeechSoundReference.MAX_STABLE_SYLLABLE_LENGTH;
+						int length = OldSpeechSoundReference.MAX_STABLE_SYLLABLE_LENGTH;
 						//we need to trim blanks for stable syllables.
 						
 
-						while (length>=SpeechSoundReference.MIN_STABLE_SYLLABLE_LENGTH) {
+						while (length>=OldSpeechSoundReference.MIN_STABLE_SYLLABLE_LENGTH) {
 			
 								if (length <= input.Length) {
 										string candidate = input.Substring (input.Length - length, length);
@@ -469,7 +469,7 @@ public class LetterSoundComponentFactoryManager
 				StableSyllable TryMakeStableSyllable (string candidate)
 				{
 						StableSyllable result = null;
-						if (SpeechSoundReference.IsStableSyllable (candidate)) 
+						if (OldSpeechSoundReference.IsStableSyllable (candidate)) 
 								result = MakeStableSyllable (candidate);
 						return result;
 
