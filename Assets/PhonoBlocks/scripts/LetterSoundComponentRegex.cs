@@ -76,7 +76,7 @@ public static class LetterSoundComponentRegex  {
 	static string anyVowel = MatchAnyOf (new string[]{ vowel, vowelDigraph });
 
 	//Magic-E rule regex
-	static Regex magicERule = Make($"({anyConsonant})?({vowel})(?!r)({consonant})e$");
+	static Regex magicERule = Make($"({anyConsonant})?({vowel})(?!r)({consonant})e(?!\\w)");
 	public static Regex MagicERule{
 		get {
 			return magicERule;
@@ -84,7 +84,7 @@ public static class LetterSoundComponentRegex  {
 	}
 
 	//Open syllable regex
-	static Regex openSyllable = Make($"({anyConsonant})?({vowel})");
+	static Regex openSyllable = Make($"({anyConsonant})?({anyVowel})(?!\\w)");
 	public static Regex OpenSyllable{
 		get {
 			return openSyllable;
@@ -115,11 +115,20 @@ public static class LetterSoundComponentRegex  {
 		TestMatchMagicERule ();
 		TestClosedSyllable ();
 
+		TestRControlledVowel ();
+		TestOpenSyllable ();
+
 	}
 
 	static void TestMatchMagicERule(){
-		
+		Debug.Log("--------TEST MAGIC E RULE------");
 		Debug.Log ($"Matches game: {MagicERule.IsMatch("game")}"); 
+		//handles extra trailing space
+		Debug.Log ($"Matches game   : {MagicERule.IsMatch("game   ")}"); 
+		//handles extra preceding space
+		Debug.Log ($"Matches   game: {MagicERule.IsMatch("  game")}"); 
+		//handles charactes before
+		Debug.Log ($"Matches nogame: {MagicERule.IsMatch("nogame")}"); 
 		Debug.Log ($"Matches shame: {MagicERule.IsMatch("shame")}"); 
 		Debug.Log ($"Matches ike: {MagicERule.IsMatch("ike")}"); 
 		Debug.Log ($"Does not match shanke: {!MagicERule.IsMatch("shanke")}");
@@ -129,12 +138,22 @@ public static class LetterSoundComponentRegex  {
 		Debug.Log ($"Does not match asp: {!MagicERule.IsMatch("asp")}");
 		Debug.Log ($"Does not match as: {!MagicERule.IsMatch("as")}");
 		Debug.Log ($"Does not match a: {!MagicERule.IsMatch("as")}");
+		Debug.Log ($"Does not match gamer: {!MagicERule.IsMatch("gamer")}"); 
+		Debug.Log ($"Does not match g a m e: {!MagicERule.IsMatch("g a m e")}");
 		//don't count r controlled vowels; different syllable.
 		Debug.Log ($"Does not match lore: {!MagicERule.IsMatch("lore")}");
+
 	}
 
 	static void TestClosedSyllable(){
+		Debug.Log("--------TEST CLOSED SYLLABLE------");
 		Debug.Log($"Matches cat: {closedSyllable.IsMatch("cat")}");
+		Debug.Log($"Matches cat  : {closedSyllable.IsMatch("cat  ")}");
+		Debug.Log($"Matches cat  : {closedSyllable.IsMatch("  cat")}");
+		Debug.Log($"Matches acat  : {closedSyllable.IsMatch("acat")}");
+		Debug.Log($"Matches acata: {closedSyllable.IsMatch("acata")}");
+		Debug.Log($"Matches acatat: {closedSyllable.IsMatch("acatat")}");
+		Debug.Log($"Matches catcat: {closedSyllable.IsMatch("catcat")}");
 		Debug.Log($"Matches chat: {closedSyllable.IsMatch("chat")}");
 		Debug.Log($"Matches cash: {closedSyllable.IsMatch("cash")}");
 		Debug.Log($"Matches ash: {closedSyllable.IsMatch("ash")}");
@@ -146,6 +165,46 @@ public static class LetterSoundComponentRegex  {
 		Debug.Log($"Does not match game: {!closedSyllable.IsMatch("game")}");
 		//don't count r controlled vowels; different syllable.
 		Debug.Log($"Does not match car: {!closedSyllable.IsMatch("car")}");
+		Debug.Log($"Does not match c a t: {!closedSyllable.IsMatch("c a t")}");
+	}
+
+
+	static void TestOpenSyllable(){
+		Debug.Log("--------TEST OPEN SYLLABLE------");
+		Debug.Log($"Matches a: {openSyllable.IsMatch("a")}");
+		Debug.Log($"Matches aa: {openSyllable.IsMatch("aa")}");
+		Debug.Log($"Matches ae: {openSyllable.IsMatch("ae")}");
+		Debug.Log($"Matches ca: {openSyllable.IsMatch("ca")}");
+		Debug.Log($"Matches caa: {openSyllable.IsMatch("caa")}");
+		Debug.Log($"Matches    a: {openSyllable.IsMatch("   a")}");
+		Debug.Log($"Matches a  : {openSyllable.IsMatch("a   ")}");
+		Debug.Log($"Matches a a a: {openSyllable.IsMatch("a a a")}");
+		Debug.Log($"Matches caca (second a): {openSyllable.IsMatch("caca")}");
+
+		Debug.Log($"Does not match c: {!openSyllable.IsMatch("c")}");
+		Debug.Log($"Does not match ad: {!openSyllable.IsMatch("ad")}");
+		Debug.Log($"Does not match ack: {!openSyllable.IsMatch("ack")}");
+		Debug.Log($"Does not match ace: {!openSyllable.IsMatch("ace")}"); //todo... this one fails
+		Debug.Log($"Does not match ar: {!openSyllable.IsMatch("ar")}");
+
+	}
+
+	static void TestRControlledVowel(){
+		Debug.Log("--------TEST R CONTROLLED VOWEL------");
+		Debug.Log($"Matches ar: {RControlledVowel.IsMatch("ar")}");
+		Debug.Log($"Matches arr: {RControlledVowel.IsMatch("arr")}");
+		Debug.Log($"Matches ark: {RControlledVowel.IsMatch("ark")}");
+		Debug.Log($"Matches arka: {RControlledVowel.IsMatch("arka")}");
+		Debug.Log($"Matches ara: {RControlledVowel.IsMatch("ara")}");
+		Debug.Log($"Matches bar: {RControlledVowel.IsMatch("bar")}");
+		Debug.Log($"Matches bara: {RControlledVowel.IsMatch("bara")}");
+		Debug.Log($"Matches ar  : {RControlledVowel.IsMatch("ar  ")}");
+		Debug.Log($"Matches   ar: {RControlledVowel.IsMatch("  ar")}");
+		Debug.Log($"Matches are: {RControlledVowel.IsMatch("are")}");
+
+		Debug.Log($"Does not match ra: {!RControlledVowel.IsMatch("ra")}");
+		Debug.Log($"Does not match rad: {!RControlledVowel.IsMatch("rad")}");
+		Debug.Log($"Does not match r a: {!RControlledVowel.IsMatch("r a")}");
 	}
 
 }
