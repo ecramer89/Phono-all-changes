@@ -179,7 +179,8 @@ public class StudentActivityController : MonoBehaviour
 
 		Func<bool> childInstantiatedTargetSpellingRule = () => {
 			return (parent != null && parent.Equals(targetComponent) || 
-					(SessionsDirector.instance.IsMagicERule && IsSubmissionCorrect()));
+				(SessionsDirector.instance.IsMagicERule && 
+					LetterSoundComponentRegex.MagicERule.IsMatch(UserChangesAsString)));
 		};
 				
 				if(childCompletedPortionOfTargetSpellingRule()){
