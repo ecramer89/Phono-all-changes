@@ -127,6 +127,7 @@ public class SessionsDirector : MonoBehaviour
 				SpeechSoundReference.Initialize ();
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
+				LetterSoundComponentRegex.Test ();
 
 		}
 
