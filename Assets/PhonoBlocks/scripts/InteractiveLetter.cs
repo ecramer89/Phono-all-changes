@@ -5,9 +5,8 @@ using System;
 //container for the letter of this cell.
 //stores data the image, the letter and the color
 //but isn't responsible for using this data to do anything.
-public class InteractiveLetter : MonoBehaviour
-{
-   
+public class InteractiveLetter : MonoBehaviour{
+
 		String inputLetter;
 		Color colorDerivedFromInput; //the 
 		public Color ColorDerivedFromInput {
@@ -68,11 +67,12 @@ public class InteractiveLetter : MonoBehaviour
 			this.numFlashCycles = numFlashCycles;
 		}
 
-	public InteractiveLetter ConfigureFlashParameters(Color a, Color b, float durationA, float durationB, int numCycles){
+
+	public void ConfigureFlashParameters(
+		Color a, Color b, float durationA, float durationB, int numCycles){
 		SetFlashColors (a, b);
 		SetFlashDurations (durationA, durationB);
 		SetNumFlashCycles (numCycles);
-		return this;
 	}
 
 
@@ -181,7 +181,6 @@ public class InteractiveLetter : MonoBehaviour
 		public void UpdateDisplayColour (UnityEngine.Color c_)
 		{
 
-
 				if (c_ == Color.clear)
 						c_ = Color.white;
 		
@@ -197,10 +196,9 @@ public class InteractiveLetter : MonoBehaviour
 
 		}
 
-	public InteractiveLetter UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
+	public void UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
 			UpdateDefaultColour (c);
 			UpdateDisplayColour (c);
-			return this;
 		}
 
 

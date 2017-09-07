@@ -8,7 +8,6 @@ using Extensions;
 	
 public class Colorer  {
 
-
 	static Color onColor = Color.white;
 	static Color offColor = Color.gray;
 	static RuleBasedColorer magicEColorer = new MagicEColorer();
@@ -26,6 +25,7 @@ public class Colorer  {
 		});
 	};
 
+	public static event Action StartAllInteractiveLetterFlashes = ()=>{};
 
 	public static void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters){
 		applyDefaultColorsToNonMatchingLetters (
@@ -36,31 +36,29 @@ public class Colorer  {
 			previousUserInputLetters,
 			UILetters
 		);
+
 	
 	}
 
 	//todo: color schemes that return a reduced or otherwise modified list of UI letters can't do that here sicne the indices need to stay aligned.
-	public static void TurnOffFlashErroneousLetters(string input, string previousInput, List<InteractiveLetter> UILetters, string target){
+	public static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput, List<InteractiveLetter> UILetters, string target){
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
-
 			//index can exceed length of target word since target word doesn't take trailing blanks into account. (e.g., "_ame___", vs "game")
+
+			//if the letter is an error and is different from previous
 			if (i < target.Length && input [i] != target [i] && previousInput [i] != input [i]) {
 				UILetter.UpdateInputDerivedAndDisplayColor (offColor);
-				//note: we can't necessarily assume this for all of the letters. if the letter is correctly placed,
-				//then even if it's the same letter as before, may still need to flash it if it now instantiates a spelling rule
-				//on account of a different, newly placed letter. e.g. the "gam"->"game"; "a" hasn't changed from prev. but needs to flash.
-				//that's why the continue is within the check on whether the letter is erroneous- otherwise we'd skip initiating the flash coroutine.
-				UILetter.SetFlashColors (offColor, onColor);
-				UILetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
-				UILetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
+				UILetter.ConfigureFlashParameters (
+					offColor, onColor, 
+					Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
+					Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
+				);
+
+				StartAllInteractiveLetterFlashes += UILetter.StartFlash;
 			}
-
-
-			//start flash co-routines of all letters (including those that were configured by the rule-specific colorer).
-			UILetter.StartFlash ();
+		
 		}
-
 
 	}
 
@@ -72,11 +70,18 @@ public class Colorer  {
 				UIletters,
 				targetWord);
 
-		TurnOffFlashErroneousLetters (
+		TurnOffAndConfigureFlashForErroneousLetters (
 			updatedUserInputLetters,
 			previousUserInputLetters,
 			UIletters,
 			targetWord);
+
+		foreach (var d in StartAllInteractiveLetterFlashes.GetInvocationList ()) {
+			Debug.Log (d.Method.Name);
+
+		}
+
+		StartAllInteractiveLetterFlashes ();
 	}
 
 
@@ -159,32 +164,34 @@ public class Colorer  {
 			
 			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
 
-			if (previousInstantiationOfRule.Success && 
-				previousInstantiationOfRule.Value == magicE.Value)
-				return; //exact same match existed before, so don't bother changing anything.
+			if (previousInstantiationOfRule.Success)
+				return; //previous input matched magic e rule; not possible (via one letter change)
+			//to produce a -different- string matching magic e rule that would require change to any letter, so return.
 
 			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
 
-			Match innerVowel = Decoder.AnyVowel.Match(magicE.Value);
-			magicELetters.
-			ElementAt (innerVowel.Index).
-			UpdateInputDerivedAndDisplayColor (innerVowelColor).
-			ConfigureFlashParameters (innerVowelColor, onColor, 
+			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
+
+			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
+
+
+			innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
 				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
 			);
 
-			//don't need to color consonants; they can retain their default on color.
+			StartAllInteractiveLetterFlashes += innerVowel.StartFlash;
 		
+			//don't need to color consonants; they can retain their default on color.
+	
 			//By definition, last letter of magic-e instance is e.
-			magicELetters.
-			Last ().
-			UpdateInputDerivedAndDisplayColor (silentEColor).
-			ConfigureFlashParameters (silentEColor, onColor, 
+			InteractiveLetter silentE = magicELetters.Last ();
+			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
+			silentE.ConfigureFlashParameters (silentEColor, onColor, 
 				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
 			);
-
+			StartAllInteractiveLetterFlashes+=silentE.StartFlash;
 		}
 
 		//no concept of a "partially matched" magic e rule. Just return.
@@ -222,5 +229,4 @@ interface RuleBasedColorer{
 		string targetWord);
 }
 	
-
 
