@@ -83,10 +83,21 @@ public static class Decoder  {
 
 	//Open syllable regex
 	static Regex openSyllable = Make($"({anyConsonant})?({anyVowel})(?!\\w)");
+	public static Regex OpenSyllable{
+		get {
+			return openSyllable;
+		}
+
+	}
 
 	//Closed syllable regex
 	static Regex closedSyllable = Make($"({anyConsonant})?({vowel})(?!r)({anyConsonant})(?!e)");
+	public static Regex ClosedSyllable{
+		get {
+			return closedSyllable;
+		}
 
+	}
 
 	static string MatchAnyOf(string[] patterns){
 		return patterns.Aggregate((acc, nxt)=>$"{acc}|{nxt}");
