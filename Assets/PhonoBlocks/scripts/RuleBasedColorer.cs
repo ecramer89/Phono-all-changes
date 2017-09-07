@@ -28,8 +28,8 @@ public class Colorer  {
 		applyDefaultColorsToNonMatchingLetters(
 				updatedUserInputLetters,
 			ruleBasedColorer.ColorMatchesAndFlashIfNew (
-				previousUserInputLetters, 
 				updatedUserInputLetters, 
+				previousUserInputLetters,
 				UILetters)
 		);
 	}
@@ -85,7 +85,6 @@ public class Colorer  {
 				return UIletters; //matched before, so nothing to change.
 
 			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
-			var rest = UIletters.Skip (magicE.Length);
 
 			Match innerVowel = Decoder.AnyVowel.Match(magicE.Value);
 			magicELetters.
@@ -118,8 +117,7 @@ public class Colorer  {
 			).
 			StartFlash ();
 
-
-			return rest.ToList ();
+			return UIletters.Skip (magicE.Length).Take(UIletters.Count - magicE.Length).ToList ();
 
 		}
 
