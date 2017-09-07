@@ -270,12 +270,19 @@ public class StudentActivityController : MonoBehaviour
 
 	
 		public void HandleNewArduinoLetter (char letter, int atPosition)
-	    {    
+	{       	string previousUserInput = UserChangesAsString;
 				RecordUsersChange (atPosition, letter); 
 				switch (state) {
-				case State.MAIN_ACTIVITY:
+		case State.MAIN_ACTIVITY:
+			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+			List<InteractiveLetter> UILetters = arduinoLetterController.GetAllUserInputLetters (false);
+			Colorer.ReColor (UserChangesAsString, UILetters);
+			Colorer.TurnOffFlashErroneousLetters (previousUserInput, UserChangesAsString, UILetters, TargetLetters);
+			Colorer.ConfigureFlashFeedbackForTargetRule (previousUserInput, UserChangesAsString, UILetters);
+
+			        /*
 					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-					arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
+					arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);*/
 					break;
 				case State.FORCE_CORRECT_LETTER_PLACEMENT:
 					InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);

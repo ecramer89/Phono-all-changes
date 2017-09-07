@@ -20,57 +20,6 @@ public enum Rule{
 	
 public static class Decoder  {
 
-	public static DecodedWord Decode(string input){
-		DecodedWord result = new DecodedWord (input);
-		foreach (Rule rule in Rule.GetValues(typeof(Rule))) {
-			MatchCollection matches = MatchesFor (rule, input);
-			foreach (Match match in matches) {
-				result.AddMatchedRule (rule, new int[]{match.Index,  match.Index + match.Length - 1});  	
-			}
-		}
-		return result;
-	}
-
-	static MatchCollection MatchesFor(Rule rule, string input){
-		Regex regex = null;
-		switch (rule) {
-		case Rule.Vowel:
-			regex = vowelRegex;
-			break;
-		case Rule.Consonant:
-			regex = consonantRegex;
-			break;
-		case Rule.ConsonantDigraph:
-			regex = consonantDigraphRegex;
-			break;
-		case Rule.VowelDigraph:
-			regex = vowelDigraphRegex;
-			break;
-		case Rule.ConsonantBlend:
-			regex = consonantBlendRegex;
-			break;
-		case Rule.ClosedSyllable:
-			regex = closedSyllable;
-			break;
-		case Rule.OpenSyllable:
-			regex = openSyllable;
-			break;
-		case Rule.MagicE:
-			regex = magicERule;
-			break;
-		case Rule.RControlledVowel:
-			regex = rControlledVowelRegex;
-			break;
-		}
-
-		if (regex == null)
-			throw new Exception ($"No Regex found for rule {rule}");
-
-		return regex.Matches(input);
-
-	}
-		
-
 	//Vowel Regex
 	static string[] vowels = new string[]{"a","e","i","o","u"};
 	static string vowel = MatchAnyOf (vowels);

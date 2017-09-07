@@ -127,7 +127,7 @@ public class SessionsDirector : MonoBehaviour
 				OldSpeechSoundReference.Initialize ();
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
-				Decoder.Decode ("game");
+	
 
 		}
 
