@@ -74,16 +74,16 @@ public static class Decoder  {
 	//Vowel Regex
 	static string[] vowels = new string[]{"a","e","i","o","u"};
 	static string vowel = MatchAnyOf (vowels);
-	static Regex vowelRegex = Make(vowel, Rule.Vowel);
+	static Regex vowelRegex = Make(vowel);
 
 	//Consonant Regex
 	static string consonant = $"[^\\W,^{vowel}]";
-	static Regex consonantRegex = Make(consonant, Rule.Consonant);
+	static Regex consonantRegex = Make(consonant);
 
 	//Consonant Digraph regex
 	static string[] consonantDigraphs = new string[]{"th","ch","sh","qu","ck","ng","nk","wh"};
 	static string consonantDigraph = MatchAnyOf (consonantDigraphs);
-	static Regex consonantDigraphRegex = Make(consonantDigraph, Rule.ConsonantDigraph);
+	static Regex consonantDigraphRegex = Make(consonantDigraph);
 
 		
 	//Consonant Blend Regex
@@ -93,33 +93,50 @@ public static class Decoder  {
 		"mp", "nt","thr"
 	};
 	static string consonantBlend = MatchAnyOf (consonantBlends);
-	static Regex consonantBlendRegex = Make(consonantBlend, Rule.ConsonantBlend);
+	static Regex consonantBlendRegex = Make(consonantBlend);
 
 	static string[] vowelDigraphs = new string[] {
 		"ea", "ai", "ae", "aa", "ee", "ie", "oe", "ue", "ou", "ay", "oa"
 	};
 	static string vowelDigraph = MatchAnyOf (vowelDigraphs);
-	static Regex vowelDigraphRegex = Make(vowelDigraph, Rule.VowelDigraph);
+	static Regex vowelDigraphRegex = Make(vowelDigraph);
 
 	static string[] rControlledVowels = new string[]{
 		"er", "ur", "or","ir","ar"
 	};
 	static string rControlledVowel = MatchAnyOf (rControlledVowels);
-	static Regex rControlledVowelRegex = Make(rControlledVowel, Rule.RControlledVowel);
+	static Regex rControlledVowelRegex = Make(rControlledVowel);
 
 
 	static string anyConsonant = MatchAnyOf(new string[]{consonant, consonantDigraph, consonantBlend});
+	static Regex anyConsonantRegex = Make (anyConsonant);
+	public static Regex AnyConsonant{
+		get {
+			return anyConsonantRegex;
+		}
+	}
 	static string anyVowel = MatchAnyOf (new string[]{ vowel, vowelDigraph });
+	static Regex anyVowelRegex = Make (anyVowel);
+	public static Regex AnyVowel{
+		get {
+			return anyVowelRegex;
+		}
+
+	}
 
 	//Magic-E rule regex
-	static Regex magicERule = Make($"({anyConsonant})?({vowel})(?!r)({consonant})e(?!\\w)", Rule.MagicE);
-
+	static Regex magicERule = Make($"({anyConsonant})?({vowel})(?!r)({consonant})e(?!\\w)");
+	public static Regex MagicERegex{
+		get {
+			return magicERule;
+		}
+	}
 
 	//Open syllable regex
-	static Regex openSyllable = Make($"({anyConsonant})?({anyVowel})(?!\\w)", Rule.OpenSyllable);
+	static Regex openSyllable = Make($"({anyConsonant})?({anyVowel})(?!\\w)");
 
 	//Closed syllable regex
-	static Regex closedSyllable = Make($"({anyConsonant})?({vowel})(?!r)({anyConsonant})(?!e)", Rule.ClosedSyllable);
+	static Regex closedSyllable = Make($"({anyConsonant})?({vowel})(?!r)({anyConsonant})(?!e)");
 
 
 	static string MatchAnyOf(string[] patterns){
@@ -127,8 +144,8 @@ public static class Decoder  {
 	}
 	//convenience 'factory-style' method; just saves me having to remember to add the case insensitive
 	//modifer to each of the regexes.
-	static Regex Make(string pattern, Rule rule){
-		return new Regex ($"(?<{rule.ToString()}>{pattern})", RegexOptions.IgnoreCase);
+	static Regex Make(string pattern){
+		return new Regex (pattern, RegexOptions.IgnoreCase);
 	}
 		
 
