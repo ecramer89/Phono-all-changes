@@ -36,29 +36,34 @@ public class Colorer  {
 
 
 	public static void TurnOffFlashErroneousLetters(string previousInput, string input,  List<InteractiveLetter> UILetters, string target){
-		int index = 0;
-		foreach(InteractiveLetter UILetter in UILetters){
-			if(previousInput[index] == input[index]) continue; //don't bother flashing/changing anything if this letter didn't change
-			if(input[index] == target[index]) continue; //correct letter; nothing to do
-			//otherwise it's a new error.
-			//turn the letter off
-			UILetter.UpdateInputDerivedAndDisplayColor(offColor);
-			//configure it to flash in the incorrect colors.
-			UILetter.SetFlashColors (offColor, onColor);
-			UILetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
-			UILetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
-			UILetter.StartFlash ();
-			index++;
-
-		}
+		for (int i = 0; i < UILetters.Count; i++) {
+			InteractiveLetter UILetter = UILetters [i];
+			if (i >= target.Length || input [i] == target [i])
+					continue; //correct letter; nothing to do
+				//otherwise it's a new error.
+				//turn the letter off
+				UILetter.UpdateInputDerivedAndDisplayColor (offColor);
+				//configure it to flash in the incorrect colors.
+			if (previousInput [i] == input [i]) continue; //skip the flashing if this letter hasn't changed from before.
+				UILetter.SetFlashColors (offColor, onColor);
+				UILetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
+				UILetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
+				UILetter.StartFlash ();
+			}
 	}
 
 
-	public static void ConfigureFlashFeedbackForTargetRule(string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UIletters, string targetWord){
-		ruleBasedColorer.FlashPartialMatchesToTarget (
-			previousUserInputLetters, 
+
+
+	public static void FlashFeedback(string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UIletters, string targetWord){
+		TurnOffFlashErroneousLetters (
+			previousUserInputLetters,
 			updatedUserInputLetters, 
-			UIletters,
+			ruleBasedColorer.ColorAndFlashPartialMatchesIfNew (
+				previousUserInputLetters, 
+				updatedUserInputLetters, 
+				UIletters,
+				targetWord),
 			targetWord);
 	}
 
@@ -122,7 +127,7 @@ public class Colorer  {
 		}
 
 		//no concept of a "partially matched" magic e rule. Just return.
-		public List<InteractiveLetter> FlashPartialMatchesToTarget(
+		public List<InteractiveLetter> ColorAndFlashPartialMatchesIfNew(
 			string previousUserInputLetters, 
 			string updatedUserInputLetters, 
 			List<InteractiveLetter> UIletters, 
@@ -137,6 +142,10 @@ public class Colorer  {
 
 
 }
+
+//note: the digraph colorer will need to update the derived and display color of members of the target digraph that do not 
+//match the entire digraph. this needs to occur in the flash partial matches method
+//likewise 
 	
 interface RuleBasedColorer{
 	List<InteractiveLetter> ColorMatchesAndFlashIfNew (
@@ -145,7 +154,7 @@ interface RuleBasedColorer{
 		List<InteractiveLetter> UIletters
 	);
 
-	List<InteractiveLetter> FlashPartialMatchesToTarget(
+	List<InteractiveLetter> ColorAndFlashPartialMatchesIfNew(
 		string previousUserInputLetters, 
 		string updatedUserInputLetters, 
 		List<InteractiveLetter> UIletters,

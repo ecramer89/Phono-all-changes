@@ -277,10 +277,8 @@ public class StudentActivityController : MonoBehaviour
 			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
 			List<InteractiveLetter> UILetters = arduinoLetterController.GetAllUserInputLetters (false);
 			Colorer.ReColor (previousUserInput, UserChangesAsString, UILetters);
-			//Colorer.TurnOffFlashErroneousLetters (previousUserInput, UserChangesAsString, UILetters, TargetLetters);
-			//Colorer.ConfigureFlashFeedbackForTargetRule (previousUserInput, UserChangesAsString, UILetters);
-
-			        /*
+			Colorer.FlashFeedback (previousUserInput, UserChangesAsString, UILetters, TargetLetters);
+			     /*
 					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
 					arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);*/
 					break;
