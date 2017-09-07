@@ -76,8 +76,7 @@ public class Colorer  {
 
 		static Color shortVowelColor = Color.yellow;
 		static Color longVowelColor = Color.red;
-		static Color consonantColor = Color.white;
-
+	
 		public void ColorMatchesAndFlashIfNew(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
@@ -100,15 +99,7 @@ public class Colorer  {
 					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);
 
-				MatchCollection consonants = Decoder.AnyConsonant.Matches (updatedUserInputLetters);
-				foreach (Match consonant in consonants) {
-					InteractiveLetter consLetter = closedSyllableLetters.ElementAt (consonant.Index);
-					consLetter.UpdateInputDerivedAndDisplayColor (consonantColor);
-					//don't bother flashing the consonants.
-				}
-
-				//this wont work; need the entries to be contiguous (i.e, inject blanks)
-				//treat already matched etters as though they are blanks
+				//
 				int endIndexOfSyllable = closedSyllable.Index + closedSyllable.Length - 1;
 				string before = unMatchedUserInputLetters.Substring (0, closedSyllable.Index);
 				string gap="".Fill (" ", closedSyllable.Length);
@@ -122,16 +113,9 @@ public class Colorer  {
 				//if this portion of the user input string was a closed syllable before, no need to update the colors/flash
 				if (Decoder.OpenSyllable.IsMatch (previousUserInputLetters.Substring (openSyllable.Index, openSyllable.Length)))
 					continue;
-				
-				//note that because the indices/lengths of unMatchedUserInputLetters and UILetters are aligned,
-				//we take the UILetters that match the open syllable from the original (full) list of UILetters
+			
 				var openSyllableLetters = UIletters.Skip (openSyllable.Index).Take (openSyllable.Length);
-				Match consonant = Decoder.AnyConsonant.Match (openSyllable.Value);
-				if (consonant.Success) { 
-					//not all open syllables contain consonants
-					InteractiveLetter consonantLetter = openSyllableLetters.ElementAt(consonant.Index);
-					consonantLetter.UpdateInputDerivedAndDisplayColor (consonantColor);
-				}
+		
 				Match vowel = Decoder.AnyVowel.Match (openSyllable.Value);
 				InteractiveLetter vowelLetter = openSyllableLetters.ElementAt(vowel.Index);
 				vowelLetter.UpdateInputDerivedAndDisplayColor (longVowelColor);
@@ -156,7 +140,6 @@ public class Colorer  {
 		
 	class MagicEColorer : RuleBasedColorer {
 		static Color innerVowelColor = Color.red;
-		static Color consonantsColor = Color.white;
 		static Color silentEColor = Color.gray;
 
 		public void ColorMatchesAndFlashIfNew(
@@ -192,19 +175,10 @@ public class Colorer  {
 				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
 			).
 			StartFlash ();
-				
-			MatchCollection consonants = Decoder.AnyConsonant.Matches(magicE.Value);
-			foreach(Match m in consonants){
-				magicELetters.
-				ElementAt(m.Index).
-				UpdateInputDerivedAndDisplayColor(consonantsColor).
-				ConfigureFlashParameters (consonantsColor, onColor, 
-					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-				).
-				StartFlash ();
-			}
+
+			//don't need to color consonants; they can retain their default on color.
 		
+			//By definition, last letter of magic-e instance is e.
 			magicELetters.
 			Last().
 			UpdateInputDerivedAndDisplayColor(silentEColor).
