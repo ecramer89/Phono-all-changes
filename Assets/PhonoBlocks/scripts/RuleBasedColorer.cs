@@ -15,22 +15,23 @@ public class Colorer  {
 	//nees to persist bw levels. depending on whichrule selected instantiates appropriate rule based colorer
 
 
-	/*
-	 * public top level method. re-colors every letter based on the current user input.
-	 * 
-	 * */
-	public static void ReColor (string updatedUserInputLetters, List<InteractiveLetter> UILetters){
-		//1. establish 'blank canvas':
-		// - any letter a user has placed is default on color 
-		// - any letter user has not placed is default off color
+	static Action<string, List<InteractiveLetter>> applyDefaultColorsToNonMatchingLetters = (string updatedUserInputLetters, List<InteractiveLetter> UILetters) => {
 		int index = 0;
 		UILetters.ForEach (UILetter => {
-			UILetter.UpdateInputDerivedAndDisplayColor (updatedUserInputLetters[index] == ' ' ? offColor : onColor);
+			UILetter.UpdateInputDerivedAndDisplayColor (updatedUserInputLetters [index] == ' ' ? offColor : onColor);
 			index++;
 		});
+	};
 
-		//2. color letters that instantiate current spelling rules in special rule based colors.
-		ruleBasedColorer.ApplyToMatches (updatedUserInputLetters, UILetters);
+
+	public static void ReColor (string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UILetters){
+		applyDefaultColorsToNonMatchingLetters(
+				updatedUserInputLetters,
+			ruleBasedColorer.ColorMatchesAndFlashIfNew (
+				previousUserInputLetters, 
+				updatedUserInputLetters, 
+				UILetters)
+		);
 	}
 
 
@@ -53,8 +54,12 @@ public class Colorer  {
 	}
 
 
-	public static void ConfigureFlashFeedbackForTargetRule(string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UIletters){
-		ruleBasedColorer.FlashPartialMatches (previousUserInputLetters, updatedUserInputLetters, UIletters);
+	public static void ConfigureFlashFeedbackForTargetRule(string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UIletters, string targetWord){
+		ruleBasedColorer.FlashPartialMatchesToTarget (
+			previousUserInputLetters, 
+			updatedUserInputLetters, 
+			UIletters,
+			targetWord);
 	}
 
 
@@ -64,45 +69,68 @@ public class Colorer  {
 		Color consonantsColor = Color.white;
 		Color silentEColor = Color.gray;
 
-		public void ApplyToMatches(string updatedUserInputLetters, List<InteractiveLetter> UIletters){
-			Match magicE = Decoder.MagicERegex.Match(updatedUserInputLetters);
+		public List<InteractiveLetter> ColorMatchesAndFlashIfNew(
+			string updatedUserInputLetters, 
+			string previousUserInputLetters, 
+			List<InteractiveLetter> UIletters){
 
+			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success)
-				return;
-
-			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
-
-			Match innerVowel = Decoder.AnyVowel.Match(magicE.Value);
-			magicELetters.ElementAt(innerVowel.Index).UpdateInputDerivedAndDisplayColor(innerVowelColor);
-			MatchCollection consonants = Decoder.AnyConsonant.Matches(magicE.Value);
-			foreach(Match m in consonants){
-				magicELetters.ElementAt(m.Index).UpdateInputDerivedAndDisplayColor(consonantsColor);
-			}
-		
-			magicELetters.Last().UpdateInputDerivedAndDisplayColor(silentEColor);
-		}
-
-		//
-		public void FlashPartialMatches(string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UIletters){
-			Match currentInputMatch = Decoder.MagicERegex.Match (updatedUserInputLetters);
-			if (!currentInputMatch.Success)
-				return;
-
-			//don't bother flashing if the previous user input letters also contained a match at the same indices for this rule.
-			//todo can bring this up into the more generic class
+				return UIletters; //no match found; nothing to do. (todo: in fact, just delegate to the open closed syllable function).
+			
 			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
 			if (previousInstantiationOfRule.Success && 
-				previousInstantiationOfRule.Index == currentInputMatch.Index && 
-				previousInstantiationOfRule.Length == currentInputMatch.Length)
-				return;
+				previousInstantiationOfRule.Index == magicE.Index && 
+				previousInstantiationOfRule.Length == magicE.Length)
+				return UIletters; //matched before, so nothing to change.
 
-			for (int i = currentInputMatch.Index; i < currentInputMatch.Index + currentInputMatch.Length; i++) {
-				InteractiveLetter UILetter = UIletters [i];
-				UILetter.SetFlashColors (UILetter.ColorDerivedFromInput, offColor);
-				UILetter.SetFlashDurations (Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF);
-				UILetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);
-				UILetter.StartFlash ();
+			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
+			var rest = UIletters.Skip (magicE.Length);
+
+			Match innerVowel = Decoder.AnyVowel.Match(magicE.Value);
+			magicELetters.
+			ElementAt (innerVowel.Index).
+			UpdateInputDerivedAndDisplayColor (innerVowelColor).
+			ConfigureFlashParameters (innerVowelColor, onColor, 
+				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+			).
+			StartFlash ();
+				
+			MatchCollection consonants = Decoder.AnyConsonant.Matches(magicE.Value);
+			foreach(Match m in consonants){
+				magicELetters.
+				ElementAt(m.Index).
+				UpdateInputDerivedAndDisplayColor(consonantsColor).
+				ConfigureFlashParameters (consonantsColor, onColor, 
+					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+				).
+				StartFlash ();
 			}
+		
+			magicELetters.
+			Last().
+			UpdateInputDerivedAndDisplayColor(silentEColor).
+			ConfigureFlashParameters (silentEColor, onColor, 
+				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+			).
+			StartFlash ();
+
+
+			return rest.ToList ();
+
+		}
+
+		//no concept of a "partially matched" magic e rule. Just return.
+		public List<InteractiveLetter> FlashPartialMatchesToTarget(
+			string previousUserInputLetters, 
+			string updatedUserInputLetters, 
+			List<InteractiveLetter> UIletters, 
+			string targetWord){
+
+			return UIletters;
 
 		}
 
@@ -113,8 +141,17 @@ public class Colorer  {
 }
 	
 interface RuleBasedColorer{
-	void ApplyToMatches (string updatedUserInputLetters, List<InteractiveLetter> UIletters);
-	void FlashPartialMatches(string previousUserInputLetters, string updatedUserInputLetters, List<InteractiveLetter> UIletters);
+	List<InteractiveLetter> ColorMatchesAndFlashIfNew (
+		string previousUserInputLetters,
+		string updatedUserInputLetters, 
+		List<InteractiveLetter> UIletters
+	);
+
+	List<InteractiveLetter> FlashPartialMatchesToTarget(
+		string previousUserInputLetters, 
+		string updatedUserInputLetters, 
+		List<InteractiveLetter> UIletters,
+		string targetWord);
 }
 	
 

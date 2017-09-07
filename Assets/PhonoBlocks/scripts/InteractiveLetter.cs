@@ -68,6 +68,13 @@ public class InteractiveLetter : MonoBehaviour
 			this.numFlashCycles = numFlashCycles;
 		}
 
+	public InteractiveLetter ConfigureFlashParameters(Color a, Color b, float durationA, float durationB, int numCycles){
+		SetFlashColors (a, b);
+		SetFlashDurations (durationA, durationB);
+		SetNumFlashCycles (numCycles);
+		return this;
+	}
+
 
 		const int NOT_AN_ARDUINO_CONTROLLED_LETTER = -1;
 		int idxAsArduinoControlledLetter = NOT_AN_ARDUINO_CONTROLLED_LETTER; //i.e., if it's a word history controlled letter. you have to "opt in" to be an arduino controlled letter.
@@ -190,9 +197,10 @@ public class InteractiveLetter : MonoBehaviour
 
 		}
 
-		public void UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
+	public InteractiveLetter UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
 			UpdateDefaultColour (c);
 			UpdateDisplayColour (c);
+			return this;
 		}
 
 
