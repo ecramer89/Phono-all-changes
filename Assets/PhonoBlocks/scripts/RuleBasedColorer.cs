@@ -37,7 +37,7 @@ public class Colorer  {
 	}
 
 	//todo move ui letters to a central state.
-	public static void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters){
+	public static void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters, string targetWord){
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 
@@ -47,7 +47,8 @@ public class Colorer  {
 		ruleBasedColorer.ColorAndConfigureFlashForMatches (
 			updatedUserInputLetters, 
 			previousUserInputLetters,
-			UILetters
+			UILetters,
+			targetWord
 		);
 
 	
@@ -103,7 +104,8 @@ public class Colorer  {
 		public void ColorAndConfigureFlashForMatches(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			List<InteractiveLetter> UIletters,
+			string targetWord){
 
 			string unMatchedUserInputLetters = updatedUserInputLetters;
 
@@ -149,7 +151,8 @@ public class Colorer  {
 	}
 
 
-		
+	//i think that target word needs to be a parameter to this function.
+	//otherwise it flashes in student mode when not appropriate.
 	class MagicEColorer : RuleBasedColorer {
 		static Color innerVowelColor = Color.red;
 		static Color silentEColor = Color.gray;
@@ -157,7 +160,8 @@ public class Colorer  {
 		public void ColorAndConfigureFlashForMatches(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			List<InteractiveLetter> UIletters,
+			string targetWord){
 
 			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
@@ -165,7 +169,8 @@ public class Colorer  {
 				openClosedVowelColorer.ColorAndConfigureFlashForMatches (
 					updatedUserInputLetters, 
 					previousUserInputLetters, 
-					UIletters
+					UIletters,
+					targetWord
 				);
 				return;
 			}
@@ -177,23 +182,21 @@ public class Colorer  {
 			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
 
 			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
+			//By definition, last letter of magic-e instance is e.
+			InteractiveLetter silentE = magicELetters.Last ();
+			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
 
-			if (!previousInstantiationOfRule.Success) { //only flash if the child newly instantiated the rule.
+			Debug.Log ("magic e value: " + magicE.Value + " target word " + targetWord + " " + Regex.IsMatch (targetWord, magicE.Value));
+			if (!previousInstantiationOfRule.Success && targetWord.Contains(magicE.Value)) { //only flash if the child newly instantiated the rule and if the child's input matches the target.
 				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
 					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
 				);
+				silentE.ConfigureFlashParameters (silentEColor, onColor, 
+					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+				);
 			}
-
-			//don't need to color consonants; they can retain their default on color.
-	
-			//By definition, last letter of magic-e instance is e.
-			InteractiveLetter silentE = magicELetters.Last ();
-			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
-			silentE.ConfigureFlashParameters (silentEColor, onColor, 
-				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-			);
 
 		}
 
@@ -222,7 +225,8 @@ interface RuleBasedColorer{
 	void ColorAndConfigureFlashForMatches (
 		string updatedUserInputLetters,
 		string previousUserInputLetters,
-		List<InteractiveLetter> UIletters
+		List<InteractiveLetter> UIletters,
+		string targetWord
 	);
 
 	void ColorAndConfigureFlashForPartialMatch( 
