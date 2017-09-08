@@ -43,6 +43,7 @@ public class Colorer  {
 	
 		ReapplyDefaultOrOff (updatedUserInputLetters, UILetters);
 
+		//todo; switch according to whether current mode is teacher or student
 		ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 			updatedUserInputLetters, 
 			previousUserInputLetters,
@@ -116,17 +117,16 @@ public class Colorer  {
 		public void ColorVowels(string updatedUserInputLetters, List<InteractiveLetter> UIletters){
 			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
-			//find closed vowels; update their colors; of what remains, find open vowels, update their colors, return what remains
+
+			//first check for closed syllables. color any vowel in a closed syllable 'short'
 			MatchCollection closedSyllables = Decoder.ClosedSyllable.Matches(unMatchedUserInputLetters);
 			foreach (Match closedSyllable in closedSyllables) {
 				var closedSyllableLetters = UIletters.Skip (closedSyllable.Index).Take (closedSyllable.Length);
-
 				InteractiveLetter vowel = closedSyllableLetters.ElementAt (Decoder.AnyVowel.Match (closedSyllable.Value).Index);
-
 				//update vowel color
 				vowel.UpdateInputDerivedAndDisplayColor (shortVowelColor);
-
-
+				//update the string that will be used to check for any remaining open syllables.
+				//e.g., as in string BABAB (should be parsed as BAB and AB).
 				int endIndexOfSyllable = closedSyllable.Index + closedSyllable.Length - 1;
 				string before = unMatchedUserInputLetters.Substring (0, closedSyllable.Index);
 				string gap="".Fill (" ", closedSyllable.Length);
@@ -134,7 +134,8 @@ public class Colorer  {
 				unMatchedUserInputLetters = $"{before}{gap}{after}"; 
 			}
 
-			//check the remaining input for valid open syllables
+			//check remaining portions of input for open syllables.
+			//color any vowel in open syllable 'long'
 			MatchCollection openSyllables = Decoder.OpenSyllable.Matches(unMatchedUserInputLetters);
 			foreach (Match openSyllable in openSyllables) {
 				var openSyllableLetters = UIletters.Skip (openSyllable.Index).Take (openSyllable.Length);
@@ -173,37 +174,18 @@ public class Colorer  {
 			string previousUserInputLetters, 
 			List<InteractiveLetter> UIletters){
 
-			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
-			if (!magicE.Success){
-				//no match found; switch to open/closed vowel coloring rules.
-				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
-				openClosed.ColorVowels (
-					updatedUserInputLetters, 
-					UIletters
-				);
+			Match magicE = RevertToOpenClosedColorIfNoMatchFound (updatedUserInputLetters, UIletters);
+			if (magicE == null)
 				return;
-			}
 
 			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
-			Func<bool> shouldFlash = () => {
+		
+			ColorAndConfigureFlashForVowelAndSilentE (updatedUserInputLetters, magicE, UIletters,
+				() => {
 				return previousInstantiationOfRule.Value != magicE.Value;
-			};
-
-			InteractiveLetter innerVowel = null;
-			InteractiveLetter silentE = null;
-			ColorVowelAndSilentE (updatedUserInputLetters, magicE, UIletters,shouldFlash);
-
-
-			if (previousInstantiationOfRule.Value != magicE.Value) { //flash for each new instantiation of magic e rule.
-				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
-					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-				);
-				silentE.ConfigureFlashParameters (silentEColor, onColor, 
-					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-				);
 			}
+			);
+
 
 		}
 
@@ -215,32 +197,40 @@ public class Colorer  {
 			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
+			Match magicE = RevertToOpenClosedColorIfNoMatchFound (updatedUserInputLetters, UIletters);
+			if (magicE == null)
+				return;
+
+			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
+			Match targetMatch = Decoder.MagicERegex.Match (targetWord);
+		
+			ColorAndConfigureFlashForVowelAndSilentE (updatedUserInputLetters, magicE, UIletters, 
+				() => {
+				return targetMatch.Value == magicE.Value && 
+					(!previousInstantiationOfRule.Success || targetMatch.Value != previousInstantiationOfRule.Value);
+				}
+			);
+
+        
+		}
+
+		Match RevertToOpenClosedColorIfNoMatchFound(string updatedUserInputLetters, List<InteractiveLetter> UILetters){
 			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
 				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
 				openClosed.ColorVowels (
 					updatedUserInputLetters, 
-					UIletters
+					UILetters
 				);
-				return;
 			}
 
-			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
-			Match targetMatch = Decoder.MagicERegex.Match (targetWord);
-			Func<bool> shouldFlash = () => {
-				return targetMatch.Value == magicE.Value && 
-					(!previousInstantiationOfRule.Success || targetMatch.Value != previousInstantiationOfRule.Value);
-			};
+			return magicE;
 
-			ColorVowelAndSilentE (updatedUserInputLetters, magicE, UIletters, shouldFlash);
-
-           
-		
 		}
 			
 
-		void ColorVowelAndSilentE(
+		void ColorAndConfigureFlashForVowelAndSilentE(
 			string updatedUserInputLetters, 
 			Match magicE,
 			List<InteractiveLetter> UIletters, 
@@ -255,7 +245,7 @@ public class Colorer  {
 			InteractiveLetter silentE = magicELetters.Last ();
 			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
 
-			if (shouldFlash()) { //flash for each new instantiation of magic e rule.
+			if (shouldFlash()) { 
 				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
 					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
