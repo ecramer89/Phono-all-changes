@@ -174,70 +174,51 @@ public class Colorer  {
 			string previousUserInputLetters, 
 			List<InteractiveLetter> UIletters){
 
-			Match magicE = RevertToOpenClosedColorIfNoMatchFound (updatedUserInputLetters, UIletters);
-			if (!magicE.Success)
-				return;
-
-			Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
-		
-			ColorAndConfigureFlashForVowelAndSilentE (updatedUserInputLetters, magicE, UIletters,
-				() => {
-				return previousInstantiationOfRule.Value != magicE.Value;
-			}
+			ColorAndConfigureFlash (updatedUserInputLetters, previousUserInputLetters, UIletters,
+				(Match magicE) => {
+					Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
+					return previousInstantiationOfRule.Value != magicE.Value;
+				}
 			);
-
-
 		}
 
-
-	
-
-	
-	
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
 			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
-			Match magicE = RevertToOpenClosedColorIfNoMatchFound (updatedUserInputLetters, UIletters);
-			if (!magicE.Success)
-				return;
 
-			Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
-			Match targetMatch = SpellingRuleRegex.MagicERegex.Match (targetWord);
-		
-			ColorAndConfigureFlashForVowelAndSilentE (updatedUserInputLetters, magicE, UIletters, 
-				() => {
-				return targetMatch.Value == magicE.Value && 
-					(!previousInstantiationOfRule.Success || targetMatch.Value != previousInstantiationOfRule.Value);
+			ColorAndConfigureFlash (updatedUserInputLetters, previousUserInputLetters, UIletters, 
+				(Match magicE) => {
+					Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
+					Match targetMatch = SpellingRuleRegex.MagicERegex.Match (targetWord);
+
+					return targetMatch.Value == magicE.Value && 
+						(!previousInstantiationOfRule.Success || targetMatch.Value != previousInstantiationOfRule.Value);
 				}
 			);
 
-        
 		}
 
-		Match RevertToOpenClosedColorIfNoMatchFound(string updatedUserInputLetters, List<InteractiveLetter> UILetters){
+
+		void ColorAndConfigureFlash(
+			string updatedUserInputLetters, 
+			string previousUserInputLetters, 
+			List<InteractiveLetter> UIletters, 
+			Func<Match, bool> shouldFlash
+		){
+
 			Match magicE = SpellingRuleRegex.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
 				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
 				openClosed.ColorVowels (
 					updatedUserInputLetters, 
-					UILetters
+					UIletters
 				);
+				return;
 			}
-
-			return magicE;
-
-		}
-			
-
-		void ColorAndConfigureFlashForVowelAndSilentE(
-			string updatedUserInputLetters, 
-			Match magicE,
-			List<InteractiveLetter> UIletters, 
-			Func<bool> shouldFlash){
 
 			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
 
@@ -248,7 +229,7 @@ public class Colorer  {
 			InteractiveLetter silentE = magicELetters.Last ();
 			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
 
-			if (shouldFlash()) { 
+			if (shouldFlash(magicE)) { 
 				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
 					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
