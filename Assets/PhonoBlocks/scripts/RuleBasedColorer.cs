@@ -10,10 +10,11 @@ public class Colorer  {
 
 	static Color onColor = Parameters.Colors.DEFAULT_ON_COLOR;
 	static Color offColor = Parameters.Colors.DEFAULT_OFF_COLOR;
+	static RuleBasedColorer consonantBlendsColorer = new ConsonantBlendsColorer();
 	static RuleBasedColorer magicEColorer = new MagicEColorer();
 	static RuleBasedColorer openClosedVowelColorer = new OpenClosedVowelColorer();
 
-	static RuleBasedColorer ruleBasedColorer = magicEColorer; //todo, make a GO, start, subscribes to event; color rule selected;
+	static RuleBasedColorer ruleBasedColorer = consonantBlendsColorer; //todo, make a GO, start, subscribes to event; color rule selected;
 	//nees to persist bw levels. depending on whichrule selected instantiates appropriate rule based colorer
 
 
@@ -41,11 +42,21 @@ public class Colorer  {
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 	
-		ReapplyDefaultOrOff (updatedUserInputLetters, UILetters);
+		ReapplyDefaultOrOff (
+			updatedUserInputLetters, 
+			UILetters
+		);
 
 		//todo; switch according to whether current mode is teacher or student
 		ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 			updatedUserInputLetters, 
+			previousUserInputLetters,
+			UILetters,
+			targetWord
+		);
+
+		TurnOffAndConfigureFlashForErroneousLetters (
+			updatedUserInputLetters,
 			previousUserInputLetters,
 			UILetters,
 			targetWord
@@ -143,14 +154,46 @@ public class Colorer  {
 			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
-			ColorAndConfigureFlashForTeacherMode (
-				updatedUserInputLetters,
-				previousUserInputLetters,
-				UIletters);
+
+			string unmatchedTargetInputLetters=targetWord;
+			Match targetConsonantBlend = null;
+			while(targetConsonantBlend==null || targetConsonantBlend.Success){
+
+				targetConsonantBlend = SpellingRuleRegex.ConsonantBlend.Match (unmatchedTargetInputLetters);
+				unmatchedTargetInputLetters = unmatchedTargetInputLetters.ReplaceRangeWith(' ', targetConsonantBlend.Index, targetConsonantBlend.Length);
+				string correspondingUserInput = updatedUserInputLetters.Substring (targetConsonantBlend.Index, targetConsonantBlend.Length);
+				Match userBlend = SpellingRuleRegex.ConsonantBlend.Match(correspondingUserInput);
+			
+				//update colors and flash if user is newly successful.
+				if (userBlend.Success && userBlend.Value == targetConsonantBlend.Value) {
+					List<InteractiveLetter> blendLetters = UIletters.GetRange (userBlend.Index, userBlend.Length);
+					Match previous = SpellingRuleRegex.ConsonantBlend.Match (previousUserInputLetters.Substring (targetConsonantBlend.Index, targetConsonantBlend.Length));
+				
+					foreach (InteractiveLetter consonant in blendLetters) {
+						if (!previous.Success || previous.Value != targetConsonantBlend.Value) {
+							consonant.UpdateInputDerivedAndDisplayColor (blendedColor);
+							ConfigureFlashOnCompletionOfTargetRule (consonant, blendedColor, onColor);
+						}
+					}
+				} else {
+					//check whether the user successfully matched either any of the consonants in this blend.
+					//if so, then color that letter as a single consonant.
+					//(we don't bother coloring other consonants in student blends mode, even if correctly placed.
+					//e.g. the "p" in "drop" would be white here, though would be single consonant color inteacher mode blends.
+					for (int i = 0; i < targetConsonantBlend.Length; i++) {
+						int indexOfLetterInInput = i + targetConsonantBlend.Index;
+						if (updatedUserInputLetters [indexOfLetterInInput] == targetConsonantBlend.Value [i]) {
+							InteractiveLetter asInteractiveLetter = UIletters.ElementAt (indexOfLetterInInput);
+							asInteractiveLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
+							//no flashing hints for consonant blends.
+						}
+
+					}
+						
+				}
+			}
 
 		}
-
-
 
 	}
 		
