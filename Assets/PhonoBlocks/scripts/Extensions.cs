@@ -18,7 +18,8 @@ public static class PhonoBlocksExtensions {
 			StringBuilder buff = new StringBuilder ();
 			buff.Append(str.Substring(0, start));
 			buff.Append("".Fill(with, length));
-			if(start + length < str.Length) buff.Append(str.Substring(start+length, str.Length));
+			if(start + length < str.Length) buff.Append (str.Substring (start + length, str.Length - start - length));
+			
 			return buff.ToString ();
 		}
 

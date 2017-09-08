@@ -203,14 +203,8 @@ public class Colorer  {
 				vowel.UpdateInputDerivedAndDisplayColor (shortVowelColor);
 				//update the string that will be used to check for any remaining open syllables.
 				//e.g., as in string BABAB (should be parsed as BAB and AB).
-				int endIndexOfSyllable = closedSyllable.Index + closedSyllable.Length - 1;
-				string before = unMatchedUserInputLetters.Substring (0, closedSyllable.Index);
-				//inject 'gap' of blanks in place of the accounted for closed syllable letters.
-				//handles potential cases of a closed syllable falling between valid open syllables. e.g.
-				//a dog i 
-				string gap="".Fill (' ', closedSyllable.Length);
-				string after = endIndexOfSyllable < unMatchedUserInputLetters.Length - 1 ? unMatchedUserInputLetters.Substring (endIndexOfSyllable+1, unMatchedUserInputLetters.Length - endIndexOfSyllable - 1) : "";
-				unMatchedUserInputLetters = $"{before}{gap}{after}"; 
+				unMatchedUserInputLetters = unMatchedUserInputLetters.ReplaceRangeWith(' ', closedSyllable.Index, closedSyllable.Length);
+
 			}
 
 			//check remaining portions of input for open syllables.
