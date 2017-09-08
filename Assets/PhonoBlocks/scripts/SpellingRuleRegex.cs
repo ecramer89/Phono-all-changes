@@ -43,6 +43,12 @@ public static class SpellingRuleRegex  {
 	};
 	static string consonantBlend = MatchAnyOf (consonantBlends);
 	static Regex consonantBlendRegex = Make(consonantBlend);
+	public Regex ConsonantBlend{
+		get {
+			return consonantBlendRegex;
+		}
+
+	}
 
 	static string[] vowelDigraphs = new string[] {
 		"ea", "ai", "ae", "aa", "ee", "ie", "oe", "ue", "ou", "ay", "oa"

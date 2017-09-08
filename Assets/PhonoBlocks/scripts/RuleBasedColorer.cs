@@ -77,6 +77,60 @@ public class Colorer  {
 		}
 
 	}
+
+
+	class ConsonantBlendsColorer : RuleBasedColorer{
+
+		Color blendedColor = Parameters.Colors.ConsonantBlendColors.COMPLETED_BLEND_COLOR;
+		Color consonantColor = Parameters.Colors.ConsonantBlendColors.SINGLE_CONSONANT_COLOR;
+		//valid blended consonants get colored green
+		//after removing all valid blended consonants; single consonants get colored blue.
+
+		public void ColorAndConfigureFlashForTeacherMode(
+			string updatedUserInputLetters, 
+			string previousUserInputLetters, 
+			List<InteractiveLetter> UIletters){
+
+
+			MatchCollection blends = SpellingRuleRegex.ConsonantBlend.Matches (updatedUserInputLetters);
+			foreach (Match blend in blends) {
+				List<InteractiveLetter> blendLetters = UIletters.GetRange (blend.Index, blend.Length);
+				Match previous = SpellingRuleRegex.ConsonantBlend.Match(previousUserInputLetters.Substring(blend.Index, blend.Length);
+				foreach (InteractiveLetter consonant in blendLetters) {
+					consonant.UpdateInputDerivedAndDisplayColor (blendedColor);
+						//if the user produced a new blend
+						if(!previous.Success || previous.Value != blend.Value){
+							//flash to indicate instantiation of spelling rule
+
+						}
+				
+				}
+
+			}
+		}
+
+
+		/*
+		 * 
+		 * 
+		 * 
+		 * */
+		public void ColorAndConfigureFlashForStudentMode(
+			string updatedUserInputLetters,
+			string previousUserInputLetters,  
+			List<InteractiveLetter> UIletters, 
+			string targetWord){
+
+			ColorAndConfigureFlashForTeacherMode (
+				updatedUserInputLetters,
+				previousUserInputLetters,
+				UIletters);
+
+		}
+
+
+
+	}
 		
 
 
