@@ -28,6 +28,13 @@ public static class SpellingRuleRegex  {
 	//Consonant Regex
 	static string consonant = $"[^\\W,^{vowel}]";
 	static Regex consonantRegex = Make(consonant);
+	public static Regex Consonant{
+		get {
+
+			return consonantRegex;
+		}
+
+	}
 
 	//Consonant Digraph regex
 	static string[] consonantDigraphs = new string[]{"th","ch","sh","qu","ck","ng","nk","wh"};
@@ -43,7 +50,7 @@ public static class SpellingRuleRegex  {
 	};
 	static string consonantBlend = MatchAnyOf (consonantBlends);
 	static Regex consonantBlendRegex = Make(consonantBlend);
-	public Regex ConsonantBlend{
+	public static Regex ConsonantBlend{
 		get {
 			return consonantBlendRegex;
 		}

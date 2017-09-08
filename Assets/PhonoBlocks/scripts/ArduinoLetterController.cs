@@ -78,7 +78,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				maxUserLetters = EndingIndex + 1 - StartingIndex;
 
 						
-		        EMPTY_USER_WORD = "".Fill (" ", maxUserLetters);
+		        EMPTY_USER_WORD = "".Fill (' ', maxUserLetters);
 				selectedUserControlledLettersAsStringBuilder = new StringBuilder (EMPTY_USER_WORD);
 		
 				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();

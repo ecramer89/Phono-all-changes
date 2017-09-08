@@ -58,7 +58,7 @@ public class Colorer  {
 	}
 
 	//todo: color schemes that return a reduced or otherwise modified list of UI letters can't do that here sicne the indices need to stay aligned.
-	public static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput, List<InteractiveLetter> UILetters, string target){
+	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput, List<InteractiveLetter> UILetters, string target){
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
 			//index can exceed length of target word since target word doesn't take trailing blanks into account. (e.g., "_ame___", vs "game")
@@ -78,11 +78,18 @@ public class Colorer  {
 
 	}
 
+	static void ConfigureFlashOnCompletionOfTargetRule(InteractiveLetter letter, Color a, Color b){
+		letter.ConfigureFlashParameters (a, b, 
+			Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+			Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+		);
+	}
+
 
 	class ConsonantBlendsColorer : RuleBasedColorer{
 
 		Color blendedColor = Parameters.Colors.ConsonantBlendColors.COMPLETED_BLEND_COLOR;
-		Color consonantColor = Parameters.Colors.ConsonantBlendColors.SINGLE_CONSONANT_COLOR;
+		Color singleConsonantColor = Parameters.Colors.ConsonantBlendColors.SINGLE_CONSONANT_COLOR;
 		//valid blended consonants get colored green
 		//after removing all valid blended consonants; single consonants get colored blue.
 
@@ -91,30 +98,45 @@ public class Colorer  {
 			string previousUserInputLetters, 
 			List<InteractiveLetter> UIletters){
 
-
-			MatchCollection blends = SpellingRuleRegex.ConsonantBlend.Matches (updatedUserInputLetters);
-			foreach (Match blend in blends) {
-				List<InteractiveLetter> blendLetters = UIletters.GetRange (blend.Index, blend.Length);
-				Match previous = SpellingRuleRegex.ConsonantBlend.Match(previousUserInputLetters.Substring(blend.Index, blend.Length);
-				foreach (InteractiveLetter consonant in blendLetters) {
-					consonant.UpdateInputDerivedAndDisplayColor (blendedColor);
+			//find and match each successive blend.
+			//because some strings could contain blends that cross boundaries (e.g., bll)
+			//input to the regex match is a buffer from which we replace the 
+			//blend letters with blanks on each iteration with blanks
+			string unmatchedUserInputLetters=updatedUserInputLetters;
+			Match consonantBlend = null;
+			while(consonantBlend==null || consonantBlend.Success){
+				consonantBlend = SpellingRuleRegex.ConsonantBlend.Match (unmatchedUserInputLetters);
+				List<InteractiveLetter> blendLetters = UIletters.GetRange (consonantBlend.Index, consonantBlend.Length);
+				//remove the blended letters from unmatchedUserInputLetters
+				//replace with blanks (don't use substring) to account for:
+				//"a dr" (example) and to keep the indices between the match data and previous input string aligned.
+				unmatchedUserInputLetters = unmatchedUserInputLetters.ReplaceRangeWith(' ', consonantBlend.Index, consonantBlend.Length);
+				Match previous = SpellingRuleRegex.ConsonantBlend.Match(previousUserInputLetters.Substring(consonantBlend.Index, consonantBlend.Length));
+					//color each single consonant within the blend.
+					foreach (InteractiveLetter consonant in blendLetters) {
+						consonant.UpdateInputDerivedAndDisplayColor (blendedColor);
 						//if the user produced a new blend
-						if(!previous.Success || previous.Value != blend.Value){
+						if(!previous.Success || previous.Value != consonantBlend.Value){
 							//flash to indicate instantiation of spelling rule
-
+							ConfigureFlashOnCompletionOfTargetRule (consonant,blendedColor, onColor);
 						}
-				
-				}
+					}
 
 			}
+
+			//after identifying/coloring the blends; color all remaining singleton consonants 
+		    //in the single consonant color.
+			MatchCollection singleConsonants = SpellingRuleRegex.Consonant.Matches(unmatchedUserInputLetters);
+			foreach (Match consonant in singleConsonants) {
+				InteractiveLetter consonantLetter = UIletters.ElementAt (consonant.Index);
+				consonantLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
+
+			}
+				
 		}
 
 
-		/*
-		 * 
-		 * 
-		 * 
-		 * */
+
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
@@ -186,7 +208,7 @@ public class Colorer  {
 				//inject 'gap' of blanks in place of the accounted for closed syllable letters.
 				//handles potential cases of a closed syllable falling between valid open syllables. e.g.
 				//a dog i 
-				string gap="".Fill (" ", closedSyllable.Length);
+				string gap="".Fill (' ', closedSyllable.Length);
 				string after = endIndexOfSyllable < unMatchedUserInputLetters.Length - 1 ? unMatchedUserInputLetters.Substring (endIndexOfSyllable+1, unMatchedUserInputLetters.Length - endIndexOfSyllable - 1) : "";
 				unMatchedUserInputLetters = $"{before}{gap}{after}"; 
 			}
@@ -287,14 +309,8 @@ public class Colorer  {
 			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
 
 			if (shouldFlash(magicE)) { 
-				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
-					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-				);
-				silentE.ConfigureFlashParameters (silentEColor, onColor, 
-					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-				);
+				ConfigureFlashOnCompletionOfTargetRule (innerVowel,innerVowelColor, onColor);
+				ConfigureFlashOnCompletionOfTargetRule (silentE, silentEColor, onColor);
 			}
 
 		}
