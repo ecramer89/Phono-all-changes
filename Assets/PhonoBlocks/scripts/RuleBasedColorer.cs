@@ -137,8 +137,7 @@ public class Colorer  {
 	}
 
 
-	//i think that target word needs to be a parameter to this function.
-	//otherwise it flashes in student mode when not appropriate.
+
 	class MagicEColorer : RuleBasedColorer {
 		static Color innerVowelColor = Color.red;
 		static Color silentEColor = Color.gray;
@@ -158,18 +157,11 @@ public class Colorer  {
 				);
 				return;
 			}
-			
+			InteractiveLetter innerVowel = null;
+			InteractiveLetter silentE = null;
+			ColorVowelAndSilentE (updatedUserInputLetters, magicE, UIletters, out innerVowel, out silentE);
+
 			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
-
-			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
-
-			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
-
-			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
-			//By definition, last letter of magic-e instance is e.
-			InteractiveLetter silentE = magicELetters.Last ();
-			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
-
 			if (previousInstantiationOfRule.Value != magicE.Value) { //flash for each new instantiation of magic e rule.
 				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
 					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
@@ -183,7 +175,7 @@ public class Colorer  {
 
 		}
 
-
+	
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
@@ -201,20 +193,13 @@ public class Colorer  {
 				return;
 			}
 
+			InteractiveLetter innerVowel = null;
+			InteractiveLetter silentE = null;
+			ColorVowelAndSilentE (updatedUserInputLetters, magicE, UIletters, out innerVowel, out silentE);
+
+             
 			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
-
-			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
-
-			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
-
-			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
-			//By definition, last letter of magic-e instance is e.
-			InteractiveLetter silentE = magicELetters.Last ();
-			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
-
-
 			Match targetMatch = Decoder.MagicERegex.Match (targetWord);
-
 		
 			if (targetMatch.Value == magicE.Value && 
 				(!previousInstantiationOfRule.Success || targetMatch.Value != previousInstantiationOfRule.Value)) { //flash only if the child newly instantiates the target magic e rule.
@@ -227,6 +212,23 @@ public class Colorer  {
 					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
 				);
 			}
+		}
+
+		void ColorVowelAndSilentE(
+			string updatedUserInputLetters, 
+			Match magicE,
+			List<InteractiveLetter> UIletters, 
+			out InteractiveLetter innerVowel, 
+			out InteractiveLetter silentE){
+
+			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
+
+			innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
+
+			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
+			//By definition, last letter of magic-e instance is e.
+			silentE = magicELetters.Last ();
+			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
 
 		}
 
