@@ -124,11 +124,10 @@ public class UserInputRouter : MonoBehaviour
 								replayInstructionsButton.SetActive (false);
 								userStarControllerGO.SetActive (false);
 						}
-		    	
-
-		      
 		        
 				}
+
+			Colorer.RegisterLettersToColorer (arduinoLetterController.GetAllUserInputLetters (false));
 		}
 
 		public bool IsScreenMode ()

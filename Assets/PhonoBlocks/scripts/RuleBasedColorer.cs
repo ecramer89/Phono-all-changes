@@ -17,18 +17,31 @@ public class Colorer  {
 	//nees to persist bw levels. depending on whichrule selected instantiates appropriate rule based colorer
 
 
-	static Action<string, List<InteractiveLetter>> applyDefaultColorsToNonMatchingLetters = (string updatedUserInputLetters, List<InteractiveLetter> UILetters) => {
+	static Action<string, List<InteractiveLetter>> ReapplyDefaultOrOff = (string updatedUserInputLetters,List<InteractiveLetter> UILetters) => {
 		int index = 0;
 		UILetters.ForEach (UILetter => {
 			UILetter.UpdateInputDerivedAndDisplayColor (updatedUserInputLetters [index] == ' ' ? offColor : onColor);
 			index++;
 		});
 	};
+		
 
-	public static event Action StartAllInteractiveLetterFlashes = ()=>{};
+	static event Action ResetAllInteractiveLetterFlashConfigurations = () => {};
+	static event Action StartAllInteractiveLetterFlashes = ()=>{};
 
+	public static void RegisterLettersToColorer(List<InteractiveLetter> UILetters){
+		UILetters.ForEach (UILetter => {
+			StartAllInteractiveLetterFlashes += UILetter.StartFlash;
+			ResetAllInteractiveLetterFlashConfigurations += UILetter.ResetFlashParameters;
+		});
+	}
+
+	//todo move ui letters to a central state.
 	public static void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters){
-		applyDefaultColorsToNonMatchingLetters (
+
+		ResetAllInteractiveLetterFlashConfigurations ();
+
+		ReapplyDefaultOrOff (
 			updatedUserInputLetters, UILetters);
 
 		ruleBasedColorer.ColorAndConfigureFlashForMatches (
@@ -55,7 +68,6 @@ public class Colorer  {
 					Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
 				);
 
-				StartAllInteractiveLetterFlashes += UILetter.StartFlash;
 			}
 		
 		}
@@ -76,10 +88,6 @@ public class Colorer  {
 			UIletters,
 			targetWord);
 
-		foreach (var d in StartAllInteractiveLetterFlashes.GetInvocationList ()) {
-			Debug.Log (d.Method.Name);
-
-		}
 
 		StartAllInteractiveLetterFlashes ();
 	}
@@ -164,24 +172,19 @@ public class Colorer  {
 			
 			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
 
-			if (previousInstantiationOfRule.Success)
-				return; //previous input matched magic e rule; not possible (via one letter change)
-			//to produce a -different- string matching magic e rule that would require change to any letter, so return.
-
 			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
 
 			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
 
 			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
 
+			if (!previousInstantiationOfRule.Success) { //only flash if the child newly instantiated the rule.
+				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
+					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+				);
+			}
 
-			innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
-				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
-				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
-			);
-
-			StartAllInteractiveLetterFlashes += innerVowel.StartFlash;
-		
 			//don't need to color consonants; they can retain their default on color.
 	
 			//By definition, last letter of magic-e instance is e.
@@ -191,7 +194,7 @@ public class Colorer  {
 				Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 				Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
 			);
-			StartAllInteractiveLetterFlashes+=silentE.StartFlash;
+
 		}
 
 		//no concept of a "partially matched" magic e rule. Just return.

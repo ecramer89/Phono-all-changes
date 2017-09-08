@@ -75,6 +75,12 @@ public class InteractiveLetter : MonoBehaviour{
 		SetNumFlashCycles (numCycles);
 	}
 
+	public void ResetFlashParameters(){
+		SetFlashColors (colorDerivedFromInput, colorDerivedFromInput);
+		SetFlashDurations (0f, 0f);
+		SetNumFlashCycles (0);
+	}
+
 
 		const int NOT_AN_ARDUINO_CONTROLLED_LETTER = -1;
 		int idxAsArduinoControlledLetter = NOT_AN_ARDUINO_CONTROLLED_LETTER; //i.e., if it's a word history controlled letter. you have to "opt in" to be an arduino controlled letter.
