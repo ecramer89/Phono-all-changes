@@ -36,20 +36,22 @@ public class Colorer  {
 		});
 	}
 
-	//todo move ui letters to a central state.
+
 	public static void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters, string targetWord){
 
 		ResetAllInteractiveLetterFlashConfigurations ();
+	
+		ReapplyDefaultOrOff (updatedUserInputLetters, UILetters);
 
-		ReapplyDefaultOrOff (
-			updatedUserInputLetters, UILetters);
-
-		ruleBasedColorer.ColorAndConfigureFlashForMatches (
+		ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 			updatedUserInputLetters, 
 			previousUserInputLetters,
 			UILetters,
 			targetWord
 		);
+
+
+		StartAllInteractiveLetterFlashes ();
 
 	
 	}
@@ -74,25 +76,7 @@ public class Colorer  {
 		}
 
 	}
-
-
-	public static void FlashFeedback(string updatedUserInputLetters, string previousUserInputLetters, List<InteractiveLetter> UIletters, string targetWord){
-		ruleBasedColorer.ColorAndConfigureFlashForPartialMatch (
-				updatedUserInputLetters,
-				previousUserInputLetters, 
-				UIletters,
-				targetWord);
-
-		TurnOffAndConfigureFlashForErroneousLetters (
-			updatedUserInputLetters,
-			previousUserInputLetters,
-			UIletters,
-			targetWord);
-
-
-		StartAllInteractiveLetterFlashes ();
-	}
-
+		
 
 
 	class OpenClosedVowelColorer : RuleBasedColorer{
@@ -101,11 +85,10 @@ public class Colorer  {
 		static Color longVowelColor = Color.red;
 
 	
-		public void ColorAndConfigureFlashForMatches(
+		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters,
-			string targetWord){
+			List<InteractiveLetter> UIletters){
 
 			string unMatchedUserInputLetters = updatedUserInputLetters;
 
@@ -137,14 +120,17 @@ public class Colorer  {
 
 		}
 
-		//no concept of a "partially matched" magic e rule. Just return.
-		public void ColorAndConfigureFlashForPartialMatch(
+
+		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
 			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
-			return;
+			ColorAndConfigureFlashForTeacherMode (
+				updatedUserInputLetters,
+				previousUserInputLetters,
+				UIletters);
 
 		}
 
@@ -157,20 +143,18 @@ public class Colorer  {
 		static Color innerVowelColor = Color.red;
 		static Color silentEColor = Color.gray;
 
-		public void ColorAndConfigureFlashForMatches(
+		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters,
-			string targetWord){
+			List<InteractiveLetter> UIletters){
 
 			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
-				openClosedVowelColorer.ColorAndConfigureFlashForMatches (
+				openClosedVowelColorer.ColorAndConfigureFlashForTeacherMode (
 					updatedUserInputLetters, 
 					previousUserInputLetters, 
-					UIletters,
-					targetWord
+					UIletters
 				);
 				return;
 			}
@@ -186,8 +170,7 @@ public class Colorer  {
 			InteractiveLetter silentE = magicELetters.Last ();
 			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
 
-			Debug.Log ("magic e value: " + magicE.Value + " target word " + targetWord + " " + Regex.IsMatch (targetWord, magicE.Value));
-			if (!previousInstantiationOfRule.Success && targetWord.Contains(magicE.Value)) { //only flash if the child newly instantiated the rule and if the child's input matches the target.
+			if (previousInstantiationOfRule.Value != magicE.Value) { //flash for each new instantiation of magic e rule.
 				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
 					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
 					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
@@ -200,17 +183,52 @@ public class Colorer  {
 
 		}
 
-		//no concept of a "partially matched" magic e rule. Just return.
-		public void ColorAndConfigureFlashForPartialMatch(
+
+		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
 			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
-			return;
+			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
+			if (!magicE.Success){
+				//no match found; switch to open/closed vowel coloring rules.
+				openClosedVowelColorer.ColorAndConfigureFlashForTeacherMode (
+					updatedUserInputLetters, 
+					previousUserInputLetters, 
+					UIletters
+				);
+				return;
+			}
+
+			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
+
+			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
+
+			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
+
+			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
+			//By definition, last letter of magic-e instance is e.
+			InteractiveLetter silentE = magicELetters.Last ();
+			silentE.UpdateInputDerivedAndDisplayColor (silentEColor);
+
+
+			Match targetMatch = Decoder.MagicERegex.Match (targetWord);
+
+		
+			if (targetMatch.Value == magicE.Value && 
+				(!previousInstantiationOfRule.Success || targetMatch.Value != previousInstantiationOfRule.Value)) { //flash only if the child newly instantiates the target magic e rule.
+				innerVowel.ConfigureFlashParameters (innerVowelColor, onColor, 
+					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+				);
+				silentE.ConfigureFlashParameters (silentEColor, onColor, 
+					Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+					Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+				);
+			}
 
 		}
-
 
 	}
 
@@ -222,14 +240,13 @@ public class Colorer  {
 //likewise 
 	
 interface RuleBasedColorer{
-	void ColorAndConfigureFlashForMatches (
+	void ColorAndConfigureFlashForTeacherMode (
 		string updatedUserInputLetters,
 		string previousUserInputLetters,
-		List<InteractiveLetter> UIletters,
-		string targetWord
+		List<InteractiveLetter> UIletters
 	);
 
-	void ColorAndConfigureFlashForPartialMatch( 
+	void ColorAndConfigureFlashForStudentMode( 
 		string updatedUserInputLetters, 
 		string previousUserInputLetters,
 		List<InteractiveLetter> UIletters,
