@@ -18,7 +18,7 @@ public enum Rule{
 	RControlledVowel
 }
 	
-public static class Decoder  {
+public static class SpellingRuleRegex  {
 
 	//Vowel Regex
 	static string[] vowels = new string[]{"a","e","i","o","u"};

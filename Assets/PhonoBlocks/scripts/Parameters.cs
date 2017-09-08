@@ -1,6 +1,50 @@
 ﻿//todo make globally accessible state and event files that ar ealso organized in this way
 //only do this when you have finished accomplishing all todos and cleaning up dependencies as best we can
+using UnityEngine;
+
 public class Parameters {
+
+
+	public class Colors{
+
+		public static Color DEFAULT_ON_COLOR=Color.white;
+		public static Color DEFAULT_OFF_COLOR=Color.gray;
+
+		public class OpenClosedVowelColors{
+			public static Color SHORT_VOWEL = Color.yellow;
+			public static Color LONG_VOWEL = Color.red;
+			public static Color FIRST_CONSONANT_COLOR = Color.blue;
+			public static Color SECOND_CONSONANT_COLOR = Color.green;
+		}
+
+
+		public class MagicEColors{
+			public static Color INNER_VOWEL = Color.red;
+			public static Color SILENT_E = Color.gray;
+		}
+
+		public class ConsonantDigraphColors{
+			public static Color COMPLETED_DIGRAPH_COLOR = Color.green;
+
+		}
+
+		public class ConsonantBlendColors{
+			public static Color COMPLETED_BLEND_COLOR = Color.green;
+			public static Color SINGLE_CONSONANT_COLOR = Color.blue;
+
+		}
+
+		public class VowelDigraphColors{
+			public static Color COMPLETED_DIGRAPH_COLOR = Color.red;
+
+		}
+
+		public class RControlledVowelColors{
+			public static Color R_CONTROLLED_VOWEL_COLOR = Color.red;
+			public static Color R_CONTROLLED_R_COLOR = Color.red;
+		}
+
+	}
 
 	public class Hints{
 		public static readonly int LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER=2;

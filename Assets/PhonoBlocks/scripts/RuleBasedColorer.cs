@@ -101,7 +101,7 @@ public class Colorer  {
 
 		void ColorConsonants(List<InteractiveLetter> UIletters, string updatedUserInputLetters){
 			//color consonants in alternating blue-green
-			MatchCollection consonants = Decoder.AnyConsonant.Matches (updatedUserInputLetters);
+			MatchCollection consonants = SpellingRuleRegex.AnyConsonant.Matches (updatedUserInputLetters);
 			for (int i = 0; i < consonants.Count; i++) {
 				Color consonantColor = i % 2 == 0 ? consonantColorFirstAlternation : consonantColorSecondAlternation;
 				Match consonant = consonants [i];
@@ -119,10 +119,10 @@ public class Colorer  {
 			string unMatchedUserInputLetters = updatedUserInputLetters;
 
 			//first check for closed syllables. color any vowel in a closed syllable 'short'
-			MatchCollection closedSyllables = Decoder.ClosedSyllable.Matches(unMatchedUserInputLetters);
+			MatchCollection closedSyllables = SpellingRuleRegex.ClosedSyllable.Matches(unMatchedUserInputLetters);
 			foreach (Match closedSyllable in closedSyllables) {
 				var closedSyllableLetters = UIletters.Skip (closedSyllable.Index).Take (closedSyllable.Length);
-				InteractiveLetter vowel = closedSyllableLetters.ElementAt (Decoder.AnyVowel.Match (closedSyllable.Value).Index);
+				InteractiveLetter vowel = closedSyllableLetters.ElementAt (SpellingRuleRegex.AnyVowel.Match (closedSyllable.Value).Index);
 				//update vowel color
 				vowel.UpdateInputDerivedAndDisplayColor (shortVowelColor);
 				//update the string that will be used to check for any remaining open syllables.
@@ -136,10 +136,10 @@ public class Colorer  {
 
 			//check remaining portions of input for open syllables.
 			//color any vowel in open syllable 'long'
-			MatchCollection openSyllables = Decoder.OpenSyllable.Matches(unMatchedUserInputLetters);
+			MatchCollection openSyllables = SpellingRuleRegex.OpenSyllable.Matches(unMatchedUserInputLetters);
 			foreach (Match openSyllable in openSyllables) {
 				var openSyllableLetters = UIletters.Skip (openSyllable.Index).Take (openSyllable.Length);
-				Match vowel = Decoder.AnyVowel.Match (openSyllable.Value);
+				Match vowel = SpellingRuleRegex.AnyVowel.Match (openSyllable.Value);
 				InteractiveLetter vowelLetter = openSyllableLetters.ElementAt(vowel.Index);
 				vowelLetter.UpdateInputDerivedAndDisplayColor (longVowelColor);
 
@@ -178,7 +178,7 @@ public class Colorer  {
 			if (magicE == null)
 				return;
 
-			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
+			Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
 		
 			ColorAndConfigureFlashForVowelAndSilentE (updatedUserInputLetters, magicE, UIletters,
 				() => {
@@ -201,8 +201,8 @@ public class Colorer  {
 			if (magicE == null)
 				return;
 
-			Match previousInstantiationOfRule = Decoder.MagicERegex.Match (previousUserInputLetters);
-			Match targetMatch = Decoder.MagicERegex.Match (targetWord);
+			Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
+			Match targetMatch = SpellingRuleRegex.MagicERegex.Match (targetWord);
 		
 			ColorAndConfigureFlashForVowelAndSilentE (updatedUserInputLetters, magicE, UIletters, 
 				() => {
@@ -215,7 +215,7 @@ public class Colorer  {
 		}
 
 		Match RevertToOpenClosedColorIfNoMatchFound(string updatedUserInputLetters, List<InteractiveLetter> UILetters){
-			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
+			Match magicE = SpellingRuleRegex.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
 				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
@@ -238,7 +238,7 @@ public class Colorer  {
 
 			var magicELetters = UIletters.Skip(magicE.Index).Take(magicE.Length);
 
-			InteractiveLetter innerVowel = magicELetters.ElementAt (Decoder.AnyVowel.Match (magicE.Value).Index);
+			InteractiveLetter innerVowel = magicELetters.ElementAt (SpellingRuleRegex.AnyVowel.Match (magicE.Value).Index);
 
 			innerVowel.UpdateInputDerivedAndDisplayColor (innerVowelColor);
 			//By definition, last letter of magic-e instance is e.
