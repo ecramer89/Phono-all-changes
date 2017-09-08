@@ -8,8 +8,8 @@ using Extensions;
 	
 public class Colorer  {
 
-	static Color onColor = Color.white;
-	static Color offColor = Color.gray;
+	static Color onColor = Parameters.Colors.DEFAULT_ON_COLOR;
+	static Color offColor = Parameters.Colors.DEFAULT_OFF_COLOR;
 	static RuleBasedColorer magicEColorer = new MagicEColorer();
 	static RuleBasedColorer openClosedVowelColorer = new OpenClosedVowelColorer();
 
@@ -82,10 +82,10 @@ public class Colorer  {
 
 	class OpenClosedVowelColorer : RuleBasedColorer{
 
-		static Color shortVowelColor = Color.yellow;
-		static Color longVowelColor = Color.red;
-		static Color consonantColorFirstAlternation = Color.blue;
-		static Color consonantColorSecondAlternation = Color.green;
+		static Color shortVowelColor = Parameters.Colors.OpenClosedVowelColors.SHORT_VOWEL;
+		static Color longVowelColor =  Parameters.Colors.OpenClosedVowelColors.LONG_VOWEL;
+		static Color consonantColorFirstAlternation = Parameters.Colors.OpenClosedVowelColors.FIRST_CONSONANT_COLOR;
+		static Color consonantColorSecondAlternation = Parameters.Colors.OpenClosedVowelColors.SECOND_CONSONANT_COLOR;
 	
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
@@ -166,8 +166,8 @@ public class Colorer  {
 
 
 	class MagicEColorer : RuleBasedColorer {
-		static Color innerVowelColor = Color.red;
-		static Color silentEColor = Color.gray;
+		static Color innerVowelColor = Parameters.Colors.MagicEColors.INNER_VOWEL;
+		static Color silentEColor = Parameters.Colors.MagicEColors.SILENT_E;
 
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
@@ -175,7 +175,7 @@ public class Colorer  {
 			List<InteractiveLetter> UIletters){
 
 			Match magicE = RevertToOpenClosedColorIfNoMatchFound (updatedUserInputLetters, UIletters);
-			if (magicE == null)
+			if (!magicE.Success)
 				return;
 
 			Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
@@ -189,6 +189,9 @@ public class Colorer  {
 
 		}
 
+
+	
+
 	
 	
 		public void ColorAndConfigureFlashForStudentMode(
@@ -198,7 +201,7 @@ public class Colorer  {
 			string targetWord){
 
 			Match magicE = RevertToOpenClosedColorIfNoMatchFound (updatedUserInputLetters, UIletters);
-			if (magicE == null)
+			if (!magicE.Success)
 				return;
 
 			Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
