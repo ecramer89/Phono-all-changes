@@ -83,24 +83,49 @@ public class Colorer  {
 
 		static Color shortVowelColor = Color.yellow;
 		static Color longVowelColor = Color.red;
-
+		static Color consonantColorFirstAlternation = Color.blue;
+		static Color consonantColorSecondAlternation = Color.green;
 	
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
 			List<InteractiveLetter> UIletters){
 
+			//color consonants in alternating blue-green.
+			ColorConsonants(UIletters, updatedUserInputLetters);
+			//color vowels by syllable type.
+			ColorVowels(updatedUserInputLetters,UIletters);
+
+		}
+
+		void ColorConsonants(List<InteractiveLetter> UIletters, string updatedUserInputLetters){
+			//color consonants in alternating blue-green
+			MatchCollection consonants = Decoder.AnyConsonant.Matches (updatedUserInputLetters);
+			for (int i = 0; i < consonants.Count; i++) {
+				Color consonantColor = i % 2 == 0 ? consonantColorFirstAlternation : consonantColorSecondAlternation;
+				Match consonant = consonants [i];
+				//"any consonant" will match consonant digraphs and blends as well as single letters.
+				//as such, some matches might contain more than one letter, which need to be colored.
+				List<InteractiveLetter> consonantLetters = UIletters.GetRange (consonant.Index, consonant.Length);
+				foreach (InteractiveLetter consonantLetter in consonantLetters) {
+					consonantLetter.UpdateInputDerivedAndDisplayColor (consonantColor);
+				}
+			}
+		}
+
+		public void ColorVowels(string updatedUserInputLetters, List<InteractiveLetter> UIletters){
+			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
-
 			//find closed vowels; update their colors; of what remains, find open vowels, update their colors, return what remains
-
 			MatchCollection closedSyllables = Decoder.ClosedSyllable.Matches(unMatchedUserInputLetters);
 			foreach (Match closedSyllable in closedSyllables) {
 				var closedSyllableLetters = UIletters.Skip (closedSyllable.Index).Take (closedSyllable.Length);
 
 				InteractiveLetter vowel = closedSyllableLetters.ElementAt (Decoder.AnyVowel.Match (closedSyllable.Value).Index);
-	
+
+				//update vowel color
 				vowel.UpdateInputDerivedAndDisplayColor (shortVowelColor);
+
 
 				int endIndexOfSyllable = closedSyllable.Index + closedSyllable.Length - 1;
 				string before = unMatchedUserInputLetters.Substring (0, closedSyllable.Index);
@@ -116,6 +141,7 @@ public class Colorer  {
 				Match vowel = Decoder.AnyVowel.Match (openSyllable.Value);
 				InteractiveLetter vowelLetter = openSyllableLetters.ElementAt(vowel.Index);
 				vowelLetter.UpdateInputDerivedAndDisplayColor (longVowelColor);
+
 			}
 
 		}
@@ -150,9 +176,9 @@ public class Colorer  {
 			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
-				openClosedVowelColorer.ColorAndConfigureFlashForTeacherMode (
+				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
+				openClosed.ColorVowels (
 					updatedUserInputLetters, 
-					previousUserInputLetters, 
 					UIletters
 				);
 				return;
@@ -185,9 +211,9 @@ public class Colorer  {
 			Match magicE = Decoder.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
-				openClosedVowelColorer.ColorAndConfigureFlashForTeacherMode (
+				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
+				openClosed.ColorVowels (
 					updatedUserInputLetters, 
-					previousUserInputLetters, 
 					UIletters
 				);
 				return;
@@ -213,6 +239,7 @@ public class Colorer  {
 				);
 			}
 		}
+			
 
 		void ColorVowelAndSilentE(
 			string updatedUserInputLetters, 
@@ -253,6 +280,8 @@ interface RuleBasedColorer{
 		string previousUserInputLetters,
 		List<InteractiveLetter> UIletters,
 		string targetWord);
+
+
 }
 	
 
