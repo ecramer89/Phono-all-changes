@@ -28,6 +28,9 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
 			this.activity = activity;
 		};
+		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> UILetters) => {
+			this.uILetters = UILetters;
+		};
 
 	}
 
@@ -36,6 +39,16 @@ public class State: MonoBehaviour  {
 		get {
 			return activity;
 		}
+	}
+
+
+	private List<InteractiveLetter> uILetters;
+	public List<InteractiveLetter> UILetters{
+		get {
+
+			return uILetters;
+		}
+
 	}
 
 

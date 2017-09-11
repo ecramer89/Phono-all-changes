@@ -83,9 +83,12 @@ public class ArduinoLetterController : MonoBehaviour{
 		
 				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();
 				letterGrid.InitializeBlankLetterSpaces (maxUserLetters);
+
 			
 				AssignInteractiveLettersToTangibleCounterParts ();
 				instance = this;
+
+				Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
 				
 		}
 

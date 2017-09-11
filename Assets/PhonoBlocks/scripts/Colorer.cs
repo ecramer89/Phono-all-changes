@@ -57,6 +57,11 @@ public class Colorer : MonoBehaviour   {
 			}
 
 		};
+
+
+		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
+			RegisterLettersToColorer(letters);
+		};
 	}
 
 

@@ -156,7 +156,7 @@ public class SessionsDirector : MonoBehaviour
 		public void SelectTeacherMode ()
 		{
 
-				Events.Dispatcher.SelectMode (Mode.TEACHER);
+				Events.Dispatcher.ModeSelected (Mode.TEACHER);
 		       
 				mode = PhonoMode.TEACHER;
 				activitySelectionButtons.SetActive (true);
@@ -179,7 +179,7 @@ public class SessionsDirector : MonoBehaviour
 
 		public void SetSessionForPracticeMode (int session)
 	{			
-				Events.Dispatcher.SelectActivity (ProblemsRepository.instance.ActivityForSession (session));
+				Events.Dispatcher.ActivitySelected (ProblemsRepository.instance.ActivityForSession (session));
 				currentUserSession = session;
 				sessionSelectionButtons.SetActive (false);
 				SetParametersForStudentMode (studentActivityControllerOB);
@@ -200,7 +200,8 @@ public class SessionsDirector : MonoBehaviour
 	{       	
 
 
-		Events.Dispatcher.SelectMode (Mode.STUDENT);
+		Events.Dispatcher.ModeSelected (Mode.STUDENT);
+
 				if (studentNameInputField.activeSelf) {
 						string nameEntered = studentName.stringToEdit.Trim ().ToLower ();
 						if (nameEntered.Length > 0) {

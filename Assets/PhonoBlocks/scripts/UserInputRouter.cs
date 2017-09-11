@@ -126,8 +126,7 @@ public class UserInputRouter : MonoBehaviour
 						}
 		        
 				}
-
-			Colorer.RegisterLettersToColorer (arduinoLetterController.GetAllUserInputLetters (false));
+			
 		}
 
 		public bool IsScreenMode ()
@@ -220,7 +219,7 @@ public class UserInputRouter : MonoBehaviour
 		public void AddCurrentWordToHistory (bool playSoundsAndShowImage)
 		{
 
-				wordHistoryController.AddCurrentWordToHistory (arduinoLetterController.GetAllUserInputLetters (false), playSoundsAndShowImage);
+		wordHistoryController.AddCurrentWordToHistory (State.Current.UILetters, playSoundsAndShowImage);
 
 		}
 		
@@ -310,11 +309,6 @@ public class UserInputRouter : MonoBehaviour
 
 		}
 
-		public List<InteractiveLetter> GetAllArduinoControlledLetters {
-				get {
-						return arduinoLetterController.GetAllUserInputLetters (false);
-			
-				}
-		}
+		
 
 }

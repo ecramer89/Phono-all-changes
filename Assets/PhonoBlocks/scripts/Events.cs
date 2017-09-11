@@ -20,15 +20,23 @@ public class Events: MonoBehaviour  {
 	}
 
 	public event Action<Mode> OnModeSelected = (Mode mode) => {};
-	public void SelectMode(Mode mode){
+	public void ModeSelected(Mode mode){
 		OnModeSelected (mode);
 	}
 
 
 	public event Action<Activity> OnActivitySelected = (Activity activity)=>{};
-	public void SelectActivity(Activity activity){
+	public void ActivitySelected(Activity activity){
 		OnActivitySelected (activity);
 	}
+
+	public event Action<List<InteractiveLetter>> OnUILettersCreated = (List<InteractiveLetter> UILetters)=>{};
+	public void UILettersCreated(List<InteractiveLetter> UILetters){
+		OnUILettersCreated(UILetters);
+	}
+
+
+
 
 
 
