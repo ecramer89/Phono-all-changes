@@ -305,6 +305,94 @@ public class Colorer  {
 		}
 
 	}
+
+	class VowelDigraphsColorer : RuleBasedColorer{
+
+		static Color digraphColor = Parameters.Colors.VowelDigraphColors.COMPLETED_DIGRAPH_COLOR;
+		static Color singleMemberOfTargetDigraphColor = Parameters.Colors.VowelDigraphColors.SINGLE_MEMBER_OF_TARGET_DIGRAPH_COLOR;
+		static Action<InteractiveLetter> hintPartialMatch = (InteractiveLetter letter) => flashCorrectLettersOfTargetMultiLetterUnit (letter, digraphColor, singleMemberOfTargetDigraphColor);
+
+		public void ColorAndConfigureFlashForTeacherMode(
+			string updatedUserInputLetters, 
+			string previousUserInputLetters, 
+			List<InteractiveLetter> UIletters){
+
+			ColorAllInstancesOfMultiLetterUnit (
+				updatedUserInputLetters,
+				previousUserInputLetters,
+				UIletters,
+				SpellingRuleRegex.VowelDigraph,
+				digraphColor
+			);
+
+		}
+
+		public void ColorAndConfigureFlashForStudentMode(
+			string updatedUserInputLetters,
+			string previousUserInputLetters,  
+			List<InteractiveLetter> UIletters, 
+			string targetWord){
+
+
+			ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit (
+				updatedUserInputLetters,
+				previousUserInputLetters,  
+				UIletters, 
+				targetWord,
+				SpellingRuleRegex.VowelDigraph,
+				digraphColor,
+				singleMemberOfTargetDigraphColor,
+				hintPartialMatch
+			);
+
+		}
+
+	}
+
+	class RControlledVowelsColorer : RuleBasedColorer{
+
+		static Color rControlledVowelColor = Parameters.Colors.RControlledVowelColors.R_CONTROLLED_VOWEL_COLOR;
+		static Color singleMemberOfRControlledVowelColor = Parameters.Colors.RControlledVowelColors.SINGLE_MEMBER_OF_TARGET_R_CONTROLLED_VOWEL_COLOR;
+		static Action<InteractiveLetter> hintPartialMatch = (InteractiveLetter letter) => flashCorrectLettersOfTargetMultiLetterUnit (letter, rControlledVowelColor, singleMemberOfRControlledVowelColor);
+
+		public void ColorAndConfigureFlashForTeacherMode(
+			string updatedUserInputLetters, 
+			string previousUserInputLetters, 
+			List<InteractiveLetter> UIletters){
+
+			ColorAllInstancesOfMultiLetterUnit (
+				updatedUserInputLetters,
+				previousUserInputLetters,
+				UIletters,
+				SpellingRuleRegex.RControlledVowel,
+				rControlledVowelColor
+			);
+
+		}
+
+		public void ColorAndConfigureFlashForStudentMode(
+			string updatedUserInputLetters,
+			string previousUserInputLetters,  
+			List<InteractiveLetter> UIletters, 
+			string targetWord){
+
+
+			ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit (
+				updatedUserInputLetters,
+				previousUserInputLetters,  
+				UIletters, 
+				targetWord,
+				SpellingRuleRegex.RControlledVowel,
+				rControlledVowelColor,
+				singleMemberOfRControlledVowelColor,
+				hintPartialMatch
+			);
+
+		}
+
+	}
+
+
 		
 
 

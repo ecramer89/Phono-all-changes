@@ -66,8 +66,9 @@ public class Parameters {
 		}
 
 		public class RControlledVowelColors{
-			public static Color R_CONTROLLED_VOWEL_COLOR = red;
-			public static Color R_CONTROLLED_R_COLOR = red;
+			public static Color R_CONTROLLED_VOWEL_COLOR = red;//applies to both the vowel and the r.
+			//separate colors for the r and the vowel will require minor changes to the code in the r controlled vowel
+			//colorer.
 			public static Color SINGLE_MEMBER_OF_TARGET_R_CONTROLLED_VOWEL_COLOR = Color.gray;
 		}
 
