@@ -170,8 +170,10 @@ public class Colorer  {
 					Match previous = SpellingRuleRegex.ConsonantBlend.Match (previousUserInputLetters.Substring (targetConsonantBlend.Index, targetConsonantBlend.Length));
 				
 					foreach (InteractiveLetter consonant in blendLetters) {
+						//for simplicity's sake, we always re-color the matching letters (otherwise they would be re-colored white by the entry point function)
+						consonant.UpdateInputDerivedAndDisplayColor (blendedColor);
 						if (!previous.Success || previous.Value != targetConsonantBlend.Value) {
-							consonant.UpdateInputDerivedAndDisplayColor (blendedColor);
+							//but only flash if the child just completed the blend on this letter placement
 							ConfigureFlashOnCompletionOfTargetRule (consonant, blendedColor, onColor);
 						}
 					}

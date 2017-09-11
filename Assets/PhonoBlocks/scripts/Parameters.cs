@@ -4,36 +4,6 @@ using UnityEngine;
 
 public class Parameters {
 
-
-	/*
-	 * 
-	 * green = Color.green;
-				green.r = (float)95 / (float)255;
-				green.b = (float)127 / (float)255;
-				green.g = (float)180 / (float)255;
-				blue = Color.blue;
-				blue.r = (float)105 / (float)255;
-				blue.g = (float)210 / (float)255;
-				blue.b = (float)231 / (float)255;
-				red = Color.red;
-				red.g = (float)58 / (float)255;
-				red.b = (float)68 / (float)255;
-				pink = Color.red;
-				pink.r = (float)247 / (float)255;
-				pink.g = (float)98 / (float)255;
-				pink.b = (float)162 / (float)255;
-				yellow = Color.yellow;
-				yellow.r = (float)249 / (float)255;
-				yellow.g = (float)249 / (float)255;
-				yellow.b = (float)98 / (float)255;
-				gray = Color.gray;
-				gray.r = (float)(gray.r * 1.2);
-				gray.g = gray.r;
-				gray.b = gray.r;
-	 * 
-	 * 
-	 * */
-
 	public class Colors{
 
 		//define special colors to use over Unity's blue, green, yellow, red, etc.

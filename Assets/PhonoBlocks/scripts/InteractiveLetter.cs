@@ -203,6 +203,7 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 
 	public void UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
+		Debug.Log ("New Color " + c);
 			UpdateDefaultColour (c);
 			UpdateDisplayColour (c);
 		}
