@@ -193,11 +193,14 @@ public class Colorer : MonoBehaviour   {
 
 			targetUnit = spellingRuleRegex.Match (unmatchedTargetInputLetters);
 			unmatchedTargetInputLetters = unmatchedTargetInputLetters.ReplaceRangeWith(' ', targetUnit.Index, targetUnit.Length);
-			string correspondingUserInput = updatedUserInputLetters.Substring (targetUnit.Index, targetUnit.Length);
-			Match userUnit = spellingRuleRegex.Match(correspondingUserInput);
+			//string correspondingUserInput = updatedUserInputLetters.Substring (targetUnit.Index, targetUnit.Length);
+			Match userUnit = spellingRuleRegex.Match(updatedUserInputLetters);
 
-			//update colors and flash if user is newly successful.
-			if (userUnit.Success && userUnit.Value == targetUnit.Value) {
+			//if a corresponding match was found in the updated user input
+			if (userUnit.Success && 
+				userUnit.Index == targetUnit.Index && 
+				userUnit.Length == targetUnit.Length && 
+				userUnit.Value == targetUnit.Value) {
 				List<InteractiveLetter> unitLetters = UIletters.GetRange (userUnit.Index, userUnit.Length);
 				Match previous = spellingRuleRegex.Match (previousUserInputLetters.Substring (targetUnit.Index, targetUnit.Length));
 

@@ -178,9 +178,10 @@ public class SessionsDirector : MonoBehaviour
 		}
 
 		public void SetSessionForPracticeMode (int session)
-		{
+	{			
 				Events.Dispatcher.SelectActivity (ProblemsRepository.instance.ActivityForSession (session));
 				currentUserSession = session;
+				sessionSelectionButtons.SetActive (false);
 				SetParametersForStudentMode (studentActivityControllerOB);
 				Application.LoadLevel ("Activity");
 
@@ -196,7 +197,10 @@ public class SessionsDirector : MonoBehaviour
 
 
 		public void SelectStudentMode ()
-	{       	Events.Dispatcher.SelectMode (Mode.STUDENT);
+	{       	
+
+
+		Events.Dispatcher.SelectMode (Mode.STUDENT);
 				if (studentNameInputField.activeSelf) {
 						string nameEntered = studentName.stringToEdit.Trim ().ToLower ();
 						if (nameEntered.Length > 0) {
