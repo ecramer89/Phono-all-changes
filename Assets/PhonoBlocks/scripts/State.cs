@@ -11,6 +11,24 @@ public class State: MonoBehaviour  {
 
 	}
 
+	public void Start(){
+		current = this;
+	}
+
+	public void SubscribeToEvents(){
+		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
+			this.activity = activity;
+		};
+
+		Events.Dispatcher.OnModeSelected += (Mode mode) => {
+			this.mode = mode;
+		};
+
+		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
+			this.uILetters = letters;
+		};
+
+	}
 
 	private Mode mode;
 	public Mode Mode{
@@ -19,20 +37,6 @@ public class State: MonoBehaviour  {
 		}
 	}
 
-	void Start(){
-		current = this;
-
-		Events.Dispatcher.OnModeSelected += (Mode mode) => {
-			this.mode = mode;
-		};
-		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
-			this.activity = activity;
-		};
-		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> UILetters) => {
-			this.uILetters = UILetters;
-		};
-
-	}
 
 	private Activity activity;
 	public Activity Activity{

@@ -244,7 +244,6 @@ public class Colorer : MonoBehaviour   {
 
 
 	class ConsonantBlendsColorer : RuleBasedColorer{
-		List<InteractiveLetter> UIletters = State.Current.UILetters;
 		//valid blended consonants get colored green
 		//after removing all valid blended consonants; single consonants get colored blue.
 		Color blendedColor = Parameters.Colors.ConsonantBlendColors.COMPLETED_BLEND_COLOR;
@@ -273,7 +272,7 @@ public class Colorer : MonoBehaviour   {
 		    //in the single consonant color.
 			MatchCollection singleConsonants = SpellingRuleRegex.Consonant.Matches(unmatchedUserInputLetters);
 			foreach (Match consonant in singleConsonants) {
-				InteractiveLetter consonantLetter = UIletters.ElementAt (consonant.Index);
+				InteractiveLetter consonantLetter = State.Current.UILetters.ElementAt (consonant.Index);
 				consonantLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
 
 			}

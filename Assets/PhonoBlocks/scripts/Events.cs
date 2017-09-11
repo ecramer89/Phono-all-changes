@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+
+[RequireComponent(typeof(State))]
 public class Events: MonoBehaviour  {
 
 	private static Events events;
@@ -12,12 +14,7 @@ public class Events: MonoBehaviour  {
 
 		}
 	}
-
-
-	void Awake(){
-		events = this;
-
-	}
+		
 
 	public event Action<Mode> OnModeSelected = (Mode mode) => {};
 	public void ModeSelected(Mode mode){
@@ -36,8 +33,28 @@ public class Events: MonoBehaviour  {
 	}
 
 
+	public event Action<string> OnTargetWordSet = (string targetWord) => { };
+	public void TargetWordSet(string targetWord){
+
+	}
+
+
+	void Awake(){
+		events = this;
+		State state = GetComponent<State> ();
+		state.SubscribeToEvents ();
+	}
+
+
+
+
+
 
 
 
 
 }
+
+
+
+
