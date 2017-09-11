@@ -10,11 +10,12 @@ public class Colorer  {
 
 	static Color onColor = Parameters.Colors.DEFAULT_ON_COLOR;
 	static Color offColor = Parameters.Colors.DEFAULT_OFF_COLOR;
+	static RuleBasedColorer consonantDigraphsColorer = new ConsonantDigraphsColorer();
 	static RuleBasedColorer consonantBlendsColorer = new ConsonantBlendsColorer();
 	static RuleBasedColorer magicEColorer = new MagicEColorer();
 	static RuleBasedColorer openClosedVowelColorer = new OpenClosedVowelColorer();
 
-	static RuleBasedColorer ruleBasedColorer = consonantBlendsColorer; //todo, make a GO, start, subscribes to event; color rule selected;
+	static RuleBasedColorer ruleBasedColorer = consonantDigraphsColorer; //todo, make a GO, start, subscribes to event; color rule selected;
 	//nees to persist bw levels. depending on whichrule selected instantiates appropriate rule based colorer
 
 
@@ -192,6 +193,96 @@ public class Colorer  {
 
 					}
 						
+				}
+			}
+
+		}
+
+	}
+
+
+	class ConsonantDigraphsColorer : RuleBasedColorer{
+
+		static Color digraphColor = Parameters.Colors.ConsonantDigraphColors.COMPLETED_DIGRAPH_COLOR;
+		static Color singleMemberOfTargetDigraphColor = Parameters.Colors.ConsonantDigraphColors.SINGLE_MEMBER_OF_TARGET_DIGRAPH_COLOR;
+
+		public void ColorAndConfigureFlashForTeacherMode(
+			string updatedUserInputLetters, 
+			string previousUserInputLetters, 
+			List<InteractiveLetter> UIletters){
+		
+			string unmatchedUserInputLetters=updatedUserInputLetters;
+			Match digraph = null;
+			while(digraph==null || digraph.Success){
+				digraph = SpellingRuleRegex.ConsonantDigraph.Match (unmatchedUserInputLetters);
+				List<InteractiveLetter> digraphLetters = UIletters.GetRange (digraph.Index, digraph.Length);
+				unmatchedUserInputLetters = unmatchedUserInputLetters.ReplaceRangeWith(' ', digraph.Index, digraph.Length);
+				Match previous = SpellingRuleRegex.ConsonantDigraph.Match(previousUserInputLetters.Substring(digraph.Index, digraph.Length));
+				foreach (InteractiveLetter consonant in digraphLetters) {
+					consonant.UpdateInputDerivedAndDisplayColor (digraphColor);
+				
+					if(!previous.Success || previous.Value != digraph.Value){
+				
+						ConfigureFlashOnCompletionOfTargetRule (consonant,digraphColor, onColor);
+					}
+				}
+
+			}
+		}
+
+		public void ColorAndConfigureFlashForStudentMode(
+			string updatedUserInputLetters,
+			string previousUserInputLetters,  
+			List<InteractiveLetter> UIletters, 
+			string targetWord){
+
+
+			string unmatchedTargetInputLetters=targetWord;
+			Match targetDigraph = null;
+			while(targetDigraph==null || targetDigraph.Success){
+
+				targetDigraph = SpellingRuleRegex.ConsonantDigraph.Match (unmatchedTargetInputLetters);
+				unmatchedTargetInputLetters = unmatchedTargetInputLetters.ReplaceRangeWith(' ', targetDigraph.Index, targetDigraph.Length);
+				string correspondingUserInput = updatedUserInputLetters.Substring (targetDigraph.Index, targetDigraph.Length);
+				Match userBlend = SpellingRuleRegex.ConsonantDigraph.Match(correspondingUserInput);
+
+				//update colors and flash if user is newly successful.
+				if (userBlend.Success && userBlend.Value == targetDigraph.Value) {
+					List<InteractiveLetter> blendLetters = UIletters.GetRange (userBlend.Index, userBlend.Length);
+					Match previous = SpellingRuleRegex.ConsonantBlend.Match (previousUserInputLetters.Substring (targetDigraph.Index, targetDigraph.Length));
+
+					foreach (InteractiveLetter consonant in blendLetters) {
+						//for simplicity's sake, we always re-color the matching letters (otherwise they would be re-colored white by the entry point function)
+						consonant.UpdateInputDerivedAndDisplayColor (digraphColor);
+						if (!previous.Success || previous.Value != targetDigraph.Value) {
+							//but only flash if the child just completed the blend on this letter placement
+							ConfigureFlashOnCompletionOfTargetRule (consonant, digraphColor, onColor);
+						}
+					}
+				} else {
+					//check whether the user successfully matched either any of the consonants in this blend.
+					//if so, then color that letter as a single consonant.
+					//(we don't bother coloring other consonants in student blends mode, even if correctly placed.
+					//e.g. the "p" in "drop" would be white here, though would be single consonant color inteacher mode blends.
+					for (int i = 0; i < targetDigraph.Length; i++) {
+						int indexOfLetterInInput = i + targetDigraph.Index;
+						if (updatedUserInputLetters [indexOfLetterInInput] == targetDigraph.Value [i]) {
+							InteractiveLetter asInteractiveLetter = UIletters.ElementAt (indexOfLetterInInput);
+							asInteractiveLetter.UpdateInputDerivedAndDisplayColor (singleMemberOfTargetDigraphColor);
+							//for multi-letter units (digraphs, r controlled vowel) we do flash each correct single 
+							//letter of target multi letter unit three times in the color of the target multi letter unit
+							//as usual, only do this if it's the first time the child placed this letter.
+							if (previousUserInputLetters [indexOfLetterInInput] != targetDigraph.Value [i]) {
+								asInteractiveLetter.ConfigureFlashParameters (digraphColor, singleMemberOfTargetDigraphColor, 
+									Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+									Parameters.Flash.Times.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME
+								);
+				
+							}
+						}
+
+					}
+
 				}
 			}
 

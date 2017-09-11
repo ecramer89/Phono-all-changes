@@ -49,6 +49,7 @@ public class Parameters {
 
 		public class ConsonantDigraphColors{
 			public static Color COMPLETED_DIGRAPH_COLOR = green;
+			public static Color SINGLE_MEMBER_OF_TARGET_DIGRAPH_COLOR = Color.gray;
 
 		}
 
@@ -60,12 +61,14 @@ public class Parameters {
 
 		public class VowelDigraphColors{
 			public static Color COMPLETED_DIGRAPH_COLOR = red;
+			public static Color SINGLE_MEMBER_OF_TARGET_DIGRAPH_COLOR = Color.gray;
 
 		}
 
 		public class RControlledVowelColors{
 			public static Color R_CONTROLLED_VOWEL_COLOR = red;
 			public static Color R_CONTROLLED_R_COLOR = red;
+			public static Color SINGLE_MEMBER_OF_TARGET_R_CONTROLLED_VOWEL_COLOR = Color.gray;
 		}
 
 	}

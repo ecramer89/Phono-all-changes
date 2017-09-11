@@ -40,6 +40,13 @@ public static class SpellingRuleRegex  {
 	static string[] consonantDigraphs = new string[]{"th","ch","sh","qu","ck","ng","nk","wh"};
 	static string consonantDigraph = MatchAnyOf (consonantDigraphs);
 	static Regex consonantDigraphRegex = Make(consonantDigraph);
+	public static Regex ConsonantDigraph{
+		get{
+			return consonantDigraphRegex;
+
+		}
+
+	}
 
 		
 	//Consonant Blend Regex
@@ -62,12 +69,24 @@ public static class SpellingRuleRegex  {
 	};
 	static string vowelDigraph = MatchAnyOf (vowelDigraphs);
 	static Regex vowelDigraphRegex = Make(vowelDigraph);
+	public static Regex VowelDigraph{
+		get {
+			return vowelDigraphRegex;
+		}
+
+	}
 
 	static string[] rControlledVowels = new string[]{
 		"er", "ur", "or","ir","ar"
 	};
 	static string rControlledVowel = MatchAnyOf (rControlledVowels);
 	static Regex rControlledVowelRegex = Make(rControlledVowel);
+	public static Regex RControlledVowel{
+		get{
+			return rControlledVowelRegex;
+		}
+
+	}
 
 
 	static string anyConsonant = MatchAnyOf(new string[]{consonant, consonantDigraph, consonantBlend});
