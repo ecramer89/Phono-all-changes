@@ -6,7 +6,15 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Extensions;
 	
-public class Colorer  {
+public class Colorer : MonoBehaviour   {
+
+	private static Colorer instance;
+	public static Colorer Instance{
+		get {
+			return instance;
+		}
+	}
+
 
 	static Color onColor = Parameters.Colors.DEFAULT_ON_COLOR;
 	static Color offColor = Parameters.Colors.DEFAULT_OFF_COLOR;
@@ -14,9 +22,42 @@ public class Colorer  {
 	static RuleBasedColorer consonantBlendsColorer = new ConsonantBlendsColorer();
 	static RuleBasedColorer magicEColorer = new MagicEColorer();
 	static RuleBasedColorer openClosedVowelColorer = new OpenClosedVowelColorer();
+	static RuleBasedColorer rControlledVowelsColorer = new RControlledVowelsColorer();
+	static RuleBasedColorer vowelDigraphsColorer = new VowelDigraphsColorer();
 
-	static RuleBasedColorer ruleBasedColorer = consonantBlendsColorer; //todo, make a GO, start, subscribes to event; color rule selected;
-	//nees to persist bw levels. depending on whichrule selected instantiates appropriate rule based colorer
+
+	static RuleBasedColorer ruleBasedColorer; 
+
+
+	public void Start(){
+		instance = this;
+
+		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
+
+			switch(activity){
+			case Activity.CONSONANT_BLENDS:
+				ruleBasedColorer = consonantBlendsColorer;
+				break;
+			case Activity.CONSONANT_DIGRAPHS:
+				ruleBasedColorer = consonantDigraphsColorer;
+				break;
+			case Activity.MAGIC_E:
+				ruleBasedColorer = magicEColorer;
+				break;
+			case Activity.R_CONTROLLED_VOWELS:
+				ruleBasedColorer = rControlledVowelsColorer;
+				break;
+			case Activity.VOWEL_DIGRAPHS:
+				ruleBasedColorer = vowelDigraphsColorer;
+				break;
+			case Activity.OPEN_CLOSED_SYLLABLE:
+				ruleBasedColorer = openClosedVowelColorer;
+				break;
+
+			}
+
+		};
+	}
 
 
 	static Action<string, List<InteractiveLetter>> ReapplyDefaultOrOff = (string updatedUserInputLetters,List<InteractiveLetter> UILetters) => {
@@ -39,7 +80,7 @@ public class Colorer  {
 	}
 
 
-	public static void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters, string targetWord){
+	public void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters, string targetWord){
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 	

@@ -77,13 +77,13 @@ public class SessionsDirector : MonoBehaviour
 
 		}
 
-		static Mode mode; //testing mode. can be student driven (usual phonoblocks practice session, phono reads words), test (assessment) or sandbox
+		static PhonoMode mode; //testing mode. can be student driven (usual phonoblocks practice session, phono reads words), test (assessment) or sandbox
 	
 			
 		/* also more like a "sandbox" mode; teacher can create whatever words they want */
 		public static bool IsTeacherMode {
 				get {
-						return mode == Mode.TEACHER;
+						return mode == PhonoMode.TEACHER;
 				}
 		
 		
@@ -91,7 +91,7 @@ public class SessionsDirector : MonoBehaviour
 
 		public static bool IsStudentMode {
 				get {
-						return mode == Mode.STUDENT;
+						return mode == PhonoMode.STUDENT;
 				}
 		
 		
@@ -112,7 +112,7 @@ public class SessionsDirector : MonoBehaviour
 
 
 
-		public enum Mode
+		public enum PhonoMode
 		{
 				TEACHER,
 				STUDENT
@@ -155,7 +155,10 @@ public class SessionsDirector : MonoBehaviour
 		//Teacher mode is the current "sandbox" mode, which just defaults to rthe colour scheme chosen at the head of this file.
 		public void SelectTeacherMode ()
 		{
-				mode = Mode.TEACHER;
+
+				Events.Dispatcher.SelectMode (Mode.TEACHER);
+		       
+				mode = PhonoMode.TEACHER;
 				activitySelectionButtons.SetActive (true);
 				studentModeButton.SetActive (false);
 				teacherModeButton.SetActive (false);
@@ -176,7 +179,7 @@ public class SessionsDirector : MonoBehaviour
 
 		public void SetSessionForPracticeMode (int session)
 		{
-
+				Events.Dispatcher.SelectActivity (ProblemsRepository.instance.ActivityForSession (session));
 				currentUserSession = session;
 				SetParametersForStudentMode (studentActivityControllerOB);
 				Application.LoadLevel ("Activity");
@@ -193,7 +196,7 @@ public class SessionsDirector : MonoBehaviour
 
 
 		public void SelectStudentMode ()
-		{
+	{       	Events.Dispatcher.SelectMode (Mode.STUDENT);
 				if (studentNameInputField.activeSelf) {
 						string nameEntered = studentName.stringToEdit.Trim ().ToLower ();
 						if (nameEntered.Length > 0) {
@@ -205,7 +208,7 @@ public class SessionsDirector : MonoBehaviour
 
 		
 								if (wasStoredDataForName) {
-										mode = Mode.STUDENT;
+										mode = PhonoMode.STUDENT;
 										studentActivityControllerOB = (GameObject)GameObject.Instantiate (studentActivityControllerOB);
 			
 										

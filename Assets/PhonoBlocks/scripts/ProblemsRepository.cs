@@ -189,6 +189,40 @@ public class ProblemsRepository : MonoBehaviour
 
 		}
 
+
+	public Activity ActivityForSession(int session){
+		switch (session) {
+		case 0:
+		case 1:
+			return Activity.OPEN_CLOSED_SYLLABLE;
+		
+		case 2:
+		case 3:
+			return Activity.CONSONANT_BLENDS;
+
+		case 4:
+		case 5:
+			return Activity.CONSONANT_DIGRAPHS;
+		
+
+		case 6:
+		case 7:
+			return Activity.MAGIC_E;
+		
+		case 8:
+		case 9:
+			return Activity.VOWEL_DIGRAPHS;
+		case 10:
+		case 11:
+			
+			return Activity.R_CONTROLLED_VOWELS;
+
+		}
+
+		throw new Exception ($"Invalid session: {session}");
+
+	}
+
 		void SetSessionColourScheme (int sessionIndex)
 		{
 				switch (sessionIndex) {
