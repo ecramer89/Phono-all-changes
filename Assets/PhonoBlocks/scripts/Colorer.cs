@@ -89,22 +89,28 @@ public class Colorer : MonoBehaviour   {
 			UILetters
 		);
 
-		//todo; switch according to whether current mode is teacher or student
-		ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
-			updatedUserInputLetters, 
-			previousUserInputLetters,
-			UILetters,
-			targetWord
-		);
+		if (State.Current.Mode == Mode.TEACHER) {
+			ruleBasedColorer.ColorAndConfigureFlashForTeacherMode (
+				updatedUserInputLetters, 
+				previousUserInputLetters,
+				UILetters
+			);
+		} else {
+			ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
+				updatedUserInputLetters, 
+				previousUserInputLetters,
+				UILetters,
+				targetWord
+			);
 
-		TurnOffAndConfigureFlashForErroneousLetters (
-			updatedUserInputLetters,
-			previousUserInputLetters,
-			UILetters,
-			targetWord
-		);
-
-
+			TurnOffAndConfigureFlashForErroneousLetters (
+				updatedUserInputLetters,
+				previousUserInputLetters,
+				UILetters,
+				targetWord
+			);
+		}
+			
 		StartAllInteractiveLetterFlashes ();
 
 	
