@@ -65,9 +65,9 @@ public class Colorer : MonoBehaviour   {
 	}
 
 
-	static Action<string, List<InteractiveLetter>> ReapplyDefaultOrOff = (string updatedUserInputLetters,List<InteractiveLetter> UILetters) => {
+	static Action<string> ReapplyDefaultOrOff = (string updatedUserInputLetters) => {
 		int index = 0;
-		UILetters.ForEach (UILetter => {
+		State.Current.UILetters.ForEach (UILetter => {
 			UILetter.UpdateInputDerivedAndDisplayColor (updatedUserInputLetters [index] == ' ' ? offColor : onColor);
 			index++;
 		});
@@ -77,41 +77,37 @@ public class Colorer : MonoBehaviour   {
 	static event Action ResetAllInteractiveLetterFlashConfigurations = () => {};
 	static event Action StartAllInteractiveLetterFlashes = ()=>{};
 
-	public static void RegisterLettersToColorer(List<InteractiveLetter> UILetters){
-		UILetters.ForEach (UILetter => {
+	public static void RegisterLettersToColorer(List<InteractiveLetter> letters){
+		State.Current.UILetters.ForEach (UILetter => {
 			StartAllInteractiveLetterFlashes += UILetter.StartFlash;
 			ResetAllInteractiveLetterFlashConfigurations += UILetter.ResetFlashParameters;
 		});
 	}
 
 
-	public void ReColor (string updatedUserInputLetters,string previousUserInputLetters, List<InteractiveLetter> UILetters, string targetWord){
+	public void ReColor (string updatedUserInputLetters,string previousUserInputLetters, string targetWord){
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 	
 		ReapplyDefaultOrOff (
-			updatedUserInputLetters, 
-			UILetters
+			updatedUserInputLetters
 		);
 
 		if (State.Current.Mode == Mode.TEACHER) {
 			ruleBasedColorer.ColorAndConfigureFlashForTeacherMode (
 				updatedUserInputLetters, 
-				previousUserInputLetters,
-				UILetters
+				previousUserInputLetters
 			);
 		} else {
 			ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 				updatedUserInputLetters, 
 				previousUserInputLetters,
-				UILetters,
 				targetWord
 			);
 
 			TurnOffAndConfigureFlashForErroneousLetters (
 				updatedUserInputLetters,
 				previousUserInputLetters,
-				UILetters,
 				targetWord
 			);
 		}
@@ -122,7 +118,8 @@ public class Colorer : MonoBehaviour   {
 	}
 
 	//todo: color schemes that return a reduced or otherwise modified list of UI letters can't do that here sicne the indices need to stay aligned.
-	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput, List<InteractiveLetter> UILetters, string target){
+	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput,string target){
+		List<InteractiveLetter> UILetters = State.Current.UILetters;
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
 			//index can exceed length of target word since target word doesn't take trailing blanks into account. (e.g., "_ame___", vs "game")
@@ -152,10 +149,10 @@ public class Colorer : MonoBehaviour   {
 	//return param is a string copy of input userInputLetters, with all letters that were colored replaced with blanks. 
 	static string ColorAllInstancesOfMultiLetterUnit(
 		string updatedUserInputLetters, 
-		string previousUserInputLetters, 
-		List<InteractiveLetter> UIletters,
+		string previousUserInputLetters,
 		Regex spellingRuleRegex,
 		Color multiLetterUnitColor){
+		List<InteractiveLetter> UIletters = State.Current.UILetters;
 		//find and match each successive blend.
 		//because some strings could contain blends that cross boundaries (e.g., bll)
 		//input to the regex match is a buffer from which we replace the 
@@ -191,13 +188,13 @@ public class Colorer : MonoBehaviour   {
 	static void ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit(
 		string updatedUserInputLetters,
 		string previousUserInputLetters,  
-		List<InteractiveLetter> UIletters, 
 		string targetWord,
 		Regex spellingRuleRegex,
 		Color multiLetterUnitColor,
 		Color singleLetterOfTargetUnitColor,
 		Action<InteractiveLetter> hintPartialMatches
 	){
+		List<InteractiveLetter> UIletters = State.Current.UILetters;
 		string unmatchedTargetInputLetters=targetWord;
 		Match targetUnit = null;
 		while(targetUnit==null || targetUnit.Success){
@@ -247,6 +244,7 @@ public class Colorer : MonoBehaviour   {
 
 
 	class ConsonantBlendsColorer : RuleBasedColorer{
+		List<InteractiveLetter> UIletters = State.Current.UILetters;
 		//valid blended consonants get colored green
 		//after removing all valid blended consonants; single consonants get colored blue.
 		Color blendedColor = Parameters.Colors.ConsonantBlendColors.COMPLETED_BLEND_COLOR;
@@ -257,8 +255,7 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
-			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			string previousUserInputLetters){
 
 			//find and match each successive blend.
 			//because some strings could contain blends that cross boundaries (e.g., bll)
@@ -267,7 +264,6 @@ public class Colorer : MonoBehaviour   {
 			string unmatchedUserInputLetters = ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
-				UIletters,
 				SpellingRuleRegex.ConsonantBlend,
 				blendedColor
             );
@@ -288,15 +284,13 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
-			string previousUserInputLetters,  
-			List<InteractiveLetter> UIletters, 
+			string previousUserInputLetters,   
 			string targetWord){
 		
 
 			ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,  
-				UIletters, 
 				targetWord,
 				SpellingRuleRegex.ConsonantBlend,
 				blendedColor,
@@ -326,13 +320,11 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
-			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			string previousUserInputLetters){
 
 			ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
-				UIletters,
 				SpellingRuleRegex.ConsonantDigraph,
 				digraphColor
 			);
@@ -341,15 +333,13 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
-			string previousUserInputLetters,  
-			List<InteractiveLetter> UIletters, 
+			string previousUserInputLetters,
 			string targetWord){
 
 
 			ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,  
-				UIletters, 
 				targetWord,
 				SpellingRuleRegex.ConsonantDigraph,
 				digraphColor,
@@ -369,13 +359,11 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
-			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			string previousUserInputLetters){
 
 			ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
-				UIletters,
 				SpellingRuleRegex.VowelDigraph,
 				digraphColor
 			);
@@ -385,14 +373,12 @@ public class Colorer : MonoBehaviour   {
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
-			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
 
 			ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,  
-				UIletters, 
 				targetWord,
 				SpellingRuleRegex.VowelDigraph,
 				digraphColor,
@@ -412,13 +398,11 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
-			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			string previousUserInputLetters){
 
 			ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
-				UIletters,
 				SpellingRuleRegex.RControlledVowel,
 				rControlledVowelColor
 			);
@@ -428,14 +412,12 @@ public class Colorer : MonoBehaviour   {
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
 			string previousUserInputLetters,  
-			List<InteractiveLetter> UIletters, 
 			string targetWord){
 
 
 			ColorCompleteAndHintPartialInstancesOfAllTargetMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,  
-				UIletters, 
 				targetWord,
 				SpellingRuleRegex.RControlledVowel,
 				rControlledVowelColor,
@@ -460,17 +442,17 @@ public class Colorer : MonoBehaviour   {
 	
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
-			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			string previousUserInputLetters){
 
 			//color consonants in alternating blue-green.
-			ColorConsonants(UIletters, updatedUserInputLetters);
+			ColorConsonants(updatedUserInputLetters);
 			//color vowels by syllable type.
-			ColorVowels(updatedUserInputLetters,UIletters);
+			ColorVowels(updatedUserInputLetters);
 
 		}
 
-		void ColorConsonants(List<InteractiveLetter> UIletters, string updatedUserInputLetters){
+		void ColorConsonants(string updatedUserInputLetters){
+			List<InteractiveLetter> UIletters = State.Current.UILetters;
 			//color consonants in alternating blue-green
 			MatchCollection consonants = SpellingRuleRegex.AnyConsonant.Matches (updatedUserInputLetters);
 			for (int i = 0; i < consonants.Count; i++) {
@@ -485,7 +467,8 @@ public class Colorer : MonoBehaviour   {
 			}
 		}
 
-		public void ColorVowels(string updatedUserInputLetters, List<InteractiveLetter> UIletters){
+		public void ColorVowels(string updatedUserInputLetters){
+			List<InteractiveLetter> UIletters = State.Current.UILetters;
 			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
 
@@ -518,14 +501,12 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
-			string previousUserInputLetters,  
-			List<InteractiveLetter> UIletters, 
+			string previousUserInputLetters,
 			string targetWord){
 
 			ColorAndConfigureFlashForTeacherMode (
 				updatedUserInputLetters,
-				previousUserInputLetters,
-				UIletters);
+				previousUserInputLetters);
 
 		}
 
@@ -539,10 +520,9 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForTeacherMode(
 			string updatedUserInputLetters, 
-			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters){
+			string previousUserInputLetters){
 
-			ColorAndConfigureFlash (updatedUserInputLetters, previousUserInputLetters, UIletters,
+			ColorAndConfigureFlash (updatedUserInputLetters, previousUserInputLetters,
 				(Match magicE) => {
 					Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
 					return previousInstantiationOfRule.Value != magicE.Value;
@@ -552,12 +532,11 @@ public class Colorer : MonoBehaviour   {
 
 		public void ColorAndConfigureFlashForStudentMode(
 			string updatedUserInputLetters,
-			string previousUserInputLetters,  
-			List<InteractiveLetter> UIletters, 
+			string previousUserInputLetters, 
 			string targetWord){
 
 
-			ColorAndConfigureFlash (updatedUserInputLetters, previousUserInputLetters, UIletters, 
+			ColorAndConfigureFlash (updatedUserInputLetters, previousUserInputLetters, 
 				(Match magicE) => {
 					Match previousInstantiationOfRule = SpellingRuleRegex.MagicERegex.Match (previousUserInputLetters);
 					Match targetMatch = SpellingRuleRegex.MagicERegex.Match (targetWord);
@@ -573,17 +552,15 @@ public class Colorer : MonoBehaviour   {
 		void ColorAndConfigureFlash(
 			string updatedUserInputLetters, 
 			string previousUserInputLetters, 
-			List<InteractiveLetter> UIletters, 
 			Func<Match, bool> shouldFlash
 		){
-
+			List<InteractiveLetter> UIletters = State.Current.UILetters;
 			Match magicE = SpellingRuleRegex.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
 				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
 				openClosed.ColorVowels (
-					updatedUserInputLetters, 
-					UIletters
+					updatedUserInputLetters
 				);
 				return;
 			}
@@ -616,14 +593,12 @@ public class Colorer : MonoBehaviour   {
 interface RuleBasedColorer{
 	void ColorAndConfigureFlashForTeacherMode (
 		string updatedUserInputLetters,
-		string previousUserInputLetters,
-		List<InteractiveLetter> UIletters
+		string previousUserInputLetters
 	);
 
 	void ColorAndConfigureFlashForStudentMode( 
 		string updatedUserInputLetters, 
 		string previousUserInputLetters,
-		List<InteractiveLetter> UIletters,
 		string targetWord);
 
 

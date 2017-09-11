@@ -228,13 +228,6 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 		
 
-		public List<InteractiveLetter> GetAllUserInputLetters (bool skipBlanks)
-		{
-		
-				return letterGrid.GetLetters (skipBlanks);
-		
-		}
-		
 
 		bool IsUpper (char letter)
 		{
