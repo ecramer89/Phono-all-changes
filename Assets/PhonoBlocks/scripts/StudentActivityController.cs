@@ -35,10 +35,7 @@ public class StudentActivityController : MonoBehaviour
 			return targetWord;
 		}
 	}
-	    //cache the list of letter sound component objects that result from 'decoding'
-	    //the target word. this is done so that we can check whether a given letter is part of 
-	    //a target digraph, blend, etc.
-		UserWord targetWordAsLetterSoundComponents;
+
 
 		public bool StringMatchesTarget (string s)
 		{
@@ -124,10 +121,7 @@ public class StudentActivityController : MonoBehaviour
 
 		       //decode the target word; cache the decoded letter sound components.
 		       //this allows us to easily access the expected multi letter unit or color of target letter for each given position.
-		        targetWordAsLetterSoundComponents = LetterSoundComponentFactoryManager.Decode (currProblem.TargetWord (true), 
-		                                                                               SessionsDirector.IsSyllableDivisionActivity);
-
-
+		   
 
 		        //clear the letters currently in the grid
 		        //place the images of the initial letters into the grid
@@ -147,67 +141,6 @@ public class StudentActivityController : MonoBehaviour
 		        
 
 		}
-
-	//todo consider abstracting in color coding scheme
-	public void AssignNewColorToLetter(
-		int indexOfLetterBarCell, 
-		LetterSoundComponent parent,
-		InteractiveLetter asInteractiveLetter,
-		LetterSoundComponent asLetterSoundComponent,
-		LetterGridController letterGrid){
-
-		if(IsErroneous(indexOfLetterBarCell)){
-			Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors();
-			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors[0]);
-			asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
-			asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
-			asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
-			return;
-		} 
-			
-		//correct letter; see whether it's part of a multi-letter unit.
-		LetterSoundComponent targetComponent = 
-			GetTargetLetterSoundComponentFor(indexOfLetterBarCell);
-
-		Func<bool> childCompletedPortionOfTargetSpellingRule = () => {
-			return targetComponent != null && targetComponent.IsComposite();
-		};
-
-		//the vowel needs to be correct; the e needs to be there; there needs to be two consonants but it doesn't matter what they are
-		//if the regex matches vowel consonant e regex and if 
-		//the match to vowel regex matches target vowel and if
-
-		Func<bool> childInstantiatedTargetSpellingRule = () => {
-			return (parent != null && parent.Equals(targetComponent) || 
-				(SessionsDirector.instance.IsMagicERule && 
-					true)); //todo if input instantiates magic e rule
-		};
-				
-				if(childCompletedPortionOfTargetSpellingRule()){
-
-						if (childInstantiatedTargetSpellingRule()) {
-							asInteractiveLetter.UpdateInputDerivedAndDisplayColor (asLetterSoundComponent.GetColour ());
-							asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), SessionsDirector.colourCodingScheme.GetColorsForOff());
-							asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF);
-							asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME);			
-							return;
-
-						}
-
-
-						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (SessionsDirector.instance.CurrentActivityColorRules.GetColorForPortionOfTargetComposite ());
-
-						if (!SessionsDirector.instance.IsConsonantBlends) {
-							asInteractiveLetter.SetFlashColors (asLetterSoundComponent.GetColour(), targetComponent.GetColour ());
-							asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.CORRECT_TARGET_COLOR, Parameters.Flash.Durations.CORRECT_OFF);
-							asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME);
-						}
-
-						return;
-					}
-
-					asInteractiveLetter.UpdateInputDerivedAndDisplayColor(asLetterSoundComponent.GetColour());
-			}
 
 	  
 
@@ -230,9 +163,7 @@ public class StudentActivityController : MonoBehaviour
 
 		}
 
-		public LetterSoundComponent GetTargetLetterSoundComponentFor(int index){
-		   return targetWordAsLetterSoundComponents.GetLetterSoundComponentForIndexRelativeWholeWord (index);
-		}
+
 
 		bool CurrentStateOfLettersMatches (string targetLetters)
 		{       
@@ -278,9 +209,7 @@ public class StudentActivityController : MonoBehaviour
 			List<InteractiveLetter> UILetters = arduinoLetterController.GetAllUserInputLetters (false);
 			Colorer.Instance.ReColor (UserChangesAsString,previousUserInput, UILetters, TargetLetters);
 
-			     /*
-					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-					arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);*/
+
 					break;
 				case State.FORCE_CORRECT_LETTER_PLACEMENT:
 					InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);
@@ -292,7 +221,7 @@ public class StudentActivityController : MonoBehaviour
 						asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
 					} else {
 						//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
-						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
+						//asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
 					}
 						break;
 				case State.REMOVE_ALL_LETTERS:

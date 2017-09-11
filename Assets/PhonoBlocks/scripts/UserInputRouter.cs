@@ -247,7 +247,7 @@ public class UserInputRouter : MonoBehaviour
 			studentActivityController.HandleNewArduinoLetter (newLetter, atPosition);
 		else {
 			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, newLetter);
-			arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
+			//arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
 		}
 
 		}

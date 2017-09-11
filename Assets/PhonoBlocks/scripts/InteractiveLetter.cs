@@ -50,7 +50,7 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 
 		BoxCollider trigger;
-		LetterSoundComponent lc;
+
 		int flashCounter = 0;
 		Color[] flashColors = new Color[2];
 		public void SetFlashColors(Color a, Color b){
@@ -96,17 +96,6 @@ public class InteractiveLetter : MonoBehaviour{
 				}
 		}
 
-		public LetterSoundComponent LetterSoundComponentIsPartOf {
-				get {
-						return lc;
-				}
-
-				set {
-						lc = value;
-				}
-
-
-		}
 
 		public BoxCollider Trigger {
 				get {

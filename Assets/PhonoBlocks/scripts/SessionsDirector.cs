@@ -124,7 +124,7 @@ public class SessionsDirector : MonoBehaviour
 		void Start ()
 		{     
 				instance = this;
-				OldSpeechSoundReference.Initialize ();
+			
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
 			

@@ -393,7 +393,7 @@ public class ArduinoUnityInterface : PhonoBlocksController
        
 		//the word will have at most 6 letters.
 		//we need to put these letters in the indexes 1 to 6
-		public void UpdateColoursOfTangibleLetters (UserWord newWord)
+		/*public void UpdateColoursOfTangibleLetters (UserWord newWord)
 		{
 		
 		
@@ -412,7 +412,7 @@ public class ArduinoUnityInterface : PhonoBlocksController
 
 			
 			
-		}
+		}*/
 
 		int CategoricalColorChannel (Color c, int channel)
 		{

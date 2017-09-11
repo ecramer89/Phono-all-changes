@@ -67,9 +67,9 @@ public class HintController : MonoBehaviour
 						UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
 					            //place the target letters and colors in the grid
 						for (int letterIndex = 0; letterIndex < studentActivityController.TargetLetters.Length; letterIndex++) {
-							LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
+							/*LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterIndex);
 							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, studentActivityController.TargetLetters [letterIndex]);
-							ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());
+							ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, placeInGrid.GetColour ());*/
 						}
 						studentActivityController.EnterForcedCorrectLetterPlacementMode ();
 					break;
@@ -93,13 +93,13 @@ public class HintController : MonoBehaviour
 					if (letterindex == numLetters)
 				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_FULL_CORRECT_WORD);
 					else {
-						LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
+						/*LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters [letterindex]);
 						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
 						string pathTo = "audio/sounded_out_words/" + studentActivityController.TargetLetters + "/" 
 							+ studentActivityController.TargetLetters [letterindex];
 						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
-						AudioSourceController.PushClip (targetSound);
+						AudioSourceController.PushClip (targetSound);*/
 					
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}

@@ -223,15 +223,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		{
 				PlaceWordInLetterGrid (EMPTY_USER_WORD);
 		}
-
-		public UserWord UpdateDefaultColoursAndSoundsOfLetters (bool flash)
-		{
 		
-				UserWord newLetterSoundComponents = GetNewColoursAndSoundsFromDecoder ();
-				AssignNewColoursAndSoundsToLetters (newLetterSoundComponents, flash);
-				return newLetterSoundComponents;
-		
-		}
 
 		public List<InteractiveLetter> GetAllUserInputLetters (bool skipBlanks)
 		{
@@ -257,14 +249,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 
 
-		UserWord GetNewColoursAndSoundsFromDecoder ()
-		{
-			
-		        string userControlledLettersAsString = studentActivityController.UserChangesAsString;
 
-				return LetterSoundComponentFactoryManager.Decode (userControlledLettersAsString, SessionsDirector.IsSyllableDivisionActivity);
-		
-		}
 
 		void AssignInteractiveLettersToTangibleCounterParts ()
 		{
@@ -281,59 +266,14 @@ public class ArduinoLetterController : MonoBehaviour{
 				return screenIndex + 1;
 		}
 
-		void AssignNewColoursAndSoundsToLetters (UserWord letterSoundComponents, bool flash)
-		{   
-				
-				int indexOfLetterBarCell = startingIndexOfUserLetters;
 
-				foreach (LetterSoundComponent p in letterSoundComponents) {
-			
-								if (p is LetterSoundComposite) {
-										LetterSoundComposite l = (LetterSoundComposite)p;
-										foreach (LetterSoundComponent lc in l.Children) {
-						                //the individual letters that compose a multi letter unit, for example the "b" in blend "bl"
-												
-												UpdateInterfaceLetter (lc, indexOfLetterBarCell, l);
-												indexOfLetterBarCell++;
-										}
-								} else {
-									
-										UpdateInterfaceLetter (p, indexOfLetterBarCell);
-										indexOfLetterBarCell++;
-								}
-
-						
-				}
-		}
 
 		public InteractiveLetter GetInteractiveLetterAt(int position){
 			return letterGrid.GetInteractiveLetter (position);
 		}
 
 
-		void UpdateInterfaceLetter (
-				LetterSoundComponent asLetterSoundComponent,  
-				int indexOfLetterBarCell, 
-				LetterSoundComposite parent = null)
-	{          
-		   
-				InteractiveLetter asInteractiveLetter = letterGrid.GetInteractiveLetter (indexOfLetterBarCell);
 
-	
-		        bool letterIsNew = !((parent != null ? parent : asLetterSoundComponent).Equals (asInteractiveLetter.LetterSoundComponentIsPartOf));
-				asInteractiveLetter.LetterSoundComponentIsPartOf = parent != null ? parent : asLetterSoundComponent; 
-	
-
-				if (SessionsDirector.IsStudentMode) {
-					studentActivityController.AssignNewColorToLetter (indexOfLetterBarCell, parent, asInteractiveLetter, asLetterSoundComponent, letterGrid);
-				} 
-		    
-				if (letterIsNew && !asLetterSoundComponent.IsBlank()) {
-						asInteractiveLetter.StartFlash ();
-				}
-
-
-			}
 						
 	/*
 		void handleSyllableDivisionMode(
@@ -343,54 +283,8 @@ public class ArduinoLetterController : MonoBehaviour{
 				asInteractiveLetter = letterGrid.GetInteractiveLetter (indexOfLetterBarCell);
 				asInteractiveLetter.UpdateDefaultColour (SessionsDirector.colourCodingScheme.GetColorsForWholeWord ());
 				asInteractiveLetter.SetSelectColour (lc.GetColour ());
-		}
+		}*/
 
-		void handleTeacherMode(
-				bool isPartOfCompletedGrapheme,
-				bool letterIsNew,
-				char newLetter,
-				LetterSoundComponent lc,
-				int indexOfLetterBarCell,
-				LetterSoundComponent parent
-
-		){
-
-				//in teacher mode. if rule is r controlled vowel, consonant or vowel digraphs, need to check if this
-				//letter is the first letter of any valid of these graphemes and flash it in that color if it is.
-				if(!isPartOfCompletedGrapheme){
-						string currentRule = SessionsDirector.instance.GetCurrentRule;
-						flash = letterIsNew;
-						timesToFlash = TimingParameters.TIMES_TO_FLASH_CORRECT_PORTION_OF_FINAL_GRAPHEME;
-						switch(currentRule){
-						case "rControlledVowel":
-								if(SpeechSoundReference.IsFirstLetterOfRControlledVowel(newLetter)){
-										flashColor = SessionsDirector.instance.CurrentActivityColorRules.GetColorsForRControlledVowel();
-										newDefaultColor = Color.gray;
-								}
-								break;
-						case "consonantDigraphs":
-								if(SpeechSoundReference.IsFirstLetterOfConsonantDigraph(newLetter)){
-										flashColor = SessionsDirector.instance.CurrentActivityColorRules.GetColorsForConsonantDigraphs();
-										newDefaultColor = Color.gray;
-								}
-								break;
-						case "vowel Digraphs":
-								if(SpeechSoundReference.IsFirstLetterOfVowelDigraph(newLetter)){
-										flashColor = SessionsDirector.instance.CurrentActivityColorRules.GetColorsForVowelDigraphs();
-										newDefaultColor = Color.gray;
-								}
-								break;
-						default:
-								flash = false;
-								timesToFlash = 0;
-								break;
-
-						}
-				}
-
-
-		}
-*/
 
 
 		//all of this is for testing; simulates arduino functionality.
@@ -458,6 +352,8 @@ public class ArduinoLetterController : MonoBehaviour{
 				return false;
 		}
 
+
+
 		bool ParseLetterKey ()
 		{       
 
@@ -468,25 +364,15 @@ public class ArduinoLetterController : MonoBehaviour{
 						return true;
 				}
 
-				foreach (string s in OldSpeechSoundReference.Vowels()) {
-					
-						if (Input.GetKeyDown (s)) {
-								SetTestLetter (s);
-								return true;
-						}
+
+			for (int i = (int)'a'; i <= (int)'z'; i++) {
+				string s =""+(char)i;
+				if (Input.GetKeyDown (s)) {
+					SetTestLetter (s);
+					return true;
 				}
 
-				foreach (string s in OldSpeechSoundReference.Consonants()) {
-				
-						if (Input.GetKeyDown (s)) {
-								//testLetter = s;
-								SetTestLetter (s);
-								return true;
-						}
-						
-
-
-				}
+			}
 				return false;
 
 		}
