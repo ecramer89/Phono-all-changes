@@ -9,8 +9,6 @@ public class StudentActivityController : MonoBehaviour
 {
 
 		HintController hintController;
-		ArduinoLetterController arduinoLetterController;
-
 	    //save references to frequently used audio clips 
 		AudioClip excellent;
 		AudioClip incorrectSoundEffect;
@@ -20,9 +18,6 @@ public class StudentActivityController : MonoBehaviour
 		AudioClip correctSoundEffect;
 		AudioClip removeAllLetters;
 		AudioClip triumphantSoundForSessionDone;
-
-		//todo refactor; should subscribe to appropriate events. SAC should publish appropriate events.
-		GameObject submitWordButton;
 
 
 		public void Initialize (GameObject hintButton, ArduinoLetterController arduinoLetterController)
@@ -81,7 +76,7 @@ public class StudentActivityController : MonoBehaviour
 		if (letter != ' ') //don't bother updating the letter unless the user removed it
 			return;
 
-		arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
 		//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
 		if(allUserControlledLettersAreBlank()){ 
 			UserInputRouter.instance.RequestTurnOffImage ();
@@ -108,38 +103,20 @@ public class StudentActivityController : MonoBehaviour
 	 void SetUpNextProblem ()
 		{  
 			
-				hintController.Reset ();
-			
 				Problem currProblem = ProblemsRepository.instance.GetNextProblem ();
 				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(true));
 				Events.Dispatcher.SetCurrentProblemInstructions (currProblem.Instructions);
 				Events.Dispatcher.SetInitialProblemLetters (currProblem.InitialWord);
-		        //save the new target word to the csv record for this acivity
-				StudentsDataHandler.instance.RecordActivityTargetWord (currProblem.TargetWord (false));
-
-				PlayInstructions (); //dont bother telling to place initial letters during assessment mode
-
 				Events.Dispatcher.BeginNewProblem ();
 				Events.Dispatcher.EnterMainActivity ();
+
+
+				AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
+
 				
-
-
-		        
 
 		}
 
-	  
-
-    
-		void PlayInstructions ()
-		{
-			
-			AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
-			
-				
-		}
-
-	 
 
 		bool CurrentStateOfUserInputMatchesTarget ()
 		{       

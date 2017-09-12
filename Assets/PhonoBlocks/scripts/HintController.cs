@@ -12,6 +12,8 @@ public class HintController : MonoBehaviour
 
 		public void Initialize (GameObject hintButton)
 		{
+				Events.Dispatcher.OnNewProblemBegun += Reset;
+
 				this.hintButton = hintButton;
 				studentActivityController = gameObject.GetComponent<StudentActivityController> ();
 				sound_out_word = InstructionsAudio.instance.soundOutTheWord;

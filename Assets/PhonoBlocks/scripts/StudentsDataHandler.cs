@@ -33,7 +33,9 @@ public class StudentsDataHandler: MonoBehaviour
 			Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 				LogEvent ("change_letter", newLetter + "", atPosition + "");
 			};
-
+			Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+				RecordActivityTargetWord (targetWord);
+			};
 
 		}
 
