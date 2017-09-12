@@ -116,7 +116,7 @@ public class StudentActivityController : MonoBehaviour
 			
 				currProblem = ProblemsRepository.instance.GetNextProblem ();
 
-				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(true));
+				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(false));
 	     
 		        //save the new target word to the csv record for this acivity
 				StudentsDataHandler.instance.RecordActivityTargetWord (currProblem.TargetWord (false));
