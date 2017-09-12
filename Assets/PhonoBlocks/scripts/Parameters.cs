@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Parameters {
 
+	public class UI{
+		public static readonly int ONSCREEN_LETTER_SPACES = 6;
+	}
+
 	public class Colors{
 
 		//define special colors to use over Unity's blue, green, yellow, red, etc.

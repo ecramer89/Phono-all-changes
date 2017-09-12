@@ -254,10 +254,6 @@ public class ProblemsRepository : MonoBehaviour
 
 						colourSchemeForSession = new RControlledVowel ();
 						return;
-				//case 11:
-						//colourSchemeForSession = new SyllableDivision ();
-
-						return;
 				default:
 						colourSchemeForSession = new NoColour ();
 						return;

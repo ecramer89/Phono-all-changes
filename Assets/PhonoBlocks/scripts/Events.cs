@@ -67,7 +67,24 @@ public class Events: MonoBehaviour  {
 		OnUserInputLettersUpdated ();
 	}
 
-
+	public event Action OnNewProblemBegun = () => {};
+	public void BeginNewProblem(){
+		OnNewProblemBegun ();
+	}
+	//distinguished from activity begun; may need to transition back into main activity state from a different state,
+	//i.e. such as force correct letter placement.
+	public event Action OnEnterMainActivity = () => {};
+	public void EnterMainActivity(){
+		OnEnterMainActivity ();
+	}
+	public event Action OnEnterForceCorrectLetterPlacement = () => {};
+	public void ForceCorrectLetterPlacement(){
+		OnEnterForceCorrectLetterPlacement ();
+	}
+	public event Action OnEnterForceRemoveAllLetters = () => {};
+	public void ForceRemoveAllLetters(){
+		OnEnterForceRemoveAllLetters ();
+	}
 
 
 	void Awake(){

@@ -92,15 +92,15 @@ public class ArduinoLetterController : MonoBehaviour{
 
 
 
-			Events.Dispatcher.OnInitialProblemLettersSet += (string initialProblemLetters) => {
-				ReplaceEachLetterWithBlank ();
-				PlaceWordInLetterGrid (initialProblemLetters);
-				TurnAllLettersOff ();
-			};
+				Events.Dispatcher.OnInitialProblemLettersSet += (string initialProblemLetters) => {
+					ReplaceEachLetterWithBlank ();
+					PlaceWordInLetterGrid (initialProblemLetters);
+					TurnAllLettersOff ();
+				};
 
-			Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
-				activateLinesBeneathLettersOfWord(targetWord);
-			};
+				Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+					activateLinesBeneathLettersOfWord(targetWord);
+				};
 
 		}
 
@@ -122,8 +122,12 @@ public class ArduinoLetterController : MonoBehaviour{
 				if (atPosition < maxUserLetters && atPosition >= StartingIndex) {
 						if (IsUpper (newLetter))
 								newLetter = ToLower (newLetter);
+			
 						UserInputRouter.instance.HandleNewUserInputLetter (newLetter,
 			                                          atPosition, this);
+						Events.Dispatcher.RecordNewUserInputLetter (newLetter, atPosition);
+
+			           
 				}
 		}
 

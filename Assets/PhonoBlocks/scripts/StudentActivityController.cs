@@ -8,22 +8,6 @@ using System.Linq;
 public class StudentActivityController : MonoBehaviour
 {
 
-		enum ActivityState
-		{
-				MAIN_ACTIVITY, //standard functionality (accept user input; update UI; update colors/error feedback)
-		        FORCE_CORRECT_LETTER_PLACEMENT, //don't update the GUI letter images unless the inputted letter is correct. still show error feedback.
-		        REMOVE_ALL_LETTERS //after the problem is completed & before going to next problem, force user to remove all the tangible letters they've placed on the platform
-			
-		}
-
-		ActivityState state = ActivityState.MAIN_ACTIVITY;
-
-		public void EnterForcedCorrectLetterPlacementMode(){
-			state = ActivityState.FORCE_CORRECT_LETTER_PLACEMENT;
-
-		}
-		
-
 		HintController hintController;
 		ArduinoLetterController arduinoLetterController;
 
@@ -116,8 +100,10 @@ public class StudentActivityController : MonoBehaviour
 
 				PlayInstructions (); //dont bother telling to place initial letters during assessment mode
 
-				state = ActivityState.MAIN_ACTIVITY;
+				Events.Dispatcher.BeginNewProblem ();
+				Events.Dispatcher.EnterMainActivity ();
 				submitWordButton.SetActive (true);
+
 
 		        
 
@@ -183,13 +169,12 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleNewArduinoLetter (char letter, int atPosition)
 	{       	string previousUserInput = UserChangesAsString;
 				RecordUsersChange (atPosition, letter); 
-				switch (state) {
-		case ActivityState.MAIN_ACTIVITY:
-				arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-		
-				Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
+			switch (State.Current.ActivityState) {
+			case ActivityStates.MAIN_ACTIVITY:
+					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+					Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
 					break;
-		case ActivityState.FORCE_CORRECT_LETTER_PLACEMENT:
+			case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
 				InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
 				if (IsErroneous(atPosition, letter)) {
 						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
@@ -204,7 +189,7 @@ public class StudentActivityController : MonoBehaviour
 						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
 					}
 						break;
-		case ActivityState.REMOVE_ALL_LETTERS:
+		case ActivityStates.REMOVE_ALL_LETTERS:
 					if (letter != ' ') //don't bother updating the letter unless the user removed it
 						return;
 			
@@ -256,12 +241,12 @@ public class StudentActivityController : MonoBehaviour
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
 			    //allow the user to access a hint.
-				switch(state){
-			case ActivityState.MAIN_ACTIVITY:
+			switch(State.Current.ActivityState){
+				case ActivityStates.MAIN_ACTIVITY:
 					hintController.ActivateHintButton ();
 					AudioSourceController.PushClip (offerHint);
 					break;
-			case ActivityState.FORCE_CORRECT_LETTER_PLACEMENT:
+				case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
 					break;
 			
 				}
@@ -289,7 +274,7 @@ public class StudentActivityController : MonoBehaviour
 		     
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
 		        //don't want the letters still on platform from problem n being interpreted as input for problem n+1.
-				state = ActivityState.REMOVE_ALL_LETTERS;
+				Events.Dispatcher.ForceRemoveAllLetters();
 				//disable submit button; we automatically go to next problem when user removes all letters. 
 				submitWordButton.SetActive (false);
       

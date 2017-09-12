@@ -53,11 +53,20 @@ public class State: MonoBehaviour  {
 			previousUserInputLetters = userInputLetters;
 			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
 		};
-
-
-
-
-
+	
+		Events.Dispatcher.OnEnterMainActivity += () => {
+			activityState = ActivityStates.MAIN_ACTIVITY;
+		};
+		Events.Dispatcher.OnEnterForceCorrectLetterPlacement += () => {
+			activityState = ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT;
+		};
+		Events.Dispatcher.OnEnterForceRemoveAllLetters += () => {
+			activityState = ActivityStates.REMOVE_ALL_LETTERS;
+		};
+		Events.Dispatcher.OnNewProblemBegun += () => {
+			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
+		};
+	
 	}
 
 	private Mode mode;
@@ -144,5 +153,14 @@ public class State: MonoBehaviour  {
 
 	}
 
+
+	private ActivityStates activityState;
+	public ActivityStates ActivityState{
+		get {
+
+			return activityState;
+		}
+
+	}
 
 }
