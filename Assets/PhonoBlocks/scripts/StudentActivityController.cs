@@ -199,17 +199,18 @@ public class StudentActivityController : MonoBehaviour
 				Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
 					break;
 		case ActivityState.FORCE_CORRECT_LETTER_PLACEMENT:
-					InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);
+				InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
 				if (IsErroneous(atPosition, letter)) {
-						Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors ();
+						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
+						asInteractiveLetter.ConfigureFlashParameters (
+							Parameters.Colors.DEFAULT_OFF_COLOR, Parameters.Colors.DEFAULT_ON_COLOR,
+							Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
+							Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
+						);
 
-						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors [0]);
-						asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
-						asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
-						asInteractiveLetter.SetNumFlashCycles (Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER);
 					} else {
 						//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
-						//asInteractiveLetter.UpdateInputDerivedAndDisplayColor (GetTargetLetterSoundComponentFor (atPosition).GetColour());
+						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
 					}
 						break;
 		case ActivityState.REMOVE_ALL_LETTERS:
