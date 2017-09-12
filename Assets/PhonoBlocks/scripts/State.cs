@@ -66,6 +66,12 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnNewProblemBegun += () => {
 			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
 		};
+		Events.Dispatcher.OnUIInputUnLocked += () => {
+			uIInputLocked = false;
+		};
+		Events.Dispatcher.OnUIInputLocked += () => {
+			uIInputLocked = true;
+		};
 	
 	}
 
@@ -74,6 +80,15 @@ public class State: MonoBehaviour  {
 		get {
 			return mode;
 		}
+	}
+
+	private bool uIInputLocked;
+	public bool UIInputLocked{
+		get {
+
+			return uIInputLocked;
+		}
+
 	}
 
 

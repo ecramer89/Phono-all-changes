@@ -86,6 +86,15 @@ public class Events: MonoBehaviour  {
 		OnEnterForceRemoveAllLetters ();
 	}
 
+	public event Action OnUIInputLocked = () => {};
+	public void LockUIInput(){
+		OnUIInputLocked ();
+	}
+	public event Action OnUIInputUnLocked = ()=>{};
+	public void UnLockUIInput(){
+		OnUIInputUnLocked ();
+	}
+
 
 	void Awake(){
 		events = this;

@@ -49,13 +49,8 @@ public class UserInputRouter : MonoBehaviour
 		public ArduinoUnityInterface arduinoLetterInterface;
 		public CheckedWordImageController checkedWordImageController;
 		public StudentActivityController studentActivityController;
-		bool acceptUIInput = true;
-		public void BlockAllUIInput(){
-			acceptUIInput = false;
-		}
-		public void UnBlockAllUIInput(){
-			acceptUIInput = true;
-		}
+
+
 		bool currentWordViolatesPhonotactics = false; //either the arduino controlled letters or one of the affixes was placed incorrectly.
 		//dont add to the history.
 	    
@@ -160,7 +155,7 @@ public class UserInputRouter : MonoBehaviour
 
 		public void RequestHint ()
 		{//and if the UI is not on lockdown.
-				if (!TeacherMode () && acceptUIInput)
+		if (!TeacherMode () && !State.Current.UIInputLocked)
 						studentActivityController.UserRequestsHint ();
 
 
@@ -205,7 +200,7 @@ public class UserInputRouter : MonoBehaviour
 		//called by the check word button.
 		public void RequestCheckWord ()
 	{     
-				if (acceptUIInput) {
+		if (!State.Current.UIInputLocked) {
 				
 						if (TeacherMode ()) {
 								AddCurrentWordToHistory (true);
@@ -239,7 +234,7 @@ public class UserInputRouter : MonoBehaviour
 
 		/* if it is activity mode, then we delegate control of the new letter to the student activity controller. otherwise just update all of the letters*/
 		public void HandleNewUserInputLetter (char newLetter, int atPosition, ArduinoLetterController alc)
-	{       if (!acceptUIInput)
+	{       if (State.Current.UIInputLocked)
 			return;
 
 				if (sessionManager != null && SessionsDirector.IsStudentMode)

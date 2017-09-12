@@ -56,7 +56,7 @@ public class HintController : MonoBehaviour
 					break;
 
 				    case 1: //level two hint
-						UserInputRouter.instance.BlockAllUIInput ();
+						Events.Dispatcher.LockUIInput();
 						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
 						StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
 					break;
@@ -101,7 +101,7 @@ public class HintController : MonoBehaviour
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
-				UserInputRouter.instance.UnBlockAllUIInput();
+				Events.Dispatcher.UnLockUIInput ();
 				ArduinoLetterController.instance.PlaceWordInLetterGrid (studentActivityController.UserChangesAsString);
 				ArduinoLetterController.instance.RevertLettersToDefaultColour ();
 			}
