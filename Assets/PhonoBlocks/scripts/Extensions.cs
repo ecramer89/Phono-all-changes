@@ -1,17 +1,18 @@
 ﻿namespace Extensions{
 using System;
 using System.Text;
+using System.Linq;
 
 public static class PhonoBlocksExtensions {
 
-	public static String Fill(this String str, char with, int times=-1){
-		times = times == -1 ? str.Length : times;
-		StringBuilder res = new StringBuilder();
-		for(int i=0;i<times;i++){
-			res.Append(""+with);
+		public static String Fill(this String str, char with, int times=-1){
+			times = times == -1 ? str.Length : times;
+			StringBuilder res = new StringBuilder();
+			for(int i=0;i<times;i++){
+				res.Append(""+with);
+			}
+			return res.ToString();
 		}
-		return res.ToString();
-	}
 
 
 		public static String ReplaceRangeWith(this String str, char with, int start, int length){
@@ -28,6 +29,11 @@ public static class PhonoBlocksExtensions {
 				char[] arr = str.ToCharArray();
 				arr[at] = with;
 				return new String(arr);
+		}
+
+
+		public static String Stringify<T>(this T[] arr){
+			return arr.Aggregate("", (acc, nxt)=>$"{acc}, {nxt.ToString()}");
 		}
 	}
 }

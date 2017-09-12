@@ -115,13 +115,13 @@ public class StudentActivityController : MonoBehaviour
 				hintController.Reset ();
 			
 				currProblem = ProblemsRepository.instance.GetNextProblem ();
+
+				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(true));
 	     
 		        //save the new target word to the csv record for this acivity
 				StudentsDataHandler.instance.RecordActivityTargetWord (currProblem.TargetWord (false));
 
-		       //decode the target word; cache the decoded letter sound components.
-		       //this allows us to easily access the expected multi letter unit or color of target letter for each given position.
-		   
+		     
 
 		        //clear the letters currently in the grid
 		        //place the images of the initial letters into the grid

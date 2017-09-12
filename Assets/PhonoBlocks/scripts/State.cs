@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Extensions;
 
 public class State: MonoBehaviour  {
 	private static State current;
@@ -34,6 +35,8 @@ public class State: MonoBehaviour  {
 
 		Events.Dispatcher.OnTargetColorsSet += (Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
+			Debug.Log("target word colors");
+			Debug.Log(targetWordColors.Stringify());
 		};
 
 	}

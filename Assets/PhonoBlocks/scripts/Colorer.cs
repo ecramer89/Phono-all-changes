@@ -65,6 +65,7 @@ public class Colorer : MonoBehaviour   {
 
 
 		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+			Debug.Log("TARGET WORD: "+targetWord);
 			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(targetWord));
 		};
 	}
@@ -156,20 +157,21 @@ public class Colorer : MonoBehaviour   {
 		string unmatched = word;
 		Match matchedUnit;
 		while (true) {
+			Debug.Log ("unmatched: " + unmatched);
 			matchedUnit = unitRegex.Match (unmatched);
 			if (!matchedUnit.Success)
 				break;
 
-
+			Debug.Log ($"matched unit: {matchedUnit.Value} {matchedUnit.Index} {matchedUnit.Length}");
 			for (int i = 0; i < matchedUnit.Length; i++) {
 				result [matchedUnit.Index + i] = unitColor;
 			}
 
-			unmatched = unmatched.ReplaceRangeWith (' ', matchedUnit.Index, matchedUnit.Length);
+			unmatched = unmatched.ReplaceRangeWith ('#', matchedUnit.Index, matchedUnit.Length);
 		}
 
 		for (int i = 0; i < unmatched.Length; i++) {
-			if (unmatched [i] == ' ')
+			if (unmatched [i] != '#')
 				result [i] = onColor;
 
 		}
@@ -286,6 +288,7 @@ public class Colorer : MonoBehaviour   {
 
 
 		public Color[] GetColorsOf(string word){
+			Debug.Log ("get colors of consonant blend");
 			return GetColorsOfMultiLetterUnits (
 				word, 
 				SpellingRuleRegex.ConsonantBlend, 
@@ -539,11 +542,13 @@ public class Colorer : MonoBehaviour   {
 					result [matchedSyllable.Index + vowel.Index + i] = matchClosed.Success ? shortVowelColor : longVowelColor;
 				}
 					
-				unmatched = unmatched.ReplaceRangeWith (' ', matchedSyllable.Index, matchedSyllable.Length);
+				unmatched = unmatched.ReplaceRangeWith ('#', matchedSyllable.Index, matchedSyllable.Length);
 			}
 
+			//any letters that weren't replaced with # were not matched.
+			//so just let them be white.
 			for (int i = 0; i < unmatched.Length; i++) {
-				if (unmatched [i] != ' ')
+				if (unmatched [i] != '#')
 					result [i] = onColor;
 			}
 

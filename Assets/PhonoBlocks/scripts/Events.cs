@@ -34,7 +34,7 @@ public class Events: MonoBehaviour  {
 
 
 	public event Action<string> OnTargetWordSet = (string targetWord) => { };
-	public void TargetWordSet(string targetWord){
+	public void SetTargetWord(string targetWord){
 		OnTargetWordSet (targetWord);
 	}
 
