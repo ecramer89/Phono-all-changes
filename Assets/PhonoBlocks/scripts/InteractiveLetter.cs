@@ -192,8 +192,6 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 
 	public void UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
-		if (inputLetter == "f")
-			Debug.Log ("UPDATING derived and display color of " + inputLetter + " to " + c);
 			UpdateDefaultColour (c);
 			UpdateDisplayColour (c);
 		}

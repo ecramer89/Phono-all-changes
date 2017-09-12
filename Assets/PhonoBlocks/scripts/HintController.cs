@@ -64,7 +64,7 @@ public class HintController : MonoBehaviour
 					case 2: //level three hint
 						currProblem.PlayAnswer ();
 						UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
-					            //place the target letters and colors in the grid
+					    //place the target letters and colors in the grid
 						for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
 							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);
 							ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, State.Current.TargetWordColors[letterIndex]);
@@ -91,14 +91,13 @@ public class HintController : MonoBehaviour
 					if (letterindex == numLetters)
 				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_FULL_CORRECT_WORD);
 					else {
-						/*LetterSoundComponent placeInGrid = studentActivityController.GetTargetLetterSoundComponentFor (letterindex);
-						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, studentActivityController.TargetLetters [letterindex]);
-						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, placeInGrid.GetColour ());
-						string pathTo = "audio/sounded_out_words/" + studentActivityController.TargetLetters + "/" 
-							+ studentActivityController.TargetLetters [letterindex];
+						string targetWord = State.Current.TargetWord;
+
+						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, targetWord[letterindex]);
+						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, State.Current.TargetWordColors[letterindex]);
+						string pathTo = $"audio/sounded_out_words/{targetWord}/{targetWord[letterindex]}";
 						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
-						AudioSourceController.PushClip (targetSound);*/
-					
+						AudioSourceController.PushClip (targetSound);
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
