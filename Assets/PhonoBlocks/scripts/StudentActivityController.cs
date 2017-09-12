@@ -288,11 +288,11 @@ public class StudentActivityController : MonoBehaviour
 				AudioSourceController.PushClip (notQuiteIt);
 			    //allow the user to access a hint.
 				switch(state){
-		case ActivityState.MAIN_ACTIVITY:
+			case ActivityState.MAIN_ACTIVITY:
 					hintController.ActivateHintButton ();
 					AudioSourceController.PushClip (offerHint);
 					break;
-		case ActivityState.FORCE_CORRECT_LETTER_PLACEMENT:
+			case ActivityState.FORCE_CORRECT_LETTER_PLACEMENT:
 					break;
 			
 				}

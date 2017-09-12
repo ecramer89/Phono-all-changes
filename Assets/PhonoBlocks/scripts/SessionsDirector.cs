@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 /*
  * session manager needs to instantiate and set up the variables of the SessionParameters component if the mode is student mode
  * 
@@ -127,9 +127,7 @@ public class SessionsDirector : MonoBehaviour
 			
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
-			
-
-		}
+	}
 
 		void SetupModeSelectionMenu ()
 		{

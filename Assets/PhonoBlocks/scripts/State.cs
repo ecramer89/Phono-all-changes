@@ -28,6 +28,14 @@ public class State: MonoBehaviour  {
 			this.uILetters = letters;
 		};
 
+		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+			this.targetWord = targetWord;
+		};
+
+		Events.Dispatcher.OnTargetColorsSet += (Color[] targetWordColors) => {
+			this.targetWordColors = targetWordColors;
+		};
+
 	}
 
 	private Mode mode;
@@ -51,6 +59,22 @@ public class State: MonoBehaviour  {
 		get {
 
 			return uILetters;
+		}
+
+	}
+
+	private string targetWord;
+	public string TargetWord{
+		get {
+
+			return targetWord;
+		}
+	}
+
+	private Color[] targetWordColors;
+	public Color[] TargetWordColors{
+		get {
+			return targetWordColors;
 		}
 
 	}

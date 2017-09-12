@@ -35,12 +35,20 @@ public class Events: MonoBehaviour  {
 
 	public event Action<string> OnTargetWordSet = (string targetWord) => { };
 	public void TargetWordSet(string targetWord){
+		OnTargetWordSet (targetWord);
+	}
 
+	public event Action<Color[]> OnTargetColorsSet = (Color[] targetColors) => {};
+	public void SetTargetColors(Color[] targetColors){
+		OnTargetColorsSet (targetColors);
 	}
 
 
 	void Awake(){
 		events = this;
+		//gaurantees that state is first subscriber whose methods are invoked when new events occur.
+		//saves other classes that need to frequently refer to these data from having to cache additional
+		//references/copies to/of data
 		State state = GetComponent<State> ();
 		state.SubscribeToEvents ();
 	}
