@@ -65,7 +65,6 @@ public class Colorer : MonoBehaviour   {
 
 
 		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
-			Debug.Log("TARGET WORD: "+targetWord);
 			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(targetWord));
 		};
 	}

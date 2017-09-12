@@ -284,11 +284,7 @@ public class UserInputRouter : MonoBehaviour
 
 		}
 
-		public void TellUserToPlaceInitialLetters ()
-		{
-				//studentActivityController.PlayInstructions ();
 
-		}
 
 		
 
