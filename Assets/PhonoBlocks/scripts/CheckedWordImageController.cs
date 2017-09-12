@@ -18,6 +18,8 @@ public class CheckedWordImageController : MonoBehaviour
 				img.enabled = false;
 				clickTrigger = checkedWordImage.GetComponent<BoxCollider> ();
 				clickTrigger.enabled = false;
+
+		//Events.Dispatcher
 		}
 
 		public void ShowImage (Texture2D newimg, long showTime)

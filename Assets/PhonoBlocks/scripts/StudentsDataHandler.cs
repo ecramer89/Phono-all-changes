@@ -40,6 +40,16 @@ public class StudentsDataHandler: MonoBehaviour
 			Events.Dispatcher.OnUserSubmittedTheirLetters += () => {
 				LogEvent ("submitted_answer", State.Current.UserInputLetters, State.Current.TargetWord);
 			};
+			Events.Dispatcher.OnCurrentProblemCompleted += () => {
+
+				RecordActivitySolved (
+				Selector.Instance.CurrentStateOfInputMatchesTarget, 
+				State.Current.UserInputLetters, 
+				Selector.Instance.SolvedOnFirstTry);
+
+				SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.InitialTargetLetters);
+
+			};
 
 		}
 

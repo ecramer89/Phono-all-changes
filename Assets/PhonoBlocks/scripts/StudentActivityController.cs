@@ -51,42 +51,6 @@ public class StudentActivityController : MonoBehaviour
 		return State.Current.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
 	}
 
-
-	void MainActivityNewLetterHandler(char letter, int atPosition){
-		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
-		Colorer.Instance.ReColor ();
-	}
-
-	void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
-		InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
-		if (IsErroneous(atPosition, letter)) {
-			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
-			asInteractiveLetter.ConfigureFlashParameters (
-				Parameters.Colors.DEFAULT_OFF_COLOR, Parameters.Colors.DEFAULT_ON_COLOR,
-				Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
-				Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
-			);
-			return;
-		}
-
-		//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
-		asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
-
-	}
-
-	void RemoveAllLettersNewLetterHandler(char letter, int atPosition){
-		if (letter != ' ') //don't bother updating the letter unless the user removed it
-			return;
-
-		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
-		//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
-		if(allUserControlledLettersAreBlank()){ 
-			UserInputRouter.instance.RequestTurnOffImage ();
-			HandleEndOfActivity ();
-		}
-	}
-
-
 	void HandleNewArduinoLetter(char newLetter, int atPosition){
 		switch (State.Current.ActivityState) {
 		case ActivityStates.MAIN_ACTIVITY:
@@ -101,6 +65,42 @@ public class StudentActivityController : MonoBehaviour
 		}
 	}
 
+
+	void MainActivityNewLetterHandler(char letter, int atPosition){
+		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
+		Colorer.Instance.ReColor ();
+	}
+
+	void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
+		InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
+		if (Selector.Instance.IsCorrectlyPlaced(atPosition)){
+			//in case the user removed and then replaced a letter correctly.
+			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
+			return;
+
+		}
+		//otherwise, don't update the UI letters but do flash the error to indicate that child didn't place the right letter.	
+		asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
+		asInteractiveLetter.ConfigureFlashParameters (
+			Parameters.Colors.DEFAULT_OFF_COLOR, Parameters.Colors.DEFAULT_ON_COLOR,
+			Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
+			Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
+		);
+		asInteractiveLetter.StartFlash ();
+
+	}
+
+	void RemoveAllLettersNewLetterHandler(char letter, int atPosition){
+		if (letter != ' ') //don't bother updating the letter unless the user removed it
+			return;
+
+		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
+		//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
+		if(allUserControlledLettersAreBlank()){ 
+			UserInputRouter.instance.RequestTurnOffImage ();
+			HandleEndOfActivity ();
+		}
+	}
 		
 	 void SetUpNextProblem ()
 		{  
@@ -119,21 +119,6 @@ public class StudentActivityController : MonoBehaviour
 
 		}
 
-
-		bool CurrentStateOfUserInputMatchesTarget ()
-		{       
-		
-			for (int i = 0; i < State.Current.UserInputLetters.Length; i++) {
-			if (IsErroneous (i, State.Current.UserInputLetters [i]))
-				return false;
-
-			}
-
-			return true;
-	    
-		}
-				
-
 		void HandleEndOfActivity ()
 		{
 				if (ProblemsRepository.instance.AllProblemsDone ()) {
@@ -147,18 +132,13 @@ public class StudentActivityController : MonoBehaviour
 		}
 				
 
-
-		bool IsErroneous(int atPosition, char letter){
-			return (atPosition >= State.Current.TargetWord.Length && letter == ' ') ||
-			(State.Current.TargetWord [atPosition] == letter);
-     	}
 		
 		public void HandleSubmittedAnswer ()
 		{     
 		       			
 				Events.Dispatcher.IncrementTimesAttemptedCurrentProblem ();
 		
-				if (IsSubmissionCorrect ()) {
+				if (Selector.Instance.CurrentStateOfInputMatchesTarget) {
 					HandleCorrectAnswer ();
 				} else {
 					HandleIncorrectAnswer ();				
@@ -175,7 +155,7 @@ public class StudentActivityController : MonoBehaviour
 			else
 				AudioSourceController.PushClip (excellent);
 			AudioSourceController.PushClip (AudioSourceController.GetWordFromResources(State.Current.TargetWord));
-			CurrentProblemCompleted (true);
+			CurrentProblemCompleted ();
 		}
 
 		void HandleIncorrectAnswer ()
@@ -187,24 +167,20 @@ public class StudentActivityController : MonoBehaviour
 					AudioSourceController.PushClip (offerHint);
 		}
 
-		void CurrentProblemCompleted (bool userSubmittedCorrectAnswer)
+		void CurrentProblemCompleted ()
 		{
-	 
+				Events.Dispatcher.RecordCurrentProblemCompleted ();
+
+
 				WordHistoryController.Instance.AddCurrentWordToHistory (State.Current.UILetters, true);
 				UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
 
-				bool solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
-				if (solvedOnFirstTry) {
+				if (Selector.Instance.SolvedOnFirstTry) {
 		
 						UserInputRouter.instance.DisplayNewStarOnScreen (ProblemsRepository.instance.ProblemsCompleted-1);
 
 				}
 			
-				StudentsDataHandler.instance.RecordActivitySolved (userSubmittedCorrectAnswer, State.Current.UserInputLetters, solvedOnFirstTry);
-			
-		        StudentsDataHandler.instance.SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.InitialTargetLetters);
-		        
-		     
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
 		        //don't want the letters still on platform from problem n being interpreted as input for problem n+1.
 				Events.Dispatcher.ForceRemoveAllLetters();
@@ -212,11 +188,6 @@ public class StudentActivityController : MonoBehaviour
       
 		}
 		
-		bool IsSubmissionCorrect ()
-		{      
-				return CurrentStateOfUserInputMatchesTarget ();
-
-		}
 
 
 

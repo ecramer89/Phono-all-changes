@@ -5,6 +5,7 @@ using System;
 
 
 [RequireComponent(typeof(State))]
+[RequireComponent(typeof(Selector))]
 public class Events: MonoBehaviour  {
 
 	private static Events events;
@@ -120,6 +121,11 @@ public class Events: MonoBehaviour  {
 		OnHintProvided ();
 	}
 
+	public Action OnCurrentProblemCompleted = () =>{};
+	public void RecordCurrentProblemCompleted(){
+		OnCurrentProblemCompleted ();
+	}
+
 	void Awake(){
 		events = this;
 		//gaurantees that state is first subscriber whose methods are invoked when new events occur.
@@ -127,6 +133,11 @@ public class Events: MonoBehaviour  {
 		//references/copies to/of data
 		State state = GetComponent<State> ();
 		state.SubscribeToEvents ();
+		//ensure that selector is the second whose subscribers are invoked.
+		//selectors job is to compute/cache derived fields (e.g., whether or not current state of user input matches target,
+		//the location of each error, so on).
+		Selector selector = GetComponent<Selector> ();
+		selector.SubscribeToEvents ();
 
 
 

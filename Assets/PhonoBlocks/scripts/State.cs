@@ -52,6 +52,7 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 			previousUserInputLetters = userInputLetters;
 			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
+				
 		};
 	
 		Events.Dispatcher.OnEnterMainActivity += () => {
@@ -137,6 +138,7 @@ public class State: MonoBehaviour  {
 			return targetWord;
 		}
 	}
+		
 
 	private string initialTargetLetters;
 	public string InitialTargetLetters{
