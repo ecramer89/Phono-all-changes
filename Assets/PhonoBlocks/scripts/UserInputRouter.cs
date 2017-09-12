@@ -248,7 +248,7 @@ public class UserInputRouter : MonoBehaviour
 		//
 		int selectTimer = -1;
 
-		void Update ()
+		/*void Update ()
 		{
 				if (selectTimer > 0)
 						selectTimer--;
@@ -276,7 +276,7 @@ public class UserInputRouter : MonoBehaviour
 
 				}
 
-		}
+		}*/
 
 		string selectedLetters = "";
 		bool wholeWordWasSelected = false;

@@ -102,7 +102,7 @@ public class HintController : MonoBehaviour
 					}
 				}
 				Events.Dispatcher.UnLockUIInput ();
-				ArduinoLetterController.instance.PlaceWordInLetterGrid (studentActivityController.UserChangesAsString);
+				ArduinoLetterController.instance.PlaceWordInLetterGrid (State.Current.UserInputLetters);
 				State.Current.UILetters.ForEach(UILetter=>UILetter.RevertToInputDerivedColor ()); 
 			}
 

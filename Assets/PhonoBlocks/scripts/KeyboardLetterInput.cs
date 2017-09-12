@@ -37,10 +37,6 @@ public class KeyboardLetterInput : MonoBehaviour {
 
 	}
 
-	ArduinoLetterController alc;
-	void Start(){
-		alc = GameObject.Find ("ArduinoLetterController").GetComponent<ArduinoLetterController> ();
-	}
 
 	void Update ()
 	{
@@ -103,7 +99,6 @@ public class KeyboardLetterInput : MonoBehaviour {
 	{
 		if (testPosition != -1 && testLetter != null) {
 			Events.Dispatcher.RecordNewUserInputLetter(testLetter [0], testPosition);
-			alc.ReceiveNewUserInputLetter (testLetter [0], testPosition);
 			ClearTestPosition ();
 
 		}

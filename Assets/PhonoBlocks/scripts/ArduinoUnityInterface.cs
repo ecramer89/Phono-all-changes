@@ -169,9 +169,12 @@ public class ArduinoUnityInterface : PhonoBlocksController
 						if (TimeToCheckForChangeHasElapsed ()) {
 
 								SearchForAndSaveChangedLetterAndPosition ();
-								if (WasAChange ())
-										SendChangeToArduinoLetterController ();
-
+				if (WasAChange ())
+					Events.Dispatcher.RecordNewUserInputLetter (
+						change.letter, 
+						AdjustArduinoPositionForScreen (change.position));
+									
+			
 								timeOfLastCheck = Time.time;
 
 				
@@ -241,13 +244,7 @@ public class ArduinoUnityInterface : PhonoBlocksController
 				return change.letter != SAME;
 		}
 
-		void SendChangeToArduinoLetterController ()
-		{
 
-        
-				arduinoLetterControllerOb.GetComponent<ArduinoLetterController> ().ReceiveNewUserInputLetter (change.letter, (AdjustArduinoPositionForScreen (change.position)));
-        
-		}
 
 		int AdjustArduinoPositionForScreen (int arduinoPlatformPosition)
 		{

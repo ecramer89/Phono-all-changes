@@ -11,19 +11,6 @@ public class StudentActivityController : MonoBehaviour
 		HintController hintController;
 		ArduinoLetterController arduinoLetterController;
 
-
-		public bool StringMatchesTarget (string s)
-		{
-			return s.Trim().Equals (State.Current.TargetWord.Trim ());
-
-		}
-
-
-		char[] usersMostRecentChanges; //array containing letters that a user has actually placed 
-	    //on the platform. would not contain for example the initial letters that appear on the screen
-		//before the user places them there themselves.
-
-
 	    //save references to frequently used audio clips 
 		AudioClip excellent;
 		AudioClip incorrectSoundEffect;
@@ -38,31 +25,17 @@ public class StudentActivityController : MonoBehaviour
 		GameObject submitWordButton;
 
 	   
-		public string UserChangesAsString {
-				get {
-					return new string (usersMostRecentChanges);
-	
-				}
-
-		}
-
 		bool allUserControlledLettersAreBlank(){
-			return usersMostRecentChanges.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
+			return State.Current.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
 		}
 
 		public void Initialize (GameObject hintButton, ArduinoLetterController arduinoLetterController)
 		{
-		        //set up dependency between arduino letter controller and this student activity controller.
-		        //
+		      
 				this.arduinoLetterController = arduinoLetterController;
-				arduinoLetterController.studentActivityController = this;
-
-				usersMostRecentChanges = new char[UserInputRouter.numOnscreenLetterSpaces];
-		
 			
 				hintController = gameObject.GetComponent<HintController> ();
 				hintController.Initialize (hintButton);
-
 	
 			    //cache audio clips
 				excellent = InstructionsAudio.instance.excellent;
@@ -86,7 +59,6 @@ public class StudentActivityController : MonoBehaviour
 	public void SetUpNextProblem ()
 		{  
 			
-				ClearSavedUserChanges ();
 				hintController.Reset ();
 			
 				Problem currProblem = ProblemsRepository.instance.GetNextProblem ();
@@ -120,29 +92,19 @@ public class StudentActivityController : MonoBehaviour
 				
 		}
 
-	   
-		void ClearSavedUserChanges ()
-		{
-				for (int i=0; i<usersMostRecentChanges.Length; i++) {
-						usersMostRecentChanges [i] = ' ';
-					
-				}
+	 
 
-		}
-
-
-
-		bool CurrentStateOfLettersMatches (string targetLetters)
+		bool CurrentStateOfUserInputMatchesTarget ()
 		{       
-				for (int i=0; i<usersMostRecentChanges.Length; i++) {
-						if (i >= targetLetters.Length) {
-								if (usersMostRecentChanges [i] != ' ')
-										return false;
-					} else if (targetLetters [i] != ' ' && usersMostRecentChanges [i] != targetLetters [i])
-								return false;
-				}
-				return true;
+		
+			for (int i = 0; i < State.Current.UserInputLetters.Length; i++) {
+			if (IsErroneous (i, State.Current.UserInputLetters [i]))
+				return false;
 
+			}
+
+			return true;
+	    
 		}
 				
 
@@ -172,12 +134,12 @@ public class StudentActivityController : MonoBehaviour
 
 
 
-		string previousUserInput = UserChangesAsString;
-				RecordUsersChange (atPosition, letter); 
+				string previousUserInput = State.Current.PreviousUserInputLetters;
+				
 			switch (State.Current.ActivityState) {
 			case ActivityStates.MAIN_ACTIVITY:
 					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-					Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
+					Colorer.Instance.ReColor (State.Current.UserInputLetters,previousUserInput,State.Current.TargetWord);
 					break;
 			case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
 				InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
@@ -218,7 +180,7 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleSubmittedAnswer ()
 		{     
 		        
-		StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, State.Current.TargetWord);
+		StudentsDataHandler.instance.LogEvent ("submitted_answer", State.Current.UserInputLetters, State.Current.TargetWord);
 					
 				Events.Dispatcher.IncrementTimesAttemptedCurrentProblem ();
 		
@@ -272,7 +234,7 @@ public class StudentActivityController : MonoBehaviour
 
 				}
 			
-				StudentsDataHandler.instance.RecordActivitySolved (userSubmittedCorrectAnswer, UserChangesAsString, solvedOnFirstTry);
+		StudentsDataHandler.instance.RecordActivitySolved (userSubmittedCorrectAnswer, State.Current.UserInputLetters, solvedOnFirstTry);
 			
 		        StudentsDataHandler.instance.SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.InitialTargetLetters);
 		        
@@ -284,23 +246,10 @@ public class StudentActivityController : MonoBehaviour
 				submitWordButton.SetActive (false);
       
 		}
-
-		public void RecordUsersChange (int position, char change)
-		{
 		
-				usersMostRecentChanges [position] = change;
-
-		
-		}
-
 		public bool IsSubmissionCorrect ()
 		{      
-				string target = State.Current.TargetWord;
-
-				bool result = CurrentStateOfLettersMatches (target);
-
-				
-				return result;
+				return CurrentStateOfUserInputMatchesTarget ();
 
 		}
 

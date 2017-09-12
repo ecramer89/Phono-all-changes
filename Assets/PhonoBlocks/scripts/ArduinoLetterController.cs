@@ -6,8 +6,7 @@ using System;
 using System.Collections;
 using Extensions;
 
-//todo this thing has a cached reference to the study activity controller. it doesn't need to check whether its student mode.
-//or receive the sac as an argument
+
 public class ArduinoLetterController : MonoBehaviour{
 		public static ArduinoLetterController instance;
 		public StudentActivityController studentActivityController;
@@ -64,40 +63,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				ChangeDisplayColourOfCells (Color.gray); 
 
 			}
-
-
-
-	
-		//invoked by the arduino and the keyboard on screen
-
-	/*
-	 * 
-	 * if ui inputs are currently locked then do nothing.
-	 * if it's teacher mode then update the letter immediately.
-	 * if it's student mode then:
-	 *   if its main activity then update the letter.
-	 * if it's force correct then don't do anything
-	 * if it's froce removal then only update if... why doesn't the sac do this? and have a teacher mode controller
-	 * 
-	 * */
-		public void ReceiveNewUserInputLetter (char newLetter, int atPosition)
-		{
-				StudentsDataHandler.instance.LogEvent ("change_letter", newLetter + "", atPosition + "");
-
-
-				if (atPosition < Parameters.UI.ONSCREEN_LETTER_SPACES && atPosition >= 0) {
-						if (IsUpper (newLetter))
-								newLetter = ToLower (newLetter);
-			
-						UserInputRouter.instance.HandleNewUserInputLetter (newLetter,
-			                                          atPosition, this);
-	
-
-			           
-				}
-		}
-
-
+		
 
 
 		public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter)
@@ -143,31 +109,6 @@ public class ArduinoLetterController : MonoBehaviour{
 				i.SwitchImageTo (newImage);
 
 
-		}
-
-		public void RevertLettersToDefaultColour (bool onlySelected=false, int start=-1, int count=7)
-		{
-				start = (start < 0 ? 0 : start);
-				count = (count > Parameters.UI.ONSCREEN_LETTER_SPACES ? Parameters.UI.ONSCREEN_LETTER_SPACES : count);
-				if (!onlySelected) {
-						for (int i=start; i<count; i++) {
-								RevertASingleLetterToDefaultColour (i);
-						}
-				} else {
-						for (int i=start; i<count; i++) {
-								if (selectedUserControlledLettersAsStringBuilder [i] != ' ')
-										RevertASingleLetterToDefaultColour (i);
-				
-						}
-
-				}
-
-		}
-
-		public void RevertASingleLetterToDefaultColour (int atPosition)
-		{
-				InteractiveLetter l = letterGrid.GetLetterCell (atPosition).GetComponent<InteractiveLetter> ();
-				l.RevertToInputDerivedColor ();
 		}
 
 

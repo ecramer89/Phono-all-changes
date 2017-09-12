@@ -4,7 +4,7 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 
-public class StudentsDataHandler 
+public class StudentsDataHandler: MonoBehaviour
 {
 
 		static readonly string DATA_FILE_EXTENSION = ".csv";
@@ -29,9 +29,13 @@ public class StudentsDataHandler
 		const int asciiFor0 = 48;
 
 
+		public void Start(){
+			Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+				LogEvent ("change_letter", newLetter + "", atPosition + "");
+			};
 
 
-		
+		}
 
 		public class StudentData
 		{
