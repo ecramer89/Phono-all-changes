@@ -129,20 +129,21 @@ public class Colorer : MonoBehaviour   {
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
 			//index can exceed length of target word since target word doesn't take trailing blanks into account. (e.g., "_ame___", vs "game")
-
 			//if the letter is an error and is different from previous
-			if (i < target.Length && input [i] != target [i] && previousInput [i] != input [i]) {
+			if (i < target.Length && input [i] != target[i]){ 
 				UILetter.UpdateInputDerivedAndDisplayColor (offColor);
-				UILetter.ConfigureFlashParameters (
-					offColor, onColor, 
-					Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
-					Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
-				);
-
-			}
+				//only flash if it's a new error
+				if(previousInput [i] != input [i]) {
+					UILetter.ConfigureFlashParameters (
+						offColor, onColor, 
+						Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
+						Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
+					);
+				}
 		
-		}
+			}
 
+		}
 	}
 
 	static void ConfigureFlashOnCompletionOfTargetRule(InteractiveLetter letter, Color a, Color b){
@@ -192,9 +193,10 @@ public class Colorer : MonoBehaviour   {
 		//input to the regex match is a buffer from which we replace the 
 		//blend letters with blanks on each iteration with blanks
 		string unmatchedUserInputLetters=updatedUserInputLetters;
-		Match multiLetterUnit = null;
-		while(multiLetterUnit==null || multiLetterUnit.Success){
+		Match multiLetterUnit;
+		while(true){
 			multiLetterUnit = spellingRuleRegex.Match (unmatchedUserInputLetters);
+			if(!multiLetterUnit.Success) break;
 			List<InteractiveLetter> unitLetters = UIletters.GetRange (multiLetterUnit.Index, multiLetterUnit.Length);
 			//remove the blended letters from unmatchedUserInputLetters
 			//replace with blanks (don't use substring) to account for:
@@ -230,12 +232,15 @@ public class Colorer : MonoBehaviour   {
 	){
 		List<InteractiveLetter> UIletters = State.Current.UILetters;
 		string unmatchedTargetInputLetters=targetWord;
-		Match targetUnit = null;
-		while(targetUnit==null || targetUnit.Success){
+		Match targetUnit;
+		while(true){
 
 			targetUnit = spellingRuleRegex.Match (unmatchedTargetInputLetters);
+
+			if (!targetUnit.Success)
+				break;
+			
 			unmatchedTargetInputLetters = unmatchedTargetInputLetters.ReplaceRangeWith(' ', targetUnit.Index, targetUnit.Length);
-			//string correspondingUserInput = updatedUserInputLetters.Substring (targetUnit.Index, targetUnit.Length);
 			Match userUnit = spellingRuleRegex.Match(updatedUserInputLetters);
 
 			//if a corresponding match was found in the updated user input
@@ -288,7 +293,6 @@ public class Colorer : MonoBehaviour   {
 
 
 		public Color[] GetColorsOf(string word){
-			Debug.Log ("get colors of consonant blend");
 			return GetColorsOfMultiLetterUnits (
 				word, 
 				SpellingRuleRegex.ConsonantBlend, 

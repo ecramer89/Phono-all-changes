@@ -35,8 +35,6 @@ public class State: MonoBehaviour  {
 
 		Events.Dispatcher.OnTargetColorsSet += (Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
-			Debug.Log("target word colors");
-			Debug.Log(targetWordColors.Stringify());
 		};
 
 	}
