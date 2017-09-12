@@ -292,22 +292,7 @@ public class ProblemsRepository : MonoBehaviour
 
 		}
 
-		public Problem GetRandomProblem ()
-		{
-				if (idxToSwapUsedProblemIn == 0)//loop if necessary
-						idxToSwapUsedProblemIn = problemsForSession.Length - 1;
 
-				int upper = idxToSwapUsedProblemIn - 1;
-				int randomIdx = (int)UnityEngine.Random.Range (0, upper);
-				Problem next = problemsForSession [randomIdx];
-				Problem temp = problemsForSession [idxToSwapUsedProblemIn];
-				problemsForSession [randomIdx] = temp;
-				problemsForSession [idxToSwapUsedProblemIn] = next;
-				idxToSwapUsedProblemIn--;
-				next.Reset ();
-				return next;
-				
-		}
 
 		
 

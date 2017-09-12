@@ -95,12 +95,6 @@ public class Problem : MonoBehaviour
 		}
 
 
-		public void Reset ()
-		{
-			
-				targetWord = cachedTargetWord;
-			
-		}
 		
 
 		protected virtual void CacheFixedInstructions (string initialWord, string targetWord)
