@@ -65,12 +65,16 @@ public class State: MonoBehaviour  {
 		};
 		Events.Dispatcher.OnNewProblemBegun += () => {
 			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
+			currentHintNumber = 0;
 		};
 		Events.Dispatcher.OnUIInputUnLocked += () => {
 			uIInputLocked = false;
 		};
 		Events.Dispatcher.OnUIInputLocked += () => {
 			uIInputLocked = true;
+		};
+		Events.Dispatcher.OnHintProvided += () => {
+			this.currentHintNumber++;
 		};
 	
 	}
@@ -174,6 +178,14 @@ public class State: MonoBehaviour  {
 		get {
 
 			return activityState;
+		}
+
+	}
+
+	private int currentHintNumber;
+	public int CurrentHintNumber{
+		get {
+			return currentHintNumber;
 		}
 
 	}

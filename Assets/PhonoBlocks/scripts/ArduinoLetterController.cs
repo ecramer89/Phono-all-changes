@@ -150,24 +150,6 @@ public class ArduinoLetterController : MonoBehaviour{
 		
 
 
-		bool IsUpper (char letter)
-		{
-				int asInt = (int)letter;
-				return asInt > 64 && asInt < 91;
-
-
-		}
-
-		//97-122 lower case; 65-> upper case
-		char ToLower (char newLetter)
-		{
-				return (char)((int)newLetter + 32);
-
-		}
-
-
-
-
 		void AssignInteractiveLettersToTangibleCounterParts ()
 		{
 				int indexOfLetterBarCell = 0;

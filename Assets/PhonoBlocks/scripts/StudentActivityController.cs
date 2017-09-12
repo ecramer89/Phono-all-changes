@@ -9,6 +9,13 @@ public class StudentActivityController : MonoBehaviour
 {
 
 		HintController hintController;
+		private static StudentActivityController instance;
+		public static StudentActivityController Instance{
+			get {
+				return instance;
+			}
+
+		}
 	    //save references to frequently used audio clips 
 		AudioClip excellent;
 		AudioClip incorrectSoundEffect;
@@ -20,15 +27,10 @@ public class StudentActivityController : MonoBehaviour
 		AudioClip triumphantSoundForSessionDone;
 
 
-		public void Initialize (GameObject hintButton, ArduinoLetterController arduinoLetterController)
-		{
+		public void Initialize ()
+	{       	instance = this;
 				Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
 				Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
-
-			
-				hintController = gameObject.GetComponent<HintController> ();
-				hintController.Initialize (hintButton);
-	
 			    //cache audio clips
 				excellent = InstructionsAudio.instance.excellent;
 				incorrectSoundEffect = InstructionsAudio.instance.incorrectSoundEffect;
@@ -145,13 +147,6 @@ public class StudentActivityController : MonoBehaviour
 		}
 				
 
-		public void UserRequestsHint ()
-		{
-		    hintController.ProvideHint ();
-
-		}
-
-
 
 		bool IsErroneous(int atPosition, char letter){
 			return (atPosition >= State.Current.TargetWord.Length && letter == ' ') ||
@@ -160,21 +155,11 @@ public class StudentActivityController : MonoBehaviour
 		
 		public void HandleSubmittedAnswer ()
 		{     
-		        
-		StudentsDataHandler.instance.LogEvent ("submitted_answer", State.Current.UserInputLetters, State.Current.TargetWord);
-					
+		       			
 				Events.Dispatcher.IncrementTimesAttemptedCurrentProblem ();
 		
 				if (IsSubmissionCorrect ()) {
-
-					AudioSourceController.PushClip (correctSoundEffect);
-					if (State.Current.TimesAttemptedCurrentProblem > 1)
-						AudioSourceController.PushClip (youDidIt);
-					else
-						AudioSourceController.PushClip (excellent);
-					AudioSourceController.PushClip (AudioSourceController.GetWordFromResources(State.Current.TargetWord));
-					CurrentProblemCompleted (true);
-					
+					HandleCorrectAnswer ();
 				} else {
 					HandleIncorrectAnswer ();				
 					
@@ -183,22 +168,23 @@ public class StudentActivityController : MonoBehaviour
 
 		}
 
-		protected void HandleIncorrectAnswer ()
+		void HandleCorrectAnswer(){
+			AudioSourceController.PushClip (correctSoundEffect);
+			if (State.Current.TimesAttemptedCurrentProblem > 1)
+				AudioSourceController.PushClip (youDidIt);
+			else
+				AudioSourceController.PushClip (excellent);
+			AudioSourceController.PushClip (AudioSourceController.GetWordFromResources(State.Current.TargetWord));
+			CurrentProblemCompleted (true);
+		}
+
+		void HandleIncorrectAnswer ()
 		{
-		       
+				Events.Dispatcher.RecordUserSubmittedIncorrectAnswer ();
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
-			  
-				switch(State.Current.ActivityState){
-				case ActivityStates.MAIN_ACTIVITY:
-					hintController.ActivateHintButton ();
+				if(State.Current.ActivityState == ActivityStates.MAIN_ACTIVITY) 
 					AudioSourceController.PushClip (offerHint);
-					break;
-				case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
-					break;
-			
-				}
-
 		}
 
 		void CurrentProblemCompleted (bool userSubmittedCorrectAnswer)

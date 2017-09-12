@@ -110,7 +110,7 @@ public class UserInputRouter : MonoBehaviour
 								studentActivityControllerGO = sessionManager.studentActivityControllerOB;
 								studentActivityController = studentActivityControllerGO.GetComponent<StudentActivityController> ();
 				            
-								studentActivityController.Initialize (hintButtonGO, arduinoLetterController);
+								studentActivityController.Initialize ();
 								userStarControllerGO.SetActive (true);
 								userStarController = userStarControllerGO.GetComponent<UserStarGridController> ();
 								userStarController.Initialize ();
@@ -147,14 +147,6 @@ public class UserInputRouter : MonoBehaviour
 
 		}
 
-		public void RequestHint ()
-		{//and if the UI is not on lockdown.
-		if (!TeacherMode () && !State.Current.UIInputLocked)
-						studentActivityController.UserRequestsHint ();
-
-
-		}
-
 
 		//touch the desk to deselect any selected selectables.
 		public void DeskTouched ()
@@ -170,15 +162,7 @@ public class UserInputRouter : MonoBehaviour
 				checkedWordImageController.EndDisplay ();
 		}
 
-		public void DisplayLettersOf (string word, bool ignoreBlanks=false)
-		{
-        //hintLetterTimer = DELAY_BEFORE_REMOVE_HINT_LETTERS;
 
-			arduinoLetterController.DisplayWordInLetterGrid (word,ignoreBlanks);
-
-		}
-
-		//
 		public void RequestDisplayImage (string word, bool disableTextureOnPress, bool indefinite=false)
 		{
 	
@@ -191,21 +175,6 @@ public class UserInputRouter : MonoBehaviour
 		}
 
 		
-
-		public void AddCurrentWordToHistory (bool playSoundsAndShowImage)
-		{
-
-		wordHistoryController.AddCurrentWordToHistory (State.Current.UILetters, playSoundsAndShowImage);
-
-		}
-		
-		public void ClearWordHistory ()
-		{
-				wordHistoryController.ClearWordHistory ();
-
-
-		}
-
 		//show stars acquired during a session (but not yet stored in player prefs and not yet displayed initially) during the activity.
 		public void DisplayNewStarOnScreen (int at)
 		{

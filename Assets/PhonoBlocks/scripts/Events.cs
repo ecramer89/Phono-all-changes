@@ -115,6 +115,11 @@ public class Events: MonoBehaviour  {
 		OnUserSubmittedCorrectAnswer ();
 	}
 
+	public event Action OnHintProvided = () => {};
+	public void RecordHintProvided(){
+		OnHintProvided ();
+	}
+
 	void Awake(){
 		events = this;
 		//gaurantees that state is first subscriber whose methods are invoked when new events occur.

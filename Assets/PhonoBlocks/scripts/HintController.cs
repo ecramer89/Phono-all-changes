@@ -4,83 +4,46 @@ using System.Text;
 
 public class HintController : MonoBehaviour
 {
-		StudentActivityController studentActivityController;
-		public AudioClip sound_out_word;
-		GameObject hintButton;
-		int currHintIdx = 0;
-		const int NUM_HINTS=3;
-
-		public void Initialize (GameObject hintButton)
-		{
-				Events.Dispatcher.OnNewProblemBegun += Reset;
-
-				this.hintButton = hintButton;
-				studentActivityController = gameObject.GetComponent<StudentActivityController> ();
-				sound_out_word = InstructionsAudio.instance.soundOutTheWord;
-		}
-
-		public void Reset ()
-		{
-				currHintIdx = 0;
 	
-		}
 
-		public void DeActivateHintButton ()
+		public void Initialize ()
 		{
-
-				hintButton.SetActive (false);
-		}
-
-		public void ActivateHintButton ()
-		{
-
-				if (!hintButton.activeSelf)
-						hintButton.SetActive (true);
-
-		}
-
-		public bool HintButtonActive ()
-		{
-				return hintButton.activeSelf;
-
+				Events.Dispatcher.OnHintRequested += ProvideHint;
 		}
 
 
 		public void ProvideHint ()
 		{      
-			if (currHintIdx >= NUM_HINTS)
+			if (State.Current.CurrentHintNumber >= Parameters.Hints.NUM_HINTS)
 				return;
 
-
-			switch (currHintIdx) {
-					case 0:
-						AudioSourceController.PushClip(AudioSourceController.GetSoundedOutWordFromResources (State.Current.TargetWord));
-					break;
-
+			switch (State.Current.CurrentHintNumber) {
 				    case 1: //level two hint
 						Events.Dispatcher.LockUIInput();
 						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
 						StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
 					break;
 
-		case 2: //level three hint
-				AudioSourceController.PushClip (AudioSourceController.GetWordFromResources (State.Current.TargetWord));
-				UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
+					case 2: //level three hint
+						AudioSourceController.PushClip (AudioSourceController.GetWordFromResources (State.Current.TargetWord));
+						UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
 						    //place the target letters and colors in the grid
-				for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
-					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);
-					ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, State.Current.TargetWordColors [letterIndex]);
-				}
-				Events.Dispatcher.ForceCorrectLetterPlacement ();
+						for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
+							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);
+							ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, State.Current.TargetWordColors [letterIndex]);
+						}
+						Events.Dispatcher.ForceCorrectLetterPlacement ();
 					break;
+
+					default: //level 1 hint, and whatever would happen should number of hints exceed 3.
+						AudioSourceController.PushClip (AudioSourceController.GetSoundedOutWordFromResources (State.Current.TargetWord));
+						break;
+				
 				}
 
-				currHintIdx++;
-				DeActivateHintButton ();
 			
+				Events.Dispatcher.RecordHintProvided ();
 
-				StudentsDataHandler.instance.LogEvent ("requested_hint", currHintIdx + "", "NA");
-			
 		}
 
 

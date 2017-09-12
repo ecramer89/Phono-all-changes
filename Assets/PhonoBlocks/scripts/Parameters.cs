@@ -79,6 +79,7 @@ public class Parameters {
 	}
 
 	public class Hints{
+		public static readonly int NUM_HINTS = 3;
 		public static readonly int LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER=2;
 		public static readonly int LEVEL_2_SECONDS_DURATION_FULL_CORRECT_WORD=5;
 	}

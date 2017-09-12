@@ -23,8 +23,6 @@ public class StudentsDataHandler: MonoBehaviour
 		//that we store in the student data object and which we place values into before saving it a single
 		//string in player prefs.
 
-
-		
 		const string valDelimiter = ",";
 		const int asciiFor0 = 48;
 
@@ -35,6 +33,12 @@ public class StudentsDataHandler: MonoBehaviour
 			};
 			Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
 				RecordActivityTargetWord (targetWord);
+			};
+			Events.Dispatcher.OnHintProvided += () => {
+				LogEvent ("requested_hint", $"{State.Current.CurrentHintNumber}", "NA");
+			};
+			Events.Dispatcher.OnUserSubmittedTheirLetters += () => {
+				LogEvent ("submitted_answer", State.Current.UserInputLetters, State.Current.TargetWord);
 			};
 
 		}
