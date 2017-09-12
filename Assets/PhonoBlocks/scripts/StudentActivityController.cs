@@ -167,7 +167,12 @@ public class StudentActivityController : MonoBehaviour
 
 	
 		public void HandleNewArduinoLetter (char letter, int atPosition)
-	{       	string previousUserInput = UserChangesAsString;
+	{       	
+		
+
+
+
+		string previousUserInput = UserChangesAsString;
 				RecordUsersChange (atPosition, letter); 
 			switch (State.Current.ActivityState) {
 			case ActivityStates.MAIN_ACTIVITY:

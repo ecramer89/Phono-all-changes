@@ -7,7 +7,7 @@ using System.Collections;
 using Extensions;
 
 //todo this thing has a cached reference to the study activity controller. it doesn't need to check whether its student mode.
-//or receive the sac as an argumenrt
+//or receive the sac as an argument
 public class ArduinoLetterController : MonoBehaviour{
 		public static ArduinoLetterController instance;
 		public StudentActivityController studentActivityController;
@@ -25,72 +25,27 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 				
 
-		public static int startingIndexOfUserLetters;
-		public static int endingIndexOfUserLetters;
 		LetterGridController letterGrid;
 		ArduinoUnityInterface tangibleLetters;
 		public GameObject letterGridControllerGO;
-	    string stringRepresentationOfPrevious;
-
-		public int StartingIndex {
-				get {
-						return startingIndexOfUserLetters;
-				}
-				set {
-						startingIndexOfUserLetters = value;
+	 
 
 
-				}
-		}
 
-		public int EndingIndex {
-				get {
-						return endingIndexOfUserLetters;
-				}
-				set {
-						endingIndexOfUserLetters = value;
-			
-				}
-		}
-
-		private int maxUserLetters;
-
-		public int MaxArduinoLetters {
-				get {
-						return maxUserLetters;
-				}
-
-
-				set {
-						maxUserLetters = value;
-
-				}
-
-		}
-
-		public void Initialize (
-				int startingIndexOfArduinoLetters, 
-				int endingIndexOfArduinoLetters, 
-				ArduinoUnityInterface tangibleLetters)
+		public void Initialize (ArduinoUnityInterface tangibleLetters)
 		{
-				StartingIndex = startingIndexOfArduinoLetters;
-				EndingIndex = endingIndexOfArduinoLetters;
-				maxUserLetters = EndingIndex + 1 - StartingIndex;
-
-						
-		        EMPTY_USER_WORD = "".Fill (' ', maxUserLetters);
+			
+	
 				selectedUserControlledLettersAsStringBuilder = new StringBuilder (EMPTY_USER_WORD);
 		
 				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();
-				letterGrid.InitializeBlankLetterSpaces (maxUserLetters);
-
-			
+				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
+	
 				AssignInteractiveLettersToTangibleCounterParts ();
 				instance = this;
 
 				Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
-
-
+		    
 
 				Events.Dispatcher.OnInitialProblemLettersSet += (string initialProblemLetters) => {
 					ReplaceEachLetterWithBlank ();
@@ -114,24 +69,35 @@ public class ArduinoLetterController : MonoBehaviour{
 
 	
 		//invoked by the arduino and the keyboard on screen
+
+	/*
+	 * 
+	 * if ui inputs are currently locked then do nothing.
+	 * if it's teacher mode then update the letter immediately.
+	 * if it's student mode then:
+	 *   if its main activity then update the letter.
+	 * if it's force correct then don't do anything
+	 * if it's froce removal then only update if... why doesn't the sac do this? and have a teacher mode controller
+	 * 
+	 * */
 		public void ReceiveNewUserInputLetter (char newLetter, int atPosition)
 		{
 				StudentsDataHandler.instance.LogEvent ("change_letter", newLetter + "", atPosition + "");
 
 
-				if (atPosition < maxUserLetters && atPosition >= StartingIndex) {
+				if (atPosition < Parameters.UI.ONSCREEN_LETTER_SPACES && atPosition >= 0) {
 						if (IsUpper (newLetter))
 								newLetter = ToLower (newLetter);
 			
 						UserInputRouter.instance.HandleNewUserInputLetter (newLetter,
 			                                          atPosition, this);
-						Events.Dispatcher.RecordNewUserInputLetter (newLetter, atPosition);
+	
 
 			           
 				}
 		}
 
-	
+
 
 
 		public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter)
@@ -149,8 +115,8 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		public void ChangeDisplayColourOfCells (Color newColour, bool onlySelected=false, int start=-1, int count=7)
 		{
-				start = (start < StartingIndex ? StartingIndex : start);
-				count = (count > MaxArduinoLetters ? MaxArduinoLetters : count);
+				start = (start < 0 ? 0 : start);
+				count = (count > Parameters.UI.ONSCREEN_LETTER_SPACES ? Parameters.UI.ONSCREEN_LETTER_SPACES : count);
 				if (!onlySelected) {
 						for (int i=start; i<count; i++) {
 								ChangeDisplayColourOfASingleCell (i, newColour);
@@ -181,8 +147,8 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		public void RevertLettersToDefaultColour (bool onlySelected=false, int start=-1, int count=7)
 		{
-				start = (start < StartingIndex ? StartingIndex : start);
-				count = (count > MaxArduinoLetters ? MaxArduinoLetters : count);
+				start = (start < 0 ? 0 : start);
+				count = (count > Parameters.UI.ONSCREEN_LETTER_SPACES ? Parameters.UI.ONSCREEN_LETTER_SPACES : count);
 				if (!onlySelected) {
 						for (int i=start; i<count; i++) {
 								RevertASingleLetterToDefaultColour (i);
@@ -209,8 +175,8 @@ public class ArduinoLetterController : MonoBehaviour{
 		public void PlaceWordInLetterGrid (string word)
 		{
 
-				for (int i=0, j=startingIndexOfUserLetters; i<word.Length; i++,j++) {
-						ChangeTheLetterOfASingleCell (j, word[i]);
+				for (int i=0;i<word.Length; i++) {
+						ChangeTheLetterOfASingleCell (i, word[i]);
 					
 				}
 		
@@ -229,9 +195,9 @@ public class ArduinoLetterController : MonoBehaviour{
 		public void DisplayWordInLetterGrid (string word, bool ignoreBlanks=false)
 		{
 		
-				for (int i=0, j=startingIndexOfUserLetters; i<word.Length; i++,j++) {
+		for (int i=0; i<word.Length; i++) {
 					if(!ignoreBlanks || word[i] != ' ')
-						ChangeTheImageOfASingleCell (j, LetterImageTable.instance.GetLetterImageFromLetter (word.Substring (i, 1) [0]));
+						ChangeTheImageOfASingleCell (i, LetterImageTable.instance.GetLetterImageFromLetter (word.Substring (i, 1) [0]));
 			
 				}
 		
@@ -265,8 +231,8 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		void AssignInteractiveLettersToTangibleCounterParts ()
 		{
-				int indexOfLetterBarCell = startingIndexOfUserLetters;
-				for (; indexOfLetterBarCell<=endingIndexOfUserLetters; indexOfLetterBarCell++) {
+				int indexOfLetterBarCell = 0;
+				for (; indexOfLetterBarCell<Parameters.UI.ONSCREEN_LETTER_SPACES; indexOfLetterBarCell++) {
 						GameObject letterCell = letterGrid.GetLetterCell (indexOfLetterBarCell);
      
 						letterCell.GetComponent<InteractiveLetter> ().IdxAsArduinoControlledLetter = ConvertScreenToArduinoIndex (indexOfLetterBarCell);//plus 1 because the indexes are shifted.
@@ -299,105 +265,7 @@ public class ArduinoLetterController : MonoBehaviour{
 
 
 
-		//all of this is for testing; simulates arduino functionality.
-		static int testPosition = -1;
 
-		public void SetTestPosition (int newPosition)
-		{
-				testPosition = newPosition;
-			
-				UpdateLetterBarIfPositionAndLetterSpecified ();
-		}
-	    
-		static String testLetter;
-
-		public void SetTestLetter (String newLetter)
-		{
-				testLetter = newLetter;
-				UpdateLetterBarIfPositionAndLetterSpecified ();
-				
-		}
-
-		public void ClearTestLetter ()
-		{
-				testLetter = null;
-				
-
-		}
-
-		public void ClearTestPosition ()
-		{
-			
-				testPosition = -1;
-
-		}
-
-		void Update ()
-		{
-				if (Input.anyKeyDown) {
-						if (Input.GetMouseButton (0) || Input.GetMouseButton (1) || Input.GetMouseButton (2))
-								return;
-
-						if (ParseNumericKey () || ParseLetterKey ())
-								UpdateLetterBarIfPositionAndLetterSpecified ();
-
-
-
-
-				}
-	
-
-		}
-
-		bool ParseNumericKey ()
-		{
-				String s;
-	
-				for (int i=0; i<maxUserLetters; i++) {
-						s = "" + i;
-						if (Input.GetKey (s)) {
-								//testPosition = i;
-								SetTestPosition (i);
-								return true;
-						}
-				}
-				return false;
-		}
-
-
-
-		bool ParseLetterKey ()
-		{       
-
-				//deleting a character
-				if (Input.GetKeyDown (KeyCode.Backspace)) {
-						//testLetter = " ";
-						SetTestLetter (" ");
-						return true;
-				}
-
-
-			for (int i = (int)'a'; i <= (int)'z'; i++) {
-				string s =""+(char)i;
-				if (Input.GetKeyDown (s)) {
-					SetTestLetter (s);
-					return true;
-				}
-
-			}
-				return false;
-
-		}
-
-		void UpdateLetterBarIfPositionAndLetterSpecified ()
-		{
-				if (testPosition != -1 && testLetter != null) {
-						
-						ReceiveNewUserInputLetter (testLetter [0], testPosition);
-						ClearTestPosition ();
-						
-				}
-		}
 
 
 }

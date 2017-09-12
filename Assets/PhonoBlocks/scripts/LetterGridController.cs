@@ -144,10 +144,10 @@ public class LetterGridController : MonoBehaviour
 		}
 		
 
-	public Texture2D GetAppropriatelyScaledImageForLetter(String letter){
-		return letter == " " ? blankLetter : CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
+		public Texture2D GetAppropriatelyScaledImageForLetter(String letter){
+			return letter == " " ? blankLetter : CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
 
-	}
+		}
 
 
 		public UITexture CreateLetterHighlightCell ()

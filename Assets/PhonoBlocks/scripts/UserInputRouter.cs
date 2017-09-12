@@ -91,7 +91,7 @@ public class UserInputRouter : MonoBehaviour
 				totalLengthOfUserInputWord = numOnscreenLetterSpaces;
 	
 				arduinoLetterController = arduinoLetterControllerGO.GetComponent<ArduinoLetterController> ();
-				arduinoLetterController.Initialize (0, numOnscreenLetterSpaces - 1, arduinoLetterInterface);
+				arduinoLetterController.Initialize (arduinoLetterInterface);
 				wordHistoryController = wordHistoryControllerGO.GetComponent<WordHistoryController> ();
 				wordHistoryController.Initialize (totalLengthOfUserInputWord);
 			
@@ -239,10 +239,7 @@ public class UserInputRouter : MonoBehaviour
 
 				if (sessionManager != null && SessionsDirector.IsStudentMode)
 					studentActivityController.HandleNewArduinoLetter (newLetter, atPosition);
-				else {
-					arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, newLetter);
-					//arduinoLetterController.UpdateDefaultColoursAndSoundsOfLetters (true);
-				}
+
 
 		}
 
