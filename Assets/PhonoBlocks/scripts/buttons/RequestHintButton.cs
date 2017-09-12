@@ -10,7 +10,9 @@ public class RequestHintButton : MonoBehaviour {
 		messenger.target = gameObject;
 		messenger.functionName = "RequestHint";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
-	
+		Events.Dispatcher.OnNewProblemBegun += () => {
+			gameObject.SetActive(false);
+		};
 		Events.Dispatcher.OnUIInputLocked += () => {
 			gameObject.SetActive(false);
 		};

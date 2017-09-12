@@ -97,10 +97,6 @@ public class UserInputRouter : MonoBehaviour
 			
 				checkedWordImageController = checkedWordImageControllerGO.GetComponent<CheckedWordImageController> ();
 
-				hintButtonGO.SetActive (false);
-			
-
-
 
 				if (sessionParametersOB != null) {
 					
