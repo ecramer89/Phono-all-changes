@@ -91,7 +91,9 @@ public class Colorer : MonoBehaviour   {
 	}
 
 
-	public void ReColor (string updatedUserInputLetters,string previousUserInputLetters, string targetWord){
+	public void ReColor (){
+		string updatedUserInputLetters = State.Current.UserInputLetters;
+		string previousUserInputLetters = State.Current.PreviousUserInputLetters;
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 	
@@ -105,6 +107,7 @@ public class Colorer : MonoBehaviour   {
 				previousUserInputLetters
 			);
 		} else {
+			string targetWord = State.Current.TargetWord;
 			ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 				updatedUserInputLetters, 
 				previousUserInputLetters,
@@ -158,12 +161,12 @@ public class Colorer : MonoBehaviour   {
 		string unmatched = word;
 		Match matchedUnit;
 		while (true) {
-			Debug.Log ("unmatched: " + unmatched);
+	
 			matchedUnit = unitRegex.Match (unmatched);
 			if (!matchedUnit.Success)
 				break;
 
-			Debug.Log ($"matched unit: {matchedUnit.Value} {matchedUnit.Index} {matchedUnit.Length}");
+		
 			for (int i = 0; i < matchedUnit.Length; i++) {
 				result [matchedUnit.Index + i] = unitColor;
 			}

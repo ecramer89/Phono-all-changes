@@ -142,8 +142,8 @@ public class UserInputRouter : MonoBehaviour
 
 		public void RequestReplayInstruction ()
 		{
-				if (SessionsDirector.IsStudentMode)
-						studentActivityController.PlayInstructions ();
+				/*if (SessionsDirector.IsStudentMode)
+						studentActivityController.PlayInstructions ();*/
 
 		}
 
@@ -232,17 +232,6 @@ public class UserInputRouter : MonoBehaviour
 		}
 	                                              
 
-		/* if it is activity mode, then we delegate control of the new letter to the student activity controller. otherwise just update all of the letters*/
-		public void HandleNewUserInputLetter (char newLetter, int atPosition, ArduinoLetterController alc)
-	{       if (State.Current.UIInputLocked)
-			return;
-
-				if (sessionManager != null && SessionsDirector.IsStudentMode)
-					studentActivityController.HandleNewArduinoLetter (newLetter, atPosition);
-
-
-		}
-
 
 		//called by the button that treats all words as selected and by the selection/deselection swipe action received by the arduinoletter controller.
 		//
@@ -297,7 +286,7 @@ public class UserInputRouter : MonoBehaviour
 
 		public void TellUserToPlaceInitialLetters ()
 		{
-				studentActivityController.PlayInstructions ();
+				//studentActivityController.PlayInstructions ();
 
 		}
 
