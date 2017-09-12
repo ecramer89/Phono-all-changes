@@ -95,6 +95,11 @@ public class Events: MonoBehaviour  {
 		OnUIInputUnLocked ();
 	}
 
+	public event Action OnUserSubmittedTheirLetters = () => {};
+	public void RecordUserSubmittedTheirLetters(){
+		OnUserSubmittedTheirLetters ();
+	}
+
 
 	void Awake(){
 		events = this;

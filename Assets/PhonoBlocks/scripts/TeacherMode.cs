@@ -6,11 +6,16 @@ public class TeacherMode : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+			ArduinoLetterController.instance.ChangeTheLetterOfASingleCell(atPosition, newLetter);
+			Colorer.Instance.ReColor();
+		};
+
+		Events.Dispatcher.OnUserSubmittedTheirLetters += () => {
+			WordHistoryController.Instance.AddCurrentWordToHistory (State.Current.UILetters, true);
+		};
 		
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

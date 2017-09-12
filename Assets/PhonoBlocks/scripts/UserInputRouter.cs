@@ -139,13 +139,7 @@ public class UserInputRouter : MonoBehaviour
 
 
 		}
-
-		public void RequestReplayInstruction ()
-		{
-				/*if (SessionsDirector.IsStudentMode)
-						studentActivityController.PlayInstructions ();*/
-
-		}
+		
 
 		public bool TeacherMode ()
 		{
@@ -197,19 +191,6 @@ public class UserInputRouter : MonoBehaviour
 		}
 
 		
-		//called by the check word button.
-		public void RequestCheckWord ()
-	{     
-		if (!State.Current.UIInputLocked) {
-				
-						if (TeacherMode ()) {
-								AddCurrentWordToHistory (true);
-			} else {
-				
-							studentActivityController.HandleSubmittedAnswer ();
-				}
-		}
-	}
 
 		public void AddCurrentWordToHistory (bool playSoundsAndShowImage)
 		{

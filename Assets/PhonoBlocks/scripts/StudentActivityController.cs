@@ -24,65 +24,12 @@ public class StudentActivityController : MonoBehaviour
 		//todo refactor; should subscribe to appropriate events. SAC should publish appropriate events.
 		GameObject submitWordButton;
 
-	   
-		bool allUserControlledLettersAreBlank(){
-			return State.Current.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
-		}
-
-
-		void MainActivityNewLetterHandler(char letter, int atPosition){
-			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-			Colorer.Instance.ReColor ();
-		}
-
-		void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
-			InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
-			if (IsErroneous(atPosition, letter)) {
-				asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
-				asInteractiveLetter.ConfigureFlashParameters (
-					Parameters.Colors.DEFAULT_OFF_COLOR, Parameters.Colors.DEFAULT_ON_COLOR,
-					Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
-					Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
-				);
-				return;
-			}
-
-			//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
-			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
-
-		}
-
-		void RemoveAllLettersNewLetterHandler(char letter, int atPosition){
-			if (letter != ' ') //don't bother updating the letter unless the user removed it
-				return;
-
-			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
-			//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
-			if(allUserControlledLettersAreBlank()){ 
-				UserInputRouter.instance.RequestTurnOffImage ();
-				HandleEndOfActivity ();
-			}
-		}
 
 		public void Initialize (GameObject hintButton, ArduinoLetterController arduinoLetterController)
 		{
-			Events.Dispatcher.OnUserEnteredNewLetter += 
-					(char newLetter, int atPosition) => {
-					switch (State.Current.ActivityState) {
-					case ActivityStates.MAIN_ACTIVITY:
-						MainActivityNewLetterHandler(newLetter, atPosition);
-						break;
-					case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
-						ForceCorrectPlacementNewLetterHandler(newLetter, atPosition);
-						break;
-					case ActivityStates.REMOVE_ALL_LETTERS:
-						RemoveAllLettersNewLetterHandler(newLetter, atPosition);
-						break;
-					}
+				Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
+				Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
 
-				};
-		
-				this.arduinoLetterController = arduinoLetterController;
 			
 				hintController = gameObject.GetComponent<HintController> ();
 				hintController.Initialize (hintButton);
@@ -104,6 +51,61 @@ public class StudentActivityController : MonoBehaviour
 
 				SetUpNextProblem ();
 		}
+
+
+	bool allUserControlledLettersAreBlank(){
+		return State.Current.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
+	}
+
+
+	void MainActivityNewLetterHandler(char letter, int atPosition){
+		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
+		Colorer.Instance.ReColor ();
+	}
+
+	void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
+		InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
+		if (IsErroneous(atPosition, letter)) {
+			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
+			asInteractiveLetter.ConfigureFlashParameters (
+				Parameters.Colors.DEFAULT_OFF_COLOR, Parameters.Colors.DEFAULT_ON_COLOR,
+				Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON,
+				Parameters.Flash.Times.TIMES_TO_FLASH_ERRORNEOUS_LETTER
+			);
+			return;
+		}
+
+		//in case the user removed a correct letter, then put it back; need to return the color to what it should be.
+		asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
+
+	}
+
+	void RemoveAllLettersNewLetterHandler(char letter, int atPosition){
+		if (letter != ' ') //don't bother updating the letter unless the user removed it
+			return;
+
+		arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+		//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
+		if(allUserControlledLettersAreBlank()){ 
+			UserInputRouter.instance.RequestTurnOffImage ();
+			HandleEndOfActivity ();
+		}
+	}
+
+
+	void HandleNewArduinoLetter(char newLetter, int atPosition){
+		switch (State.Current.ActivityState) {
+		case ActivityStates.MAIN_ACTIVITY:
+			MainActivityNewLetterHandler(newLetter, atPosition);
+			break;
+		case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
+			ForceCorrectPlacementNewLetterHandler(newLetter, atPosition);
+			break;
+		case ActivityStates.REMOVE_ALL_LETTERS:
+			RemoveAllLettersNewLetterHandler(newLetter, atPosition);
+			break;
+		}
+	}
 
 		
 	 void SetUpNextProblem ()

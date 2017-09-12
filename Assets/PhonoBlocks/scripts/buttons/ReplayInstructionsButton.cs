@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIButtonMessage))]
-public class ReplayInstructions : MonoBehaviour {
+public class ReplayInstructionsButton : MonoBehaviour {
 
 	void Start(){
 		UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
 		messenger.target = gameObject;
-		messenger.functionName = "PlayInstructions";
+		messenger.functionName = "ReplayInstructions";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
 
@@ -20,7 +20,7 @@ public class ReplayInstructions : MonoBehaviour {
 		};
 	}
 
-	void PlayInstructions(){
+	void ReplayInstructions(){
 		if (State.Current.UIInputLocked)
 			return;
 		AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);

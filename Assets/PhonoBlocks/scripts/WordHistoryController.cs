@@ -6,6 +6,13 @@ using System.Text;
 
 public class WordHistoryController : MonoBehaviour
 {
+		private static WordHistoryController instance;
+		public static WordHistoryController Instance{
+			get {
+				return instance;
+			}
+
+		}
 		int wordLength;
 		public GameObject wordHistoryPanelBackground;
 		LetterImageTable letterImageTable;
@@ -34,6 +41,11 @@ public class WordHistoryController : MonoBehaviour
 
 		}
 
+		public void Start(){
+			instance = this;
+
+		}
+
 		public int showImageTime = 60 * 8;
 
 		public void Initialize (int wordLength)
@@ -44,7 +56,7 @@ public class WordHistoryController : MonoBehaviour
 				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = wordLength;
 				letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
 				InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
-	
+	 
 		}
 
 		public void AddCurrentWordToHistory (List<InteractiveLetter> currentWord, bool playSoundAndShowImage=false)

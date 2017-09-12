@@ -9,11 +9,7 @@ using Extensions;
 
 public class ArduinoLetterController : MonoBehaviour{
 		public static ArduinoLetterController instance;
-		public StudentActivityController studentActivityController;
-		public String EMPTY_USER_WORD;
-		List<InteractiveLetter> lettersToFlash = new List<InteractiveLetter> ();
-
-
+		
 		private StringBuilder selectedUserControlledLettersAsStringBuilder;
 
 		public string SelectedUserControlledLettersAsString {
@@ -35,7 +31,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		{
 			
 	
-				selectedUserControlledLettersAsStringBuilder = new StringBuilder (EMPTY_USER_WORD);
+				
 		
 				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();
 				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
@@ -147,7 +143,9 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		public void ReplaceEachLetterWithBlank ()
 		{
-				PlaceWordInLetterGrid (EMPTY_USER_WORD);
+			for (int i = 0; i < Parameters.UI.ONSCREEN_LETTER_SPACES; i++) {
+					ChangeTheLetterOfASingleCell (i, ' ');
+			}
 		}
 		
 
