@@ -11,7 +11,7 @@ using System.Text;
 
 //..receives new color data back from the controller and uses it to update the arduino letters.
 //(implement this later)
-public class ArduinoUnityInterface : PhonoBlocksController
+public class ArduinoUnityInterface : MonoBehaviour
 {
 
 		int CURR_MAX_NUM_PIN = 2;
