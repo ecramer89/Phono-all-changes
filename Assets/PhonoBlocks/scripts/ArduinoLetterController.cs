@@ -89,7 +89,19 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 
 				Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
-				
+
+
+
+			Events.Dispatcher.OnInitialProblemLettersSet += (string initialProblemLetters) => {
+				ReplaceEachLetterWithBlank ();
+				PlaceWordInLetterGrid (initialProblemLetters);
+				TurnAllLettersOff ();
+			};
+
+			Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+				activateLinesBeneathLettersOfWord(targetWord);
+			};
+
 		}
 
 

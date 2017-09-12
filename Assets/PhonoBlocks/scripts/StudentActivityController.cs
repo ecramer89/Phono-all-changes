@@ -108,19 +108,10 @@ public class StudentActivityController : MonoBehaviour
 				Problem currProblem = ProblemsRepository.instance.GetNextProblem ();
 				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(true));
 				Events.Dispatcher.SetCurrentProblemInstructions (currProblem.Instructions);
+				Events.Dispatcher.SetInitialProblemLetters (currProblem.InitialWord);
 		        //save the new target word to the csv record for this acivity
 				StudentsDataHandler.instance.RecordActivityTargetWord (currProblem.TargetWord (false));
-
-		     
-
-		        //clear the letters currently in the grid
-		        //place the images of the initial letters into the grid
-		        arduinoLetterController.ReplaceEachLetterWithBlank ();
-				arduinoLetterController.PlaceWordInLetterGrid (currProblem.InitialWord);
-	            //turn off all the letters to begin with.
-		        arduinoLetterController.TurnAllLettersOff ();
-		        //turn on the underlines that indicate which letters the child has to place
-				arduinoLetterController.activateLinesBeneathLettersOfWord(currProblem.TargetWord(true));
+	
 		        
 
 				PlayInstructions (); //dont bother telling to place initial letters during assessment mode
