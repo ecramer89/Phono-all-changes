@@ -84,7 +84,7 @@ public class HintController : MonoBehaviour
 
 			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
 				int letterindex = -1;
-				int numLetters = studentActivityController.TargetLetters.Length;
+				int numLetters = State.Current.TargetWord.Length;
 				while(true){
 					letterindex++;
 					if (letterindex > numLetters) break;

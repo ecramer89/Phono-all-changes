@@ -28,18 +28,11 @@ public class StudentActivityController : MonoBehaviour
 		ArduinoLetterController arduinoLetterController;
 		Problem currProblem;
 
-		public string TargetLetters{
-		get {
-			string targetWord = currProblem.TargetWord(true);
-
-			return targetWord;
-		}
-	}
 
 
 		public bool StringMatchesTarget (string s)
 		{
-				return s.Equals (currProblem.TargetWord (true));
+			return s.Trim().Equals (State.Current.TargetWord.Trim ());
 
 		}
 		
@@ -207,7 +200,7 @@ public class StudentActivityController : MonoBehaviour
 		case ActivityState.MAIN_ACTIVITY:
 			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
 		
-			Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,TargetLetters);
+			Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
 
 
 					break;
