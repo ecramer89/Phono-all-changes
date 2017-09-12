@@ -35,5 +35,7 @@ public static class PhonoBlocksExtensions {
 		public static String Stringify<T>(this T[] arr){
 			return arr.Aggregate("", (acc, nxt)=>$"{acc}, {nxt.ToString()}");
 		}
+
+
 	}
 }

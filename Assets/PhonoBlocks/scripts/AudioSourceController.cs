@@ -38,6 +38,12 @@ public class AudioSourceController : MonoBehaviour
 				return (AudioClip)Resources.Load (RESOURCES_WORD_PATH + word, typeof(AudioClip));
 
 		}
+
+		public static void PushClips(AudioClip[] clips){
+			foreach (AudioClip clip in clips)
+				PushClip (clip);
+
+		}
 		
 		
 		//play the first, when it's done, play the second.

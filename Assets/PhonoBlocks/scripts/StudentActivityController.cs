@@ -26,8 +26,6 @@ public class StudentActivityController : MonoBehaviour
 
 		HintController hintController;
 		ArduinoLetterController arduinoLetterController;
-		Problem currProblem;
-
 
 
 		public bool StringMatchesTarget (string s)
@@ -35,7 +33,7 @@ public class StudentActivityController : MonoBehaviour
 			return s.Trim().Equals (State.Current.TargetWord.Trim ());
 
 		}
-		
+
 
 		char[] usersMostRecentChanges; //array containing letters that a user has actually placed 
 	    //on the platform. would not contain for example the initial letters that appear on the screen
@@ -107,10 +105,9 @@ public class StudentActivityController : MonoBehaviour
 				ClearSavedUserChanges ();
 				hintController.Reset ();
 			
-				currProblem = ProblemsRepository.instance.GetNextProblem ();
-
-				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(false));
-	     
+				Problem currProblem = ProblemsRepository.instance.GetNextProblem ();
+				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(true));
+				Events.Dispatcher.SetCurrentProblemInstructions (currProblem.Instructions);
 		        //save the new target word to the csv record for this acivity
 				StudentsDataHandler.instance.RecordActivityTargetWord (currProblem.TargetWord (false));
 
@@ -141,7 +138,7 @@ public class StudentActivityController : MonoBehaviour
 		public void PlayInstructions ()
 		{
 			
-				currProblem.PlayCurrentInstruction ();
+			AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
 			
 				
 		}
@@ -187,8 +184,7 @@ public class StudentActivityController : MonoBehaviour
 
 		public void UserRequestsHint ()
 		{
-		    hintController.ProvideHint (currProblem);
-	
+		    hintController.ProvideHint ();
 
 		}
 
@@ -198,16 +194,15 @@ public class StudentActivityController : MonoBehaviour
 				RecordUsersChange (atPosition, letter); 
 				switch (state) {
 		case ActivityState.MAIN_ACTIVITY:
-			arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
+				arduinoLetterController.ChangeTheLetterOfASingleCell (atPosition, letter);
 		
-			Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
-
-
+				Colorer.Instance.ReColor (UserChangesAsString,previousUserInput,State.Current.TargetWord);
 					break;
 		case ActivityState.FORCE_CORRECT_LETTER_PLACEMENT:
 					InteractiveLetter asInteractiveLetter = arduinoLetterController.GetInteractiveLetterAt (atPosition);
-					if (IsErroneous (atPosition)) {
+				if (IsErroneous(atPosition, letter)) {
 						Color[] errorColors = SessionsDirector.colourCodingScheme.GetErrorColors ();
+
 						asInteractiveLetter.UpdateInputDerivedAndDisplayColor (errorColors [0]);
 						asInteractiveLetter.SetFlashColors (errorColors [0], errorColors [1]);
 						asInteractiveLetter.SetFlashDurations (Parameters.Flash.Durations.ERROR_OFF, Parameters.Flash.Durations.ERROR_ON);
@@ -233,37 +228,26 @@ public class StudentActivityController : MonoBehaviour
 		
 
 
-	   public bool IsErroneous(int atPosition){
-		if (!ReferenceEquals(currProblem, null) && !ReferenceEquals(currProblem.TargetWord (true), null)) {
-			string target = currProblem.TargetWord(true);
-			if(atPosition > target.Length-1 || atPosition > usersMostRecentChanges.Length) return false;
-			char targetChar = target[atPosition];
-			char actualChar = usersMostRecentChanges[atPosition];
-			return (int)actualChar != 32 && targetChar != actualChar;
-			}
-			return false;
-	    }
-
-		bool PositionIsOutsideBoundsOfTargetWord (int wordRelativeIndex)
-		{
-				return wordRelativeIndex >= currProblem.TargetWord (true).Length; 
-		}
-
+			public bool IsErroneous(int atPosition, char letter){
+				return (atPosition >= State.Current.TargetWord.Length && letter == ' ') ||
+					(State.Current.TargetWord [atPosition] == letter);
+		     }
+		
 		public void HandleSubmittedAnswer ()
 		{     
 		        
-				StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, currProblem.TargetWord (false));
+		StudentsDataHandler.instance.LogEvent ("submitted_answer", UserChangesAsString, State.Current.TargetWord);
 					
-				currProblem.IncrementTimesAttempted ();
+				Events.Dispatcher.IncrementTimesAttemptedCurrentProblem ();
 		
 				if (IsSubmissionCorrect ()) {
 
 					AudioSourceController.PushClip (correctSoundEffect);
-					if (currProblem.TimesAttempted > 1)
+					if (State.Current.TimesAttemptedCurrentProblem > 1)
 						AudioSourceController.PushClip (youDidIt);
 					else
 						AudioSourceController.PushClip (excellent);
-					currProblem.PlayAnswer ();
+					AudioSourceController.PushClip (AudioSourceController.GetWordFromResources(State.Current.TargetWord));
 					CurrentProblemCompleted (true);
 					
 				} else {
@@ -297,9 +281,9 @@ public class StudentActivityController : MonoBehaviour
 			
 			   
 				UserInputRouter.instance.AddCurrentWordToHistory (false);
-				UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
+				UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
 
-				bool solvedOnFirstTry = currProblem.TimesAttempted == 1;
+				bool solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
 				if (solvedOnFirstTry) {
 		
 						UserInputRouter.instance.DisplayNewStarOnScreen (ProblemsRepository.instance.ProblemsCompleted-1);
@@ -308,7 +292,7 @@ public class StudentActivityController : MonoBehaviour
 			
 				StudentsDataHandler.instance.RecordActivitySolved (userSubmittedCorrectAnswer, UserChangesAsString, solvedOnFirstTry);
 			
-				StudentsDataHandler.instance.SaveActivityDataAndClearForNext (currProblem.TargetWord (false), currProblem.InitialWord);
+		        StudentsDataHandler.instance.SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.InitialTargetLetters);
 		        
 		     
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
@@ -329,7 +313,7 @@ public class StudentActivityController : MonoBehaviour
 
 		public bool IsSubmissionCorrect ()
 		{      
-				string target = currProblem.TargetWord (true);
+				string target = State.Current.TargetWord;
 
 				bool result = CurrentStateOfLettersMatches (target);
 

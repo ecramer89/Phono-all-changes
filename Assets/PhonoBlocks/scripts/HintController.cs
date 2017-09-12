@@ -44,7 +44,7 @@ public class HintController : MonoBehaviour
 		}
 
 
-		public void ProvideHint (Problem currProblem)
+		public void ProvideHint ()
 		{      
 			if (currHintIdx >= NUM_HINTS)
 				return;
@@ -52,7 +52,7 @@ public class HintController : MonoBehaviour
 
 			switch (currHintIdx) {
 					case 0:
-							currProblem.PlaySoundedOutWord ();
+						AudioSourceController.PushClip(AudioSourceController.GetSoundedOutWordFromResources (State.Current.TargetWord));
 					break;
 
 				    case 1: //level two hint
@@ -62,8 +62,8 @@ public class HintController : MonoBehaviour
 					break;
 
 					case 2: //level three hint
-						currProblem.PlayAnswer ();
-						UserInputRouter.instance.RequestDisplayImage (currProblem.TargetWord (true), false, true);
+						AudioSourceController.PushClip(AudioSourceController.GetWordFromResources (State.Current.TargetWord));
+						UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
 					    //place the target letters and colors in the grid
 						for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
 							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);

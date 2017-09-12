@@ -37,6 +37,27 @@ public class State: MonoBehaviour  {
 			this.targetWordColors = targetWordColors;
 		};
 
+		Events.Dispatcher.OnTimesAttemptedCurrentProblemIncremented += () => {
+			timesAttemptedCurrentProblem++;
+		};
+
+		Events.Dispatcher.OnCurrentProblemInstructionsSet += (AudioClip[] instuctions) => {
+			currentProblemInstrutions = instuctions;
+		};
+
+		Events.Dispatcher.OnInitialProblemLettersSet += (string initialLetters) => {
+			initialTargetLetters = initialLetters;
+		};
+
+		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+			previousUserInputLetters = userInputLetters;
+			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
+		};
+
+
+
+
+
 	}
 
 	private Mode mode;
@@ -64,6 +85,23 @@ public class State: MonoBehaviour  {
 
 	}
 
+	private string previousUserInputLetters;
+	private string userInputLetters;
+	public string UserInputLetters{
+		get {
+
+			return userInputLetters;
+		}
+
+	}
+
+	public string PreviousUserInputLetters{
+		get {
+			return previousUserInputLetters;
+		}
+
+	}
+
 	private string targetWord;
 	public string TargetWord{
 		get {
@@ -71,6 +109,16 @@ public class State: MonoBehaviour  {
 			return targetWord;
 		}
 	}
+
+	private string initialTargetLetters;
+	public string InitialTargetLetters{
+		get {
+
+			return initialTargetLetters;
+		}
+
+	}
+
 
 	private Color[] targetWordColors;
 	public Color[] TargetWordColors{
@@ -81,13 +129,20 @@ public class State: MonoBehaviour  {
 	}
 
 
+	private int timesAttemptedCurrentProblem;
+	public int TimesAttemptedCurrentProblem{
+		get {
+			return timesAttemptedCurrentProblem;
+		}
+	}
 
+	private AudioClip[] currentProblemInstrutions;
+	public AudioClip[] CurrentProblemInstructions{
+		get {
+			return currentProblemInstrutions;
+		}
 
-
-
-
-
-
+	}
 
 
 }
