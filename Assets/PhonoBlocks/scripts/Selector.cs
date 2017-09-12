@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using Extensions;
 public class Selector : MonoBehaviour {
 
 	private static Selector instance;
@@ -19,11 +19,11 @@ public class Selector : MonoBehaviour {
 	public void SubscribeToEvents(){
 		Events.Dispatcher.OnNewProblemBegun += () => {
 			solvedOnFirstTry = false;
-			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
 			currentStateOfUserInputMatchesTarget = false;
 		};
 
 		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
 			//by default, we presume that all of the spaces in which the child has not placed a letter
 			//and which are not part of the target word are correctly placed.
 			//i.e., when target word is "thin", 
@@ -58,7 +58,7 @@ public class Selector : MonoBehaviour {
 		}
 
 	}
-	private bool[] correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
+	private bool[] correctlyPlacedLetters;
 	public bool IsCorrectlyPlaced(int atPosition){
 		return correctlyPlacedLetters[atPosition];
 	}
