@@ -45,10 +45,7 @@ public class StudentActivityController : MonoBehaviour
 
 				triumphantSoundForSessionDone = InstructionsAudio.instance.allDoneSession;
 
-		       //todo: refactor so that events are sent and the button disables itself.
-				submitWordButton = GameObject.Find("CheckWordButton");
-
-
+		  
 				SetUpNextProblem ();
 		}
 
@@ -124,7 +121,7 @@ public class StudentActivityController : MonoBehaviour
 
 				Events.Dispatcher.BeginNewProblem ();
 				Events.Dispatcher.EnterMainActivity ();
-				submitWordButton.SetActive (true);
+				
 
 
 		        
@@ -214,8 +211,8 @@ public class StudentActivityController : MonoBehaviour
 		       
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
-			    //allow the user to access a hint.
-			switch(State.Current.ActivityState){
+			  
+				switch(State.Current.ActivityState){
 				case ActivityStates.MAIN_ACTIVITY:
 					hintController.ActivateHintButton ();
 					AudioSourceController.PushClip (offerHint);
@@ -229,9 +226,8 @@ public class StudentActivityController : MonoBehaviour
 
 		void CurrentProblemCompleted (bool userSubmittedCorrectAnswer)
 		{
-			
-			   
-				UserInputRouter.instance.AddCurrentWordToHistory (false);
+	 
+				WordHistoryController.Instance.AddCurrentWordToHistory (State.Current.UILetters, true);
 				UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
 
 				bool solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
@@ -249,8 +245,7 @@ public class StudentActivityController : MonoBehaviour
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
 		        //don't want the letters still on platform from problem n being interpreted as input for problem n+1.
 				Events.Dispatcher.ForceRemoveAllLetters();
-				//disable submit button; we automatically go to next problem when user removes all letters. 
-				submitWordButton.SetActive (false);
+			
       
 		}
 		

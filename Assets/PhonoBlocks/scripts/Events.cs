@@ -100,6 +100,20 @@ public class Events: MonoBehaviour  {
 		OnUserSubmittedTheirLetters ();
 	}
 
+	public event Action OnHintRequested = () => {};
+	public void RecordUserRequestedHint(){
+		OnHintRequested ();
+	}
+
+	public event Action OnUserSubmittedIncorrectAnswer = () => {};
+	public void RecordUserSubmittedIncorrectAnswer(){
+		OnUserSubmittedIncorrectAnswer ();
+	}
+
+	public event Action OnUserSubmittedCorrectAnswer = () => {};
+	public void RecordUserSubmittedCorrectAnswer(){
+		OnUserSubmittedCorrectAnswer ();
+	}
 
 	void Awake(){
 		events = this;

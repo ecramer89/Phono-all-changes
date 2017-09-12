@@ -32,9 +32,9 @@ public class UserInputRouter : MonoBehaviour
 
 	}*/
 		public GameObject studentActivityControllerGO;
-		//public GameObject arduinoAndAffixLetterControllerGO;
+
 		public GameObject arduinoLetterControllerGO;
-		//public GameObject onscreenKeyboardControllerGO;
+
 		public GameObject userStarControllerGO;
 		public GameObject wordHistoryControllerGO;
 		public GameObject arduinoLetterInterfaceG0;
