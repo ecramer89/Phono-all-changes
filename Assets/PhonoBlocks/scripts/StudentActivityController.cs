@@ -170,13 +170,6 @@ public class StudentActivityController : MonoBehaviour
 		void CurrentProblemCompleted ()
 		{
 				Events.Dispatcher.RecordCurrentProblemCompleted ();
-	
-				if (Selector.Instance.SolvedOnFirstTry) {
-		
-						UserInputRouter.instance.DisplayNewStarOnScreen (ProblemsRepository.instance.ProblemsCompleted-1);
-
-				}
-			
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
 		        //don't want the letters still on platform from problem n being interpreted as input for problem n+1.
 				Events.Dispatcher.ForceRemoveAllLetters();
