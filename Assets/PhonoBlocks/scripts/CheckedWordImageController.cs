@@ -12,6 +12,7 @@ public class CheckedWordImageController : MonoBehaviour
 		public long defaultDisplayTime = 2000;
 		bool caller_ends_display;
 
+
 		void Start ()
 		{
 				img = checkedWordImage.GetComponent<UITexture> ();
@@ -24,12 +25,22 @@ public class CheckedWordImageController : MonoBehaviour
 					EndDisplay ();
 				};
 				//display the target word image
-				Events.Dispatcher.OnCurrentProblemCompleted += () => {
-					Texture2D newimg = (Texture2D)Resources.Load ($"{Parameters.FILEPATHS.RESOURCES_WORD_IMAGE_PATH}{State.Current.TargetWord}", typeof(Texture2D));
-					if (!ReferenceEquals (newimg, null)) {
-						ShowImage (newimg, false, true);
+				Events.Dispatcher.OnCurrentProblemCompleted += DisplayTargetWord;
+				//level three hint; show the image of the target word.
+				Events.Dispatcher.OnHintProvided += () => {
+				if(State.Current.CurrentHintNumber == Parameters.Hints.Descriptions.
+					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
+						DisplayTargetWord();
 					}
 				};
+		}
+
+
+		void DisplayTargetWord(){
+			Texture2D newimg = (Texture2D)Resources.Load ($"{Parameters.FILEPATHS.RESOURCES_WORD_IMAGE_PATH}{State.Current.TargetWord}", typeof(Texture2D));
+			if (!ReferenceEquals (newimg, null)) {
+				ShowImage (newimg, false, true);
+			}
 		}
 
 		public void ShowImage (Texture2D newimg, long showTime)

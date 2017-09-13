@@ -153,30 +153,6 @@ public class UserInputRouter : MonoBehaviour
 
 		}
 
-		public void RequestTurnOffImage ()
-		{
-				checkedWordImageController.EndDisplay ();
-		}
-
-
-		public void RequestDisplayImage (string word, bool disableTextureOnPress, bool indefinite=false)
-		{
-	
-				StringBuilder path = new StringBuilder (RESOURCES_WORD_IMAGE_PATH);
-				path.Append (word);
-				Texture2D newimg = (Texture2D)Resources.Load (path.ToString (), typeof(Texture2D));
-				if (!ReferenceEquals (newimg, null)) {
-						checkedWordImageController.ShowImage (newimg, disableTextureOnPress, indefinite);
-				}
-		}
-
-		
-		//show stars acquired during a session (but not yet stored in player prefs and not yet displayed initially) during the activity.
-		public void DisplayNewStarOnScreen (int at)
-		{
-				userStarController.AddNewUserStar (true, at);
-		}
-	                                              
 
 
 		//called by the button that treats all words as selected and by the selection/deselection swipe action received by the arduinoletter controller.

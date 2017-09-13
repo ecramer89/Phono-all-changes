@@ -59,7 +59,7 @@ public class WordHistoryController : MonoBehaviour
 				Word newWord = CreateNewWordAndAddToList (AddLettersOfNewWordToHistory (currentWord));
 				if (playSoundAndShowImage) {		
 						AudioSourceController.PushClip (newWord.Sound);
-						UserInputRouter.instance.RequestDisplayImage (newWord.AsString, true);
+						//UserInputRouter.instance.RequestDisplayImage (newWord.AsString, true);
 				}
 	
 			

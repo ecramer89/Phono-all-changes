@@ -87,6 +87,12 @@ public class Parameters {
 		public static readonly int NUM_HINTS = 3;
 		public static readonly int LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER=2;
 		public static readonly int LEVEL_2_SECONDS_DURATION_FULL_CORRECT_WORD=5;
+
+		public class Descriptions{
+			public const int PLAY_SOUNDED_OUT_TARGET_WORD = 0;
+			public const int PRESENT_EACH_TARGET_LETTER_IN_SEQUENCE = 1;
+			public const int PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT = 2;
+		}
 	}
 
 	public class Flash{

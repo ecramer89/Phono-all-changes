@@ -18,15 +18,16 @@ public class HintController : MonoBehaviour
 				return;
 
 			switch (State.Current.CurrentHintNumber) {
-				    case 1: //level two hint
+				case Parameters.Hints.Descriptions.
+					PRESENT_EACH_TARGET_LETTER_IN_SEQUENCE: 
 						Events.Dispatcher.LockUIInput();
 						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
 						StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
 					break;
 
-					case 2: //level three hint
+				case Parameters.Hints.Descriptions.
+					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT:
 						AudioSourceController.PushClip (AudioSourceController.GetWordFromResources (State.Current.TargetWord));
-						UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
 						    //place the target letters and colors in the grid
 						for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
 							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);
