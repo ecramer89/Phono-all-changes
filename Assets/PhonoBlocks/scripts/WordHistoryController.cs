@@ -20,18 +20,8 @@ public class WordHistoryController : MonoBehaviour
 
 		public GameObject wordHistoryGrid;
 		LetterGridController lettersOfWordInHistory;
-		public List<Word> words; //words in the word history.
+		List<Word> words; //words in the word history.
 		Word psuedoWord; //a dummy value to return in case there is some kind of error.
-		public Word PsuedoWord {
-				get {
-						if (psuedoWord == null) {
-								psuedoWord = new Word ("whoops");
-			
-						}
-						return psuedoWord;
-				}
-
-		}
 
 		public void Start(){
 			instance = this;
@@ -48,28 +38,22 @@ public class WordHistoryController : MonoBehaviour
 				InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
 
 		        //subscribe to events
-				Events.Dispatcher.OnCurrentProblemCompleted += () => {
-					AddCurrentWordToHistory (State.Current.UILetters, true);
-				};
-	 
+				Events.Dispatcher.OnCurrentProblemCompleted += AddCurrentWordToHistory;
+				Events.Dispatcher.OnUserAddedWordToHistory += AddCurrentWordToHistory;
 		}
 
-		public void AddCurrentWordToHistory (List<InteractiveLetter> currentWord, bool playSoundAndShowImage=false)
+		public void AddCurrentWordToHistory ()
 		{
-				Word newWord = CreateNewWordAndAddToList (AddLettersOfNewWordToHistory (currentWord));
-				if (playSoundAndShowImage) {		
-						AudioSourceController.PushClip (newWord.Sound);
-						//UserInputRouter.instance.RequestDisplayImage (newWord.AsString, true);
-				}
-	
+				Word newWord = CreateNewWordAndAddToList (AddLettersOfNewWordToHistory ());
+				AudioSourceController.PushClip (newWord.Sound);
 			
 		}
 
-		string AddLettersOfNewWordToHistory (List<InteractiveLetter> newWord)
+		string AddLettersOfNewWordToHistory ()
 		{ 
 				StringBuilder currentWordAsString = new StringBuilder ();
 				int position = words.Count * Parameters.UI.ONSCREEN_LETTER_SPACES;
-				foreach (InteractiveLetter l in newWord) {
+				foreach (InteractiveLetter l in State.Current.UILetters) {
 					
 						
 			     GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (l.InputLetter (), l.CurrentDisplayImage (), (position++) + "", (SessionsDirector.IsSyllableDivisionActivity?l.SelectColour:l.ColorDerivedFromInput));
@@ -130,9 +114,64 @@ public class WordHistoryController : MonoBehaviour
 		{
 				if (idx > -1 && idx < words.Count)
 						return words [idx];
-				return PsuedoWord;
+				return psuedoWord;
 
 		}
+
+	//private inner class; just a convenient package for all the data pertaining to a specific word.
+	class Word : MonoBehaviour
+	{
+
+		string asString;
+
+		public string AsString {
+			get {
+				return this.asString;
+
+			}
+
+
+		}
+
+		Texture2D image;
+
+		public Texture2D Image {
+			get {
+				return this.image;
+
+			}
+
+			set {
+				this.image = value;
+
+			}
+
+		}
+
+		AudioClip sound;
+
+		public AudioClip Sound {
+			get {
+				return this.sound;
+
+			}
+
+			set {
+				this.sound = value;
+
+			}
+
+
+
+		}
+
+		public Word (string asString_)
+		{
+			asString = asString_;
+			sound = (AudioClip)Resources.Load ("audio/words/" + asString, typeof(AudioClip));
+		}
+
+	}
 
 
 }

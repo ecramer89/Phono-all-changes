@@ -33,14 +33,27 @@ public class CheckedWordImageController : MonoBehaviour
 						DisplayTargetWord();
 					}
 				};
+		        //if the current state of user input letters corresponds to a saved image, then
+				//display it.
+				Events.Dispatcher.OnUserAddedWordToHistory += DisplayCurrentInputWord;
+		}
+
+		void DisplayCurrentInputWord(){
+			DisplayImageForWordIfAny (State.Current.UserInputLetters);
 		}
 
 
 		void DisplayTargetWord(){
-			Texture2D newimg = (Texture2D)Resources.Load ($"{Parameters.FILEPATHS.RESOURCES_WORD_IMAGE_PATH}{State.Current.TargetWord}", typeof(Texture2D));
+			DisplayImageForWordIfAny (State.Current.TargetWord);
+		}
+
+		void DisplayImageForWordIfAny(string word){
+			word = word.Trim ();
+			Texture2D newimg = (Texture2D)Resources.Load ($"{Parameters.FILEPATHS.RESOURCES_WORD_IMAGE_PATH}{word}", typeof(Texture2D));
 			if (!ReferenceEquals (newimg, null)) {
 				ShowImage (newimg, false, true);
 			}
+
 		}
 
 		public void ShowImage (Texture2D newimg, long showTime)

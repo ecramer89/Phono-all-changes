@@ -126,6 +126,12 @@ public class Events: MonoBehaviour  {
 		OnCurrentProblemCompleted ();
 	}
 
+	//only dispatched in teacher mode; otherwise words added to history automatically when current problem completed.
+	public Action OnUserAddedWordToHistory = () => {};
+	public void RecordUserAddedWordToHistory(){
+		OnUserAddedWordToHistory ();
+	}
+
 	void Awake(){
 		events = this;
 		//gaurantees that state is first subscriber whose methods are invoked when new events occur.

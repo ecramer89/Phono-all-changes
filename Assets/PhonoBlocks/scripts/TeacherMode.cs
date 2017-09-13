@@ -12,7 +12,8 @@ public class TeacherMode : MonoBehaviour {
 		};
 
 		Events.Dispatcher.OnUserSubmittedTheirLetters += () => {
-			WordHistoryController.Instance.AddCurrentWordToHistory (State.Current.UILetters, true);
+			Events.Dispatcher.RecordUserAddedWordToHistory();
+
 		};
 		
 	}
