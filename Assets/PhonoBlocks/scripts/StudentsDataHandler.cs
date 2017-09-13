@@ -51,6 +51,8 @@ public class StudentsDataHandler: MonoBehaviour
 
 			};
 
+			Events.Dispatcher.OnSessionCompleted += UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs;
+
 		}
 
 		public class StudentData
@@ -245,7 +247,7 @@ public class StudentsDataHandler: MonoBehaviour
 		public void UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs ()
 		{       //update the current session number so that next time we retrieve this students data we set up the right session
 				//int nextSession = currUser.CurrentSession + 1; Min wants it to be such that she picks which activities the students do,
-		//so for now will just save the session they did this time into the current session field (will communicate basically the last session)
+		       //so for now will just save the session they did this time into the current session field (will communicate basically the last session)
 				
 				string experimentWideParametersOfStudent = UpdateSavedSessionAsString (currUser.CurrentSession, currUser.numStars);
 				StringBuilder studentData = new StringBuilder (experimentWideParametersOfStudent);

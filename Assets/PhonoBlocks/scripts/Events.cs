@@ -96,6 +96,10 @@ public class Events: MonoBehaviour  {
 		OnUIInputUnLocked ();
 	}
 
+	//STUDENT MODE, TEACHER MODE
+	//intermediary event fired before one of user submitted incorrect answer or current problem completed (in student mode) OR
+	//user added word to history (teacher mode). 
+	//One of student or teacher mode subscribes to this event and determines which event(s) to fire as consequence.
 	public event Action OnUserSubmittedTheirLetters = () => {};
 	public void RecordUserSubmittedTheirLetters(){
 		OnUserSubmittedTheirLetters ();
@@ -106,30 +110,42 @@ public class Events: MonoBehaviour  {
 		OnHintRequested ();
 	}
 
+	//STUDENT MODE
+	//fired if user presses check word button and current state of user input letters does not match target
 	public event Action OnUserSubmittedIncorrectAnswer = () => {};
 	public void RecordUserSubmittedIncorrectAnswer(){
 		OnUserSubmittedIncorrectAnswer ();
 	}
 
-	public event Action OnUserSubmittedCorrectAnswer = () => {};
-	public void RecordUserSubmittedCorrectAnswer(){
-		OnUserSubmittedCorrectAnswer ();
-	}
-
+	//STUDENT MODE
+	//fired once for each hint, after each successive hint is provided.
 	public event Action OnHintProvided = () => {};
 	public void RecordHintProvided(){
 		OnHintProvided ();
 	}
 
+	//STUDENT MODE
+	//fired if user presses check word button and current state of user input letters matces target word.
 	public Action OnCurrentProblemCompleted = () =>{};
 	public void RecordCurrentProblemCompleted(){
 		OnCurrentProblemCompleted ();
 	}
 
-	//only dispatched in teacher mode; otherwise words added to history automatically when current problem completed.
+	//TEACHER MODE
+	//fired when the user presses the check word button
 	public Action OnUserAddedWordToHistory = () => {};
 	public void RecordUserAddedWordToHistory(){
 		OnUserAddedWordToHistory ();
+	}
+
+	//STUDENT MODE
+	//fired when the user completes all of the problems for a particular session.
+	//e.g., for session 1, user has to spell:
+	//"bet","dad","tin". 
+	//OnSessionCompleted dispatched after Current Problem Completed when target word is "tin".
+	public Action OnSessionCompleted = () => {};
+	public void RecordSessionCompleted(){
+		OnSessionCompleted ();
 	}
 
 	void Awake(){

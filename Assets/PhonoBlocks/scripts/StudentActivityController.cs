@@ -7,8 +7,6 @@ using System.Linq;
 
 public class StudentActivityController : MonoBehaviour
 {
-
-		HintController hintController;
 		private static StudentActivityController instance;
 		public static StudentActivityController Instance{
 			get {
@@ -123,7 +121,7 @@ public class StudentActivityController : MonoBehaviour
 		void HandleEndOfActivity ()
 		{
 				if (ProblemsRepository.instance.AllProblemsDone ()) {
-						StudentsDataHandler.instance.UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs ();
+						Events.Dispatcher.RecordSessionCompleted ();
 						AudioSourceController.PushClip (triumphantSoundForSessionDone);
 						
 				} else {
@@ -168,6 +166,7 @@ public class StudentActivityController : MonoBehaviour
 					AudioSourceController.PushClip (offerHint);
 		}
 
+	    
 		void CurrentProblemCompleted ()
 		{
 				Events.Dispatcher.RecordCurrentProblemCompleted ();
