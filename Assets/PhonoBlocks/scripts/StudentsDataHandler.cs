@@ -28,6 +28,9 @@ public class StudentsDataHandler: MonoBehaviour
 
 
 		public void Start(){
+			Events.Dispatcher.OnSessionSelected += (int session) => {
+				UpdateUsersSession (session);
+			};
 			Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 				LogEvent ("change_letter", newLetter + "", atPosition + "");
 			};
@@ -50,6 +53,7 @@ public class StudentsDataHandler: MonoBehaviour
 				SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.InitialTargetLetters);
 
 			};
+			
 
 			Events.Dispatcher.OnSessionCompleted += UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs;
 
@@ -357,13 +361,13 @@ public class StudentsDataHandler: MonoBehaviour
 		}
 
 		public void LogEvent (string eventName, string eventParam1, string eventParam2)
-		{       //only log events in activity mode.
+		{       //only log events in STUDENT mode.
 
-				if (SessionsDirector.IsStudentMode) {
+					if (State.Current.Mode == Mode.STUDENT) {
 						// Write the string to a file.append mode is enabled so that the log
 						// lines get appended to  test.txt than wiping content and writing the log
 		
-						string assessType = (SessionsDirector.IsStudentMode ? "activity" : "assessment");
+						string assessType = "activity";
 						if (fileName.Length < 1)
 								SetFileName ();
 						string filePath = System.IO.Path.Combine (LOG_FILE_DIRECTORY, fileName);

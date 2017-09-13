@@ -16,15 +16,20 @@ public class Events: MonoBehaviour  {
 		}
 	}
 
-	public event Action<InputMode> OnInputModeSelected = (InputMode mode) => {};
-	public void InputModeSelected(InputMode mode){
-		OnInputModeSelected (mode);
+	public event Action<InputType> OnInputTypeSelected = (InputType mode) => {};
+	public void RecordInputTypeSelected(InputType mode){
+		OnInputTypeSelected (mode);
 	}
 		
 
 	public event Action<Mode> OnModeSelected = (Mode mode) => {};
-	public void ModeSelected(Mode mode){
+	public void RecordModeSelected(Mode mode){
 		OnModeSelected (mode);
+	}
+
+	public event Action<int> OnSessionSelected = (int session) => {};
+	public void RecordSessionSelected(int session){
+		OnSessionSelected (session);
 	}
 
 

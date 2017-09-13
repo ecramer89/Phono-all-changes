@@ -10,7 +10,7 @@ using System.Linq;
 public class SessionsDirector : MonoBehaviour
 		
 {
-		[SerializeField] InputMode inputMode;
+		[SerializeField] InputType inputType;
 		public static SessionsDirector instance;
 		public static ColourCodingScheme colourCodingScheme = new RControlledVowel ();
 
@@ -51,7 +51,7 @@ public class SessionsDirector : MonoBehaviour
 
 
 		public static int currentUserSession; //will obtain from player prefs
-		public static int numStarsOfCurrentUser; //will obtain from player prefs
+		//public static int numStarsOfCurrentUser; //will obtain from player prefs
 	
 	
 		public static bool IsTheFirstTutorLedSession ()
@@ -60,26 +60,7 @@ public class SessionsDirector : MonoBehaviour
 				return  currentUserSession == 0;
 
 		}
-
-		static PhonoMode mode; //testing mode. can be student driven (usual phonoblocks practice session, phono reads words), test (assessment) or sandbox
-	
-			
-		/* also more like a "sandbox" mode; teacher can create whatever words they want */
-		public static bool IsTeacherMode {
-				get {
-						return mode == PhonoMode.TEACHER;
-				}
 		
-		
-		}
-
-		public static bool IsStudentMode {
-				get {
-						return mode == PhonoMode.STUDENT;
-				}
-		
-		
-		}
 
 		public GameObject studentActivityControllerOB;
 		public GameObject activitySelectionButtons;
@@ -94,17 +75,6 @@ public class SessionsDirector : MonoBehaviour
 		public static DateTime assessmentStartTime;
 		
 
-
-
-		public enum PhonoMode
-		{
-				TEACHER,
-				STUDENT
-			
-		}
-
-
-
 		void Start ()
 		{     
 		
@@ -112,7 +82,7 @@ public class SessionsDirector : MonoBehaviour
 			
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
-				Events.Dispatcher.InputModeSelected (inputMode);
+				Events.Dispatcher.RecordInputTypeSelected (inputType);
 	}
 
 		void SetupModeSelectionMenu ()
@@ -140,9 +110,8 @@ public class SessionsDirector : MonoBehaviour
 		public void SelectTeacherMode ()
 		{
 
-				Events.Dispatcher.ModeSelected (Mode.TEACHER);
+				Events.Dispatcher.RecordModeSelected (Mode.TEACHER);
 		       
-				mode = PhonoMode.TEACHER;
 				activitySelectionButtons.SetActive (true);
 				studentModeButton.SetActive (false);
 				teacherModeButton.SetActive (false);
@@ -161,12 +130,12 @@ public class SessionsDirector : MonoBehaviour
 				Application.LoadLevel ("Activity");
 		}
 
-		public void SetSessionForPracticeMode (int session)
+		public void SetSessionForStudentMode (int session)
 	{			
 				Events.Dispatcher.ActivitySelected (ProblemsRepository.instance.ActivityForSession (session));
 				currentUserSession = session;
 				sessionSelectionButtons.SetActive (false);
-				SetParametersForStudentMode (studentActivityControllerOB);
+				
 				Application.LoadLevel ("Activity");
 
 		}
@@ -184,8 +153,6 @@ public class SessionsDirector : MonoBehaviour
 	{       	
 
 
-		Events.Dispatcher.ModeSelected (Mode.STUDENT);
-
 				if (studentNameInputField.activeSelf) {
 						string nameEntered = studentName.stringToEdit.Trim ().ToLower ();
 						if (nameEntered.Length > 0) {
@@ -194,15 +161,9 @@ public class SessionsDirector : MonoBehaviour
 
 
 								bool wasStoredDataForName = StudentsDataHandler.instance.LoadStudentData (nameEntered);
-
-		
-								if (wasStoredDataForName) {
-										mode = PhonoMode.STUDENT;
-										studentActivityControllerOB = (GameObject)GameObject.Instantiate (studentActivityControllerOB);
 			
-										
-										UnityEngine.Object.DontDestroyOnLoad (studentActivityControllerOB);
-									
+								if (wasStoredDataForName) {
+										Events.Dispatcher.RecordModeSelected (Mode.STUDENT);
 										LoadSessionSelectionScreen ();
 								
 								} else {
@@ -232,20 +193,6 @@ public class SessionsDirector : MonoBehaviour
 				}
 
 				return nameEntered;
-		}
-
-		public void SetParametersForStudentMode (GameObject studentActivityController)
-		{
-			StudentsDataHandler.instance.UpdateUsersSession (currentUserSession);
-
-			numStarsOfCurrentUser = StudentsDataHandler.instance.GetUsersNumStars ();
-			                                
-			ProblemsRepository.instance.Initialize (currentUserSession);
-			
-			colourCodingScheme = ProblemsRepository.instance.ActiveColourScheme;
-			
-			StudentActivityController sc = studentActivityControllerOB.GetComponent<StudentActivityController> ();
-
 		}
 
 

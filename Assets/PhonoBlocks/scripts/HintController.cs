@@ -6,7 +6,7 @@ public class HintController : MonoBehaviour
 {
 	
 
-		public void Initialize ()
+		public void Start ()
 		{
 				Events.Dispatcher.OnHintRequested += ProvideHint;
 		}

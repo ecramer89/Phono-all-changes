@@ -18,6 +18,6 @@ public enum ActivityStates{
 }
 
 
-public enum InputMode{
+public enum InputType{
 	KEYBOARD, TUI
 }

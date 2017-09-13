@@ -205,7 +205,7 @@ public class InteractiveLetter : MonoBehaviour{
 		if (IsBlank())
 						c = Color.black;
 		if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER &&
-		      State.Current.InputMode == InputMode.TUI) {
+		      State.Current.InputType == InputType.TUI) {
 			ArduinoUnityInterface.Instance.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c);
 		}
 

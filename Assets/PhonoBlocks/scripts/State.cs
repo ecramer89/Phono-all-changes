@@ -17,8 +17,8 @@ public class State: MonoBehaviour  {
 	}
 
 	public void SubscribeToEvents(){
-		Events.Dispatcher.OnInputModeSelected += (InputMode mode) => {
-			inputMode = mode;
+		Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
+			inputType = type;
 		};
 
 		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
@@ -27,6 +27,10 @@ public class State: MonoBehaviour  {
 
 		Events.Dispatcher.OnModeSelected += (Mode mode) => {
 			this.mode = mode;
+		};
+
+		Events.Dispatcher.OnSessionSelected += (int session) => {
+			this.session = session;
 		};
 
 		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
@@ -84,10 +88,10 @@ public class State: MonoBehaviour  {
 	
 	}
 
-	private InputMode inputMode;
-	public InputMode InputMode{
+	private InputType inputType;
+	public InputType InputType{
 		get {
-			return inputMode;
+			return inputType;
 		}
 	}
 
@@ -95,6 +99,13 @@ public class State: MonoBehaviour  {
 	public Mode Mode{
 		get {
 			return mode;
+		}
+	}
+
+	private int session;
+	public int Session {
+		get {
+			return session;
 		}
 	}
 

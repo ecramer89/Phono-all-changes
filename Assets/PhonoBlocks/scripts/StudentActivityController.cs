@@ -25,19 +25,24 @@ public class StudentActivityController : MonoBehaviour
 		AudioClip triumphantSoundForSessionDone;
 
 
-		public void Start ()
-		{       
+		void Start ()
+	{       		instance = this;
+				
 					Events.Dispatcher.OnModeSelected += (Mode mode) => {
+							Debug.Log("mode?");
 						if (mode == Mode.STUDENT) {
-						   instance = this;
 							Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
 							Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
 							CacheAudioClips ();
-							SetUpNextProblem ();
+							Events.Dispatcher.OnSessionSelected += (int session) => {
+								ProblemsRepository.instance.Initialize (session);
+								SetUpNextProblem ();
+							};
 						} else {
 							gameObject.SetActive (false);
 						}
 					};
+
 		}
 
 

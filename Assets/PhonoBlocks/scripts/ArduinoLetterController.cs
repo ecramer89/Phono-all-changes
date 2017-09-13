@@ -29,14 +29,12 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		public void Start ()
 		{
-			
-	
+				instance = this;
 				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();
 				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 	
 				AssignInteractiveLettersToTangibleCounterParts ();
-				instance = this;
-
+				
 				Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
 		    
 

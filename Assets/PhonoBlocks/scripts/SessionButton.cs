@@ -20,8 +20,8 @@ public class SessionButton : MonoBehaviour {
 	{
 		
 		if (pressed) {
-		
-			sessionsDirector.SetSessionForPracticeMode(session_num);
+			Events.Dispatcher.RecordSessionSelected (session_num);
+			//sessionsDirector.SetSessionForStudentMode(session_num);
 		}
 		
 		

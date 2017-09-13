@@ -92,8 +92,8 @@ public class ArduinoUnityInterface : MonoBehaviour
 		public void Start(){
 				instance = this;
 				GameObject uniduino = GameObject.Find ("Uniduino");
-				Events.Dispatcher.OnInputModeSelected += (InputMode mode) => {
-					if(mode == InputMode.KEYBOARD) {
+				Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
+					if(type == InputType.KEYBOARD) {
 						gameObject.SetActive(false);
 						uniduino.SetActive(false);
 				} else {
