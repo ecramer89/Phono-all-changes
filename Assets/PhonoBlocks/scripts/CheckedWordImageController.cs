@@ -1,25 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.SceneManagement;
 
 public class CheckedWordImageController : MonoBehaviour
 {
-		public GameObject checkedWordImage;
+		GameObject checkedWordImage;
 		UITexture img;
 		BoxCollider clickTrigger;
 		long showTime = -1;
 		bool disableTextureOnPress;
-		public long defaultDisplayTime = 2000;
+		long defaultDisplayTime = 2000;
 		bool caller_ends_display;
 
 
-		void Start ()
-		{
-				img = checkedWordImage.GetComponent<UITexture> ();
-				img.enabled = false;
-				clickTrigger = checkedWordImage.GetComponent<BoxCollider> ();
-				clickTrigger.enabled = false;
-		        
+			void Start (){
+
 				//remove the old image, if it's still there
 				Events.Dispatcher.OnNewProblemBegun += () => {
 					EndDisplay ();
@@ -36,6 +32,16 @@ public class CheckedWordImageController : MonoBehaviour
 		        //if the current state of user input letters corresponds to a saved image, then
 				//display it.
 				Events.Dispatcher.OnUserAddedWordToHistory += DisplayCurrentInputWord;
+
+				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
+					if(scene.name == "Activity"){
+						checkedWordImage = GameObject.Find("CheckedWordImage");
+						img = checkedWordImage.GetComponent<UITexture> ();
+						img.enabled = false;
+						clickTrigger = checkedWordImage.GetComponent<BoxCollider> ();
+						clickTrigger.enabled = false;
+					}
+				};
 		}
 
 		void DisplayCurrentInputWord(){

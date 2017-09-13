@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.SceneManagement;
 public class UserStarGridController : MonoBehaviour
 {
 
-		public GameObject userStarsGridOb;
+		public GameObject userStarGrid;
 		public Texture2D userStarImg;
 		public Texture2D userStarOutlineImg;
-		public int starWidth;
-		public int starHeight;
+		int starWidth;
+		int starHeight;
 		int timesToFlash = 4;
 		int flashCounter;
 		float secondsDelayBetweenFlashes = .20f;
@@ -16,10 +16,11 @@ public class UserStarGridController : MonoBehaviour
 
 		public void Start ()
 		{
-			Events.Dispatcher.OnModeSelected += (Mode mode) => {
-				if (mode == Mode.STUDENT) {
-					if (starWidth == 0 || starHeight == 0) //you can specify dimensions for the image that are different from those of the grid.
-						MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
+
+			SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
+				if(scene.name == "Activity" && State.Current.Mode == Mode.STUDENT){
+					userStarGrid = GameObject.Find("UserStarGrid");
+					MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
 
 
 					PlaceUserStarOutlinesInGrid (); 
@@ -29,12 +30,10 @@ public class UserStarGridController : MonoBehaviour
 							AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
 						}
 					};
-				} else {
+				}else {
 					gameObject.SetActive (false);
 				}
-		};
-
-
+			};
 
 
 		}
@@ -47,14 +46,14 @@ public class UserStarGridController : MonoBehaviour
 
 				}
 	
-				userStarsGridOb.GetComponent<UIGrid> ().Reposition ();
+				userStarGrid.GetComponent<UIGrid> ().Reposition ();
 		}
 
 		public void AddNewUserStar (bool flash, int at)
 		{
-				UITexture newCellTexture = userStarsGridOb.transform.GetChild (at).GetComponent<UITexture> ();
+				UITexture newCellTexture = userStarGrid.transform.GetChild (at).GetComponent<UITexture> ();
 				newCellTexture.mainTexture = userStarImg;
-				userStarsGridOb.GetComponent<UIGrid> ().Reposition ();
+				userStarGrid.GetComponent<UIGrid> ().Reposition ();
 				if (flash) {
 						toFlash = newCellTexture;
 						StartCoroutine ("Flash");
@@ -64,7 +63,7 @@ public class UserStarGridController : MonoBehaviour
 
 		void MatchStarImageToGridCellDimensions ()
 		{
-				UIGrid grid = userStarsGridOb.GetComponent<UIGrid> ();
+				UIGrid grid = userStarGrid.GetComponent<UIGrid> ();
 				starWidth = (int)grid.cellWidth;
 				starHeight = (int)grid.cellHeight;
 		
@@ -73,7 +72,7 @@ public class UserStarGridController : MonoBehaviour
 		public UITexture CreateStarCellInGrid ()
 		{      
 				Texture2D tex2dCopy = CopyAndScaleTexture (starWidth, starHeight, userStarOutlineImg);
-				UITexture ut = NGUITools.AddChild<UITexture> (userStarsGridOb);
+				UITexture ut = NGUITools.AddChild<UITexture> (userStarGrid);
 				ut.material = new Material (Shader.Find ("Unlit/Transparent Colored"));
 				ut.shader = Shader.Find ("Unlit/Transparent Colored");
 				ut.mainTexture = tex2dCopy;

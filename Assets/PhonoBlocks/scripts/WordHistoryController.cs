@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine.SceneManagement;
 
 public class WordHistoryController : MonoBehaviour
 {
@@ -25,10 +26,16 @@ public class WordHistoryController : MonoBehaviour
 
 		public void Start(){
 			instance = this;
-			lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
-			wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
-			letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
-			InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
+			SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
+				if (scene.name == "Activity") {
+					wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
+					wordHistoryGrid = GameObject.Find("WordHistoryGrid");
+					lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
+					wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
+					letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
+					InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
+				}
+			};
 
 			//subscribe to events
 			Events.Dispatcher.OnCurrentProblemCompleted += AddCurrentWordToHistory;
