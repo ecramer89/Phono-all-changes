@@ -13,18 +13,10 @@ public class WordHistoryController : MonoBehaviour
 			}
 
 		}
-		int wordLength;
+
 		public GameObject wordHistoryPanelBackground;
 		LetterImageTable letterImageTable;
 
-		public int WordLength {
-				get {
-
-						return wordLength;
-
-				}
-
-		}
 
 		public GameObject wordHistoryGrid;
 		LetterGridController lettersOfWordInHistory;
@@ -48,14 +40,17 @@ public class WordHistoryController : MonoBehaviour
 
 		public int showImageTime = 60 * 8;
 
-		public void Initialize (int wordLength)
+		public void Initialize ()
 		{
-				this.wordLength = wordLength;
 				lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
-
-				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = wordLength;
+				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
 				letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
 				InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
+
+		        //subscribe to events
+				Events.Dispatcher.OnCurrentProblemCompleted += () => {
+					AddCurrentWordToHistory (State.Current.UILetters, true);
+				};
 	 
 		}
 
@@ -73,7 +68,7 @@ public class WordHistoryController : MonoBehaviour
 		string AddLettersOfNewWordToHistory (List<InteractiveLetter> newWord)
 		{ 
 				StringBuilder currentWordAsString = new StringBuilder ();
-				int position = words.Count * wordLength;
+				int position = words.Count * Parameters.UI.ONSCREEN_LETTER_SPACES;
 				foreach (InteractiveLetter l in newWord) {
 					
 						
@@ -127,7 +122,7 @@ public class WordHistoryController : MonoBehaviour
 
 		int IndexOfWordThatLetterBelongsTo (GameObject pressedLetterCell)
 		{
-				return (Int32.Parse (pressedLetterCell.name)) / wordLength;
+				return (Int32.Parse (pressedLetterCell.name)) / Parameters.UI.ONSCREEN_LETTER_SPACES;
 
 		}
 	

@@ -170,11 +170,7 @@ public class StudentActivityController : MonoBehaviour
 		void CurrentProblemCompleted ()
 		{
 				Events.Dispatcher.RecordCurrentProblemCompleted ();
-
-
-				WordHistoryController.Instance.AddCurrentWordToHistory (State.Current.UILetters, true);
-				UserInputRouter.instance.RequestDisplayImage (State.Current.TargetWord, false, true);
-
+	
 				if (Selector.Instance.SolvedOnFirstTry) {
 		
 						UserInputRouter.instance.DisplayNewStarOnScreen (ProblemsRepository.instance.ProblemsCompleted-1);

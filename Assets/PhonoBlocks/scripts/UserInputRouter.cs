@@ -93,7 +93,7 @@ public class UserInputRouter : MonoBehaviour
 				arduinoLetterController = arduinoLetterControllerGO.GetComponent<ArduinoLetterController> ();
 				arduinoLetterController.Initialize (arduinoLetterInterface);
 				wordHistoryController = wordHistoryControllerGO.GetComponent<WordHistoryController> ();
-				wordHistoryController.Initialize (totalLengthOfUserInputWord);
+				wordHistoryController.Initialize ();
 			
 				checkedWordImageController = checkedWordImageControllerGO.GetComponent<CheckedWordImageController> ();
 

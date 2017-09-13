@@ -8,6 +8,11 @@ public class Parameters {
 		public static readonly int ONSCREEN_LETTER_SPACES = 6;
 	}
 
+	public class FILEPATHS{
+		public static readonly string RESOURCES_WORD_IMAGE_PATH = "WordImages/"; 
+
+	}
+
 	public class Colors{
 
 		//define special colors to use over Unity's blue, green, yellow, red, etc.
