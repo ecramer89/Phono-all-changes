@@ -31,23 +31,25 @@ public class StudentActivityController : MonoBehaviour
 	{       	instance = this;
 				Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
 				Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
-			    //cache audio clips
-				excellent = InstructionsAudio.instance.excellent;
-				incorrectSoundEffect = InstructionsAudio.instance.incorrectSoundEffect;
-				notQuiteIt = InstructionsAudio.instance.notQuiteIt;
-				offerHint = InstructionsAudio.instance.offerHint;
-				youDidIt = InstructionsAudio.instance.youDidIt;
-				correctSoundEffect = InstructionsAudio.instance.correctSoundEffect;
-				removeAllLetters = InstructionsAudio.instance.removeAllLetters;
-
-				triumphantSoundForSessionDone = InstructionsAudio.instance.allDoneSession;
-
-		  
+				CacheAudioClips();
 				SetUpNextProblem ();
 		}
 
 
-	bool allUserControlledLettersAreBlank(){
+	void CacheAudioClips(){
+		excellent = InstructionsAudio.instance.excellent;
+		incorrectSoundEffect = InstructionsAudio.instance.incorrectSoundEffect;
+		notQuiteIt = InstructionsAudio.instance.notQuiteIt;
+		offerHint = InstructionsAudio.instance.offerHint;
+		youDidIt = InstructionsAudio.instance.youDidIt;
+		correctSoundEffect = InstructionsAudio.instance.correctSoundEffect;
+		removeAllLetters = InstructionsAudio.instance.removeAllLetters;
+
+		triumphantSoundForSessionDone = InstructionsAudio.instance.allDoneSession;
+	}
+
+
+	bool AllUserControlledLettersAreBlank(){
 		return State.Current.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
 	}
 
@@ -96,8 +98,7 @@ public class StudentActivityController : MonoBehaviour
 
 		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
 		//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
-		if(allUserControlledLettersAreBlank()){ 
-			UserInputRouter.instance.RequestTurnOffImage ();
+		if(AllUserControlledLettersAreBlank()){ 
 			HandleEndOfActivity ();
 		}
 	}
