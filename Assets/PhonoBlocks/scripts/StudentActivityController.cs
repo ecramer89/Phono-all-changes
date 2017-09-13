@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -27,22 +28,27 @@ public class StudentActivityController : MonoBehaviour
 
 		void Start ()
 	{       		instance = this;
-					Debug.Log ("sac start called");
+		
 					Events.Dispatcher.OnModeSelected += (Mode mode) => {
-						Debug.Log("mode selected handler in sac called");
+					
 						if (mode == Mode.STUDENT) {
 							Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
 							Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
 							CacheAudioClips ();
 							Events.Dispatcher.OnSessionSelected += (int session) => {
-								Debug.Log("on session selcted handler in sac called");
 								ProblemsRepository.instance.Initialize (session);
-								SetUpNextProblem ();
+							};
+							SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
+								if(scene.name=="Activity"){
+											SetUpNextProblem ();
+								}
 							};
 						} else {
 							gameObject.SetActive (false);
 						}
 					};
+
+					
 
 		}
 
