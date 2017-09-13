@@ -26,8 +26,10 @@ public class WordHistoryController : MonoBehaviour
 
 		public void Start(){
 			instance = this;
+			
 			SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 				if (scene.name == "Activity") {
+					words = new List<Word> ();
 					wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
 					wordHistoryGrid = GameObject.Find("WordHistoryGrid");
 					lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
