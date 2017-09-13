@@ -23,7 +23,7 @@ public class CheckedWordImageController : MonoBehaviour
 				//display the target word image
 				Events.Dispatcher.OnCurrentProblemCompleted += DisplayTargetWord;
 				//level three hint; show the image of the target word.
-				Events.Dispatcher.OnHintProvided += () => {
+				Events.Dispatcher.OnHintRequested += () => {
 				if(State.Current.CurrentHintNumber == Parameters.Hints.Descriptions.
 					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
 						DisplayTargetWord();

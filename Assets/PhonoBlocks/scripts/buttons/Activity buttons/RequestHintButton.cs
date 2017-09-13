@@ -6,8 +6,8 @@ using UnityEngine;
 public class RequestHintButton : MonoBehaviour {
 
 	void Start(){
-		Events.Dispatcher.OnModeSelected += (Mode mode) => {
-			if (mode == Mode.STUDENT) {
+			if (State.Current.Mode == Mode.STUDENT) {
+				gameObject.SetActive(false); //inactive to begin with.
 				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "RequestHint";
@@ -32,7 +32,6 @@ public class RequestHintButton : MonoBehaviour {
 			} else {
 				gameObject.SetActive(false);
 			}
-		};
 	}
 
 

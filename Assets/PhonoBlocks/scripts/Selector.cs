@@ -40,7 +40,7 @@ public class Selector : MonoBehaviour {
 			//it's outside the bounds of target word and is blank.
 			correctlyPlacedLetters[atPosition] = 
 				(atPosition >= State.Current.TargetWord.Length && newLetter == ' ') ||
-				newLetter == State.Current.TargetWord[atPosition];
+				(atPosition <  State.Current.TargetWord.Length && newLetter == State.Current.TargetWord[atPosition]);
 			
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
 		};

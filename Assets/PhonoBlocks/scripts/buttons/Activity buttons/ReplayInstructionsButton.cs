@@ -6,9 +6,7 @@ using UnityEngine;
 public class ReplayInstructionsButton : MonoBehaviour {
 
 	void Start(){
-
-		Events.Dispatcher.OnModeSelected += (Mode mode) => {
-			if (mode == Mode.STUDENT) {
+			if (State.Current.Mode == Mode.STUDENT) {
 				UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "ReplayInstructions";
@@ -24,9 +22,7 @@ public class ReplayInstructionsButton : MonoBehaviour {
 			} else {
 				gameObject.SetActive(false);
 			}
-		};
 
-	
 	}
 
 	void ReplayInstructions(){

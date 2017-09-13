@@ -22,7 +22,6 @@ public class UserStarGridController : MonoBehaviour
 					userStarGrid = GameObject.Find("UserStarGrid");
 					MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
 
-
 					PlaceUserStarOutlinesInGrid (); 
 
 					Events.Dispatcher.OnCurrentProblemCompleted += () => {
