@@ -6,18 +6,27 @@ using UnityEngine;
 public class ReplayInstructionsButton : MonoBehaviour {
 
 	void Start(){
-		UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
-		messenger.target = gameObject;
-		messenger.functionName = "ReplayInstructions";
-		messenger.trigger = UIButtonMessage.Trigger.OnClick;
+
+		Events.Dispatcher.OnModeSelected += (Mode mode) => {
+			if (mode == Mode.STUDENT) {
+				UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
+				messenger.target = gameObject;
+				messenger.functionName = "ReplayInstructions";
+				messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
 
-		Events.Dispatcher.OnUIInputLocked += () => {
-			gameObject.SetActive(false);
+				Events.Dispatcher.OnUIInputLocked += () => {
+					gameObject.SetActive(false);
+				};
+				Events.Dispatcher.OnUIInputUnLocked += () => {
+					gameObject.SetActive(true);
+				};
+			} else {
+				gameObject.SetActive(false);
+			}
 		};
-		Events.Dispatcher.OnUIInputUnLocked += () => {
-			gameObject.SetActive(true);
-		};
+
+	
 	}
 
 	void ReplayInstructions(){

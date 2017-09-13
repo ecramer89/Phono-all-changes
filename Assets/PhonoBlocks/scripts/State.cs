@@ -17,6 +17,10 @@ public class State: MonoBehaviour  {
 	}
 
 	public void SubscribeToEvents(){
+		Events.Dispatcher.OnInputModeSelected += (InputMode mode) => {
+			inputMode = mode;
+		};
+
 		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
 			this.activity = activity;
 		};
@@ -78,6 +82,13 @@ public class State: MonoBehaviour  {
 			this.currentHintNumber++;
 		};
 	
+	}
+
+	private InputMode inputMode;
+	public InputMode InputMode{
+		get {
+			return inputMode;
+		}
 	}
 
 	private Mode mode;

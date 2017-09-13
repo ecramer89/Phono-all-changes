@@ -71,7 +71,7 @@ public class Problem : MonoBehaviour
 				CacheFixedInstructions (initialWord, targetWord);
 
 				cachedTrimmedTargetWord = targetWord;
-				this.targetWord = AppendBlanksToEnd (targetWord, UserInputRouter.numOnscreenLetterSpaces);
+				this.targetWord = AppendBlanksToEnd (targetWord, Parameters.UI.ONSCREEN_LETTER_SPACES);
 				this.initialWord = AppendBlanksToFrontOrEnd (initialWord, this.targetWord);
 		
 				cachedTargetWord = this.targetWord;

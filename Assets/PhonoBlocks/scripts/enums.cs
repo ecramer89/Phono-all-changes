@@ -16,3 +16,8 @@ public enum ActivityStates{
 	FORCE_CORRECT_LETTER_PLACEMENT, //don't update the GUI letter images unless the inputted letter is correct. still show error feedback.
 	REMOVE_ALL_LETTERS //after the problem
 }
+
+
+public enum InputMode{
+	KEYBOARD, TUI
+}

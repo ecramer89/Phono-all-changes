@@ -8,9 +8,9 @@ using System.Linq;
  * 
  * */
 public class SessionsDirector : MonoBehaviour
-		//change this between students
+		
 {
-
+		[SerializeField] InputMode inputMode;
 		public static SessionsDirector instance;
 		public static ColourCodingScheme colourCodingScheme = new RControlledVowel ();
 
@@ -49,22 +49,6 @@ public class SessionsDirector : MonoBehaviour
 				}
 	}
 
-		public INTERFACE_TYPE INTERFACE;
-
- 
-
-		public enum INTERFACE_TYPE
-		{
-				TANGIBLE, 
-				SCREEN_KEYBOARD
-    }
-		;
-
-		public bool IsScreenMode ()
-		{
-				return INTERFACE == INTERFACE_TYPE.SCREEN_KEYBOARD;
-
-		}
 
 		public static int currentUserSession; //will obtain from player prefs
 		public static int numStarsOfCurrentUser; //will obtain from player prefs
@@ -123,10 +107,12 @@ public class SessionsDirector : MonoBehaviour
 
 		void Start ()
 		{     
+		
 				instance = this;
 			
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
+				Events.Dispatcher.InputModeSelected (inputMode);
 	}
 
 		void SetupModeSelectionMenu ()

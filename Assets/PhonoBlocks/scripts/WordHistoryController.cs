@@ -25,22 +25,18 @@ public class WordHistoryController : MonoBehaviour
 
 		public void Start(){
 			instance = this;
+			lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
+			wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
+			letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
+			InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
 
+			//subscribe to events
+			Events.Dispatcher.OnCurrentProblemCompleted += AddCurrentWordToHistory;
+			Events.Dispatcher.OnUserAddedWordToHistory += AddCurrentWordToHistory;
 		}
 
 		public int showImageTime = 60 * 8;
 
-		public void Initialize ()
-		{
-				lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
-				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
-				letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
-				InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
-
-		        //subscribe to events
-				Events.Dispatcher.OnCurrentProblemCompleted += AddCurrentWordToHistory;
-				Events.Dispatcher.OnUserAddedWordToHistory += AddCurrentWordToHistory;
-		}
 
 		public void AddCurrentWordToHistory ()
 		{

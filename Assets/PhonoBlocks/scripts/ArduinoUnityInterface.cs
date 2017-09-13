@@ -13,14 +13,18 @@ using System.Text;
 //(implement this later)
 public class ArduinoUnityInterface : MonoBehaviour
 {
+		private static ArduinoUnityInterface instance;
+		public static ArduinoUnityInterface Instance{
+			get {
 
+				return instance;
+			}
+		}
 		int CURR_MAX_NUM_PIN = 2;
 		public float minimumSecondsBeforeNextLetterCheck = 1;
 		float timeOfLastCheck;
 		public Arduino arduino;
 		public static bool communicationWithArduinoAchieved = false; //begin the main program because arduino has finished connecting/configuring.
-		public GameObject arduinoLetterControllerOb;
-
 
 		const int NUM_VALUES_PER_COLOR = 3;
 		const int NUM_PINS_PER_LETTER_POSITION = 7;
@@ -85,12 +89,25 @@ public class ArduinoUnityInterface : MonoBehaviour
 		const char SAME = '?';
 		ArduinoLetterData change;
 
-		public void Initialize ()
-		{
-				change = new ArduinoLetterData ();
-				arduino = Arduino.global;
-				arduino.Setup (ConfigurePins);
+		public void Start(){
+				instance = this;
+				GameObject uniduino = GameObject.Find ("Uniduino");
+				Events.Dispatcher.OnInputModeSelected += (InputMode mode) => {
+					if(mode == InputMode.KEYBOARD) {
+						gameObject.SetActive(false);
+						uniduino.SetActive(false);
+				} else {
+					
+					uniduino.GetComponent<Uniduino.Arduino> ().Connect ();
+					change = new ArduinoLetterData ();
+					arduino = Arduino.global;
+					arduino.Setup (ConfigurePins);
+
+				}
+			};
+
 		}
+		
 
 		void ConfigurePins ()
 		{

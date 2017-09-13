@@ -173,15 +173,15 @@ public class InteractiveLetter : MonoBehaviour{
 		flashCounter = 0;
 	}
 		
-		public void UpdateDisplayColour (UnityEngine.Color c_)
+		public void UpdateDisplayColour (Color c)
 		{
 
-				if (c_ == Color.clear)
-						c_ = Color.white;
+				if (c == Color.clear)
+						c = Color.white;
 		
-				GetComponent<UITexture> ().color = c_;
+				GetComponent<UITexture> ().color = c;
 				//change colour of counterpart tangible letter
-				ChangeColourOfTangibleCounterpartIfThereIsOne (c_);
+				ChangeColourOfTangibleCounterpartIfThereIsOne (c);
 			
 		}
 
@@ -191,26 +191,27 @@ public class InteractiveLetter : MonoBehaviour{
 
 		}
 
-	public void UpdateInputDerivedAndDisplayColor(UnityEngine.Color c){
+	public void UpdateInputDerivedAndDisplayColor(Color c){
 			UpdateDefaultColour (c);
 			UpdateDisplayColour (c);
 		}
 
 
-		public void ChangeColourOfTangibleCounterpartIfThereIsOne (UnityEngine.Color c_)
+		public void ChangeColourOfTangibleCounterpartIfThereIsOne (Color c)
 		{
  
         //on the screen, blank letters are just clear.
         //but we issue the black (0,0,0) colour to the arduino.
 		if (IsBlank())
-						c_ = Color.black;
-				if (UserInputRouter.instance != null)
-				if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER && UserInputRouter.instance.IsArduinoMode ()) 
-						UserInputRouter.instance.arduinoLetterInterface.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c_);
+						c = Color.black;
+		if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER &&
+		      State.Current.InputMode == InputMode.TUI) {
+			ArduinoUnityInterface.Instance.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c);
+		}
 
 
 		}
-		public void UpdateInputLetterAndInputDerivedColor (String letter, Texture2D img, UnityEngine.Color c)
+		public void UpdateInputLetterAndInputDerivedColor (String letter, Texture2D img, Color c)
 		{
 			UpdateInputLetterButNotInputDerivedColor (letter, img);
 			UpdateInputDerivedAndDisplayColor (c);
@@ -240,7 +241,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 
 
-		public void UpdateDefaultColour (UnityEngine.Color c)
+		public void UpdateDefaultColour (Color c)
 		{
 			colorDerivedFromInput = c == Color.clear ? Color.white : c;
 

@@ -21,18 +21,16 @@ public class ArduinoLetterController : MonoBehaviour{
 				
 
 		LetterGridController letterGrid;
-		ArduinoUnityInterface tangibleLetters;
+
 		public GameObject letterGridControllerGO;
 	 
 
 
 
-		public void Initialize (ArduinoUnityInterface tangibleLetters)
+		public void Start ()
 		{
 			
 	
-				
-		
 				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();
 				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 	
@@ -170,22 +168,6 @@ public class ArduinoLetterController : MonoBehaviour{
 		public InteractiveLetter GetInteractiveLetterAt(int position){
 			return letterGrid.GetInteractiveLetter (position);
 		}
-
-
-
-						
-	/*
-		void handleSyllableDivisionMode(
-				LetterSoundComponent lc,
-				int indexOfLetterBarCell
-		){
-				asInteractiveLetter = letterGrid.GetInteractiveLetter (indexOfLetterBarCell);
-				asInteractiveLetter.UpdateDefaultColour (SessionsDirector.colourCodingScheme.GetColorsForWholeWord ());
-				asInteractiveLetter.SetSelectColour (lc.GetColour ());
-		}*/
-
-
-
 
 
 

@@ -15,6 +15,11 @@ public class Events: MonoBehaviour  {
 
 		}
 	}
+
+	public event Action<InputMode> OnInputModeSelected = (InputMode mode) => {};
+	public void InputModeSelected(InputMode mode){
+		OnInputModeSelected (mode);
+	}
 		
 
 	public event Action<Mode> OnModeSelected = (Mode mode) => {};

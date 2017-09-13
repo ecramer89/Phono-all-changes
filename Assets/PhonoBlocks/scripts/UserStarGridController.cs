@@ -14,19 +14,28 @@ public class UserStarGridController : MonoBehaviour
 		float secondsDelayBetweenFlashes = .20f;
 		UITexture toFlash;
 
-		public void Initialize ()
+		public void Start ()
 		{
-				if (starWidth == 0 || starHeight == 0) //you can specify dimensions for the image that are different from those of the grid.
+			Events.Dispatcher.OnModeSelected += (Mode mode) => {
+				if (mode == Mode.STUDENT) {
+					if (starWidth == 0 || starHeight == 0) //you can specify dimensions for the image that are different from those of the grid.
 						MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
 
 
-				PlaceUserStarOutlinesInGrid (); 
+					PlaceUserStarOutlinesInGrid (); 
 
-				Events.Dispatcher.OnCurrentProblemCompleted += () => {
-					if (Selector.Instance.SolvedOnFirstTry){
+					Events.Dispatcher.OnCurrentProblemCompleted += () => {
+						if (Selector.Instance.SolvedOnFirstTry){
 							AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
-					}
-				};
+						}
+					};
+				} else {
+					gameObject.SetActive (false);
+				}
+		};
+
+
+
 
 		}
 
