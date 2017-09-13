@@ -24,7 +24,6 @@ public class Events: MonoBehaviour  {
 
 	public event Action<Mode> OnModeSelected = (Mode mode) => {};
 	public void RecordModeSelected(Mode mode){
-		Debug.Log ("on mode selected from dispatch");
 		OnModeSelected (mode);
 	}
 
@@ -36,7 +35,6 @@ public class Events: MonoBehaviour  {
 
 	public event Action<Activity> OnActivitySelected = (Activity activity)=>{};
 	public void RecordActivitySelected(Activity activity){
-		Debug.Log($"Activity selected: {activity.ToString()}");
 		OnActivitySelected (activity);
 	}
 

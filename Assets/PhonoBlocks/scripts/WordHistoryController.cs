@@ -59,7 +59,7 @@ public class WordHistoryController : MonoBehaviour
 				foreach (InteractiveLetter l in State.Current.UILetters) {
 					
 						
-			     GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (l.InputLetter (), l.CurrentDisplayImage (), (position++) + "", (SessionsDirector.IsSyllableDivisionActivity?l.SelectColour:l.ColorDerivedFromInput));
+			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (l.InputLetter (), l.CurrentDisplayImage (), (position++) + "", l.ColorDerivedFromInput);
 				
 
 						letterInWord.AddComponent<BoxCollider> ();

@@ -12,55 +12,8 @@ public class SessionsDirector : MonoBehaviour
 {
 		[SerializeField] InputType inputType;
 		public static SessionsDirector instance;
-		public static ColourCodingScheme colourCodingScheme = new RControlledVowel ();
-
-		public bool IsMagicERule {
-				get {
-						return colourCodingScheme.label.Equals ("vowelInfluenceE");
-				}
-		}
-
-
-	public ColourCodingScheme CurrentActivityColorRules{
-		get {
-						return colourCodingScheme;
-				}
-	}
-
-	public string GetCurrentRule{
-		get {
-
-			return colourCodingScheme.label;
-				}
-
-	}
-
-		public static bool IsSyllableDivisionActivity {
-				get {
-						return colourCodingScheme.label.Equals ("syllableDivision");
-
-				}
-
-		}
-
-	public bool IsConsonantBlends {
-		get {
-			return colourCodingScheme.label.Equals ("Blends");
-				}
-	}
-
-
-		public static int currentUserSession; //will obtain from player prefs
-		//public static int numStarsOfCurrentUser; //will obtain from player prefs
-	
-	
-		public static bool IsTheFirstTutorLedSession ()
-		{
-
-				return  currentUserSession == 0;
-
-		}
 		
+
 
 		public GameObject studentActivityControllerOB;
 		public GameObject activitySelectionButtons;
