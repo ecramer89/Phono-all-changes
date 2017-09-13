@@ -5,7 +5,7 @@ using System.Text;
 using System;
 using System.Collections;
 using Extensions;
-
+using UnityEngine.SceneManagement;
 
 public class ArduinoLetterController : MonoBehaviour{
 		public static ArduinoLetterController instance;
@@ -22,21 +22,11 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		LetterGridController letterGrid;
 
-		public GameObject letterGridControllerGO;
-	 
-
-
 
 		public void Start ()
 		{
 				instance = this;
-				letterGrid = letterGridControllerGO.GetComponent<LetterGridController> ();
-				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
-	
-				AssignInteractiveLettersToTangibleCounterParts ();
 				
-				Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
-		    
 
 				Events.Dispatcher.OnInitialProblemLettersSet += (string initialProblemLetters) => {
 					ReplaceEachLetterWithBlank ();
@@ -46,6 +36,17 @@ public class ArduinoLetterController : MonoBehaviour{
 
 				Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
 					activateLinesBeneathLettersOfWord(targetWord);
+				};
+
+				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
+						if (scene.name == "Activity") {
+							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
+							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
+							AssignInteractiveLettersToTangibleCounterParts ();
+
+							Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
+						}
+
 				};
 
 		}

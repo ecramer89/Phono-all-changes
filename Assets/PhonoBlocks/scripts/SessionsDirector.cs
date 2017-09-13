@@ -83,17 +83,20 @@ public class SessionsDirector : MonoBehaviour
 				studentName = studentNameInputField.GetComponent<InputField> ();
 				SetupModeSelectionMenu ();
 				Events.Dispatcher.RecordInputTypeSelected (inputType);
+				Events.Dispatcher.OnActivitySelected += (Activity obj) => {
+						Application.LoadLevel ("Activity");
+				};
 	}
 
 		void SetupModeSelectionMenu ()
 		{
 				
 				assessmentStartTime = DateTime.Now;
-				activitySelectionButtons.SetActive (false);
-				sessionSelectionButtons.SetActive (false);
+				//activitySelectionButtons.SetActive (false);
+				//sessionSelectionButtons.SetActive (false);
 				studentModeButton.SetActive (true);
 				teacherModeButton.SetActive (true);
-				studentNameInputField.SetActive (false);
+				//studentNameInputField.SetActive (false);
 
 		}
 
@@ -120,25 +123,6 @@ public class SessionsDirector : MonoBehaviour
 
 		}
 
-	 //1. 
-		public void SetContentForTeacherMode (ProblemsRepository.ProblemType problemType)
-		{
-
-				colourCodingScheme = ProblemsRepository.instance.GetColourCodingSchemeGivenProblemType (problemType);
-			
-
-				Application.LoadLevel ("Activity");
-		}
-
-		public void SetSessionForStudentMode (int session)
-	{			
-				Events.Dispatcher.ActivitySelected (ProblemsRepository.instance.ActivityForSession (session));
-				currentUserSession = session;
-				sessionSelectionButtons.SetActive (false);
-				
-				Application.LoadLevel ("Activity");
-
-		}
 
 		public void LoadSessionSelectionScreen ()
 		{

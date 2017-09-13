@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TeacherMode : MonoBehaviour {
+public class TeacherModeController : MonoBehaviour {
 
 	void Start () {
 		Events.Dispatcher.OnModeSelected += (Mode mode) => {

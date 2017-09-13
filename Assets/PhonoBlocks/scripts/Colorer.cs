@@ -33,29 +33,7 @@ public class Colorer : MonoBehaviour   {
 		instance = this;
 
 		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
-
-			switch(activity){
-			case Activity.CONSONANT_BLENDS:
-				ruleBasedColorer = consonantBlendsColorer;
-				break;
-			case Activity.CONSONANT_DIGRAPHS:
-				ruleBasedColorer = consonantDigraphsColorer;
-				break;
-			case Activity.MAGIC_E:
-				ruleBasedColorer = magicEColorer;
-				break;
-			case Activity.R_CONTROLLED_VOWELS:
-				ruleBasedColorer = rControlledVowelsColorer;
-				break;
-			case Activity.VOWEL_DIGRAPHS:
-				ruleBasedColorer = vowelDigraphsColorer;
-				break;
-			case Activity.OPEN_CLOSED_SYLLABLE:
-				ruleBasedColorer = openClosedVowelColorer;
-				break;
-
-			}
-
+			InitializeRuleBasedColorer();
 		};
 
 
@@ -65,9 +43,45 @@ public class Colorer : MonoBehaviour   {
 
 
 		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+			InitializeRuleBasedColorer();
 			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(targetWord));
 		};
 	}
+
+	static Action InitializeRuleBasedColorer = () => {
+		//this is a bit of a smell. The issue is that in Student Mode the Student Activity controller
+		//dispatches target word set within its handler for activity set. 
+		//in consequence, since the SAC's handler for activity set was posted before the colorer's, 
+		//the colorer's handler for target word set is invoked before its handler for the (preceding)
+		//activity set.
+		//in teacher mode, this handler would have the job of initializing the rule based colorer.
+		//but in student mode this handler wouldn't typically do anything as I also conditionally initialize
+		//the rule based color within other handlers that use it.
+		if (ruleBasedColorer != null)
+			return; 
+		switch (State.Current.Activity) {
+		case Activity.CONSONANT_BLENDS:
+			ruleBasedColorer = consonantBlendsColorer;
+			break;
+		case Activity.CONSONANT_DIGRAPHS:
+			ruleBasedColorer = consonantDigraphsColorer;
+			break;
+		case Activity.MAGIC_E:
+			ruleBasedColorer = magicEColorer;
+			break;
+		case Activity.R_CONTROLLED_VOWELS:
+			ruleBasedColorer = rControlledVowelsColorer;
+			break;
+		case Activity.VOWEL_DIGRAPHS:
+			ruleBasedColorer = vowelDigraphsColorer;
+			break;
+		case Activity.OPEN_CLOSED_SYLLABLE:
+			ruleBasedColorer = openClosedVowelColorer;
+			break;
+
+		}
+
+	};
 
 
 	static Action<string> ReapplyDefaultOrOff = (string updatedUserInputLetters) => {
