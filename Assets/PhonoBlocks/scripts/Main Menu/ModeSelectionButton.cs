@@ -4,6 +4,7 @@ using UnityEngine;
 
 
 [RequireComponent(typeof(UIButtonMessage))]
+[RequireComponent(typeof(UIImageButton))]
 public class ModeSelectionButton : MonoBehaviour {
 	[SerializeField] Mode mode;
 
@@ -20,6 +21,8 @@ public class ModeSelectionButton : MonoBehaviour {
 			if(mode == Mode.TEACHER || this.mode == Mode.TEACHER){
 				gameObject.SetActive(false);
 			} else {
+				//todo this doesn't seem to be working; find out why
+				GetComponent<UIImageButton>().enabled = false; //disable sprite change on hover
 				messenger.enabled=false; //leave the student mode button onscreen but 
 				//disable its click functionality.
 			}

@@ -17,70 +17,11 @@ public class ProblemsRepository : MonoBehaviour
 		}
 
 		public readonly int PROBLEMS_PER_SESSION = 3;
-		public readonly int TOTAL_NUMBER_OF_EXPERIMENTAL_PROBLEMS_PER_PROBLEM_TYPE;
-		ColourCodingScheme colourSchemeForSession = new NoColour ();
+
+
 		public static ProblemsRepository instance = new ProblemsRepository ();
 
-		public ColourCodingScheme ActiveColourScheme {
-				get {
-						return colourSchemeForSession;
 
-				}
-		}
-
-
-		public enum ProblemType
-		{
-				OPEN_CLOSED_VOWEL,
-				MAGIC_E,
-				SYLLABLE_DIVISION,
-				CONSONANT_DIGRAPHS,
-				CONSONANT_BLENDS,
-				R_CONTROLLED_VOWEL,
-				VOWEL_DIGRAPHS
-
-		}
-
-
-
-
-		public ColourCodingScheme GetColourCodingSchemeGivenProblemType (ProblemType type)
-		{
-				switch (type) {
-				case ProblemType.OPEN_CLOSED_VOWEL:
-						return new OpenClosedVowel ();
-
-			
-				case ProblemType.CONSONANT_DIGRAPHS:
-						return new ConsonantDigraphs ();
-
-				case ProblemType.CONSONANT_BLENDS:
-						return new ConsonantBlends ();
-					
-				case ProblemType.MAGIC_E:
-						return new VowelInfluenceERule ();
-					
-			
-				case ProblemType.VOWEL_DIGRAPHS:
-						return new VowelDigraphs (); //change after we make the vowel digraphs scheme
-				
-					
-				case ProblemType.R_CONTROLLED_VOWEL:
-						return new RControlledVowel ();
-		
-
-				case ProblemType.SYLLABLE_DIVISION:
-						return new SyllableDivision ();
-
-				default: 
-						return new NoColour ();
-				
-
-				}
-		       
-
-		}
-	
 		static readonly int INITIAL_WORD_IDX = 1;
 		static readonly int TARGET_WORD_IDX = 0;
 		static string[][][] activity_word_sets = {
@@ -159,36 +100,18 @@ public class ProblemsRepository : MonoBehaviour
 				}
 		}
 
-		void Problems (Problem[] problems)
-		{
-				this.problemsForSession = problems;
-				idxToSwapUsedProblemIn = problems.Length - 1;
-		}
 
-		int idxToSwapUsedProblemIn;
-
-
-	
 		public void Initialize (int sessionIndex)
 		{
-				InitializeProblems (sessionIndex);
-				SetSessionColourScheme (sessionIndex);
+			string[][] wordsForSessionProblems = activity_word_sets [sessionIndex % activity_word_sets.Length];
+			problemsForSession = new Problem[PROBLEMS_PER_SESSION];
 
-		
-		}
 
-		void InitializeProblems (int sessionIndex)
-		{
+			for (int i=0; i<PROBLEMS_PER_SESSION; i++) {
 
-				string[][] wordsForSessionProblems = activity_word_sets [sessionIndex % activity_word_sets.Length];
-				problemsForSession = new Problem[PROBLEMS_PER_SESSION];
-				
-		      
-				for (int i=0; i<PROBLEMS_PER_SESSION; i++) {
-			        
-						problemsForSession [i] = new Problem (wordsForSessionProblems [INITIAL_WORD_IDX] [i], wordsForSessionProblems [TARGET_WORD_IDX] [i]);
-				}
-
+				problemsForSession [i] = new Problem (wordsForSessionProblems [INITIAL_WORD_IDX] [i], wordsForSessionProblems [TARGET_WORD_IDX] [i]);
+			}
+	
 		}
 
 
@@ -224,53 +147,7 @@ public class ProblemsRepository : MonoBehaviour
 		throw new Exception ($"Invalid session: {session}");
 
 	}
-
-		void SetSessionColourScheme (int sessionIndex)
-		{
-				switch (sessionIndex) {
-				case 0:
-				case 1:
-						colourSchemeForSession = new OpenClosedVowel ();
-						return;
-				case 2:
-				case 3:
-						colourSchemeForSession = new ConsonantBlends ();
-						return;
-				case 4:
-				case 5:
-						colourSchemeForSession = new ConsonantDigraphs ();
-						return;
-
-				case 6:
-				case 7:
-
-						colourSchemeForSession = new VowelInfluenceERule ();
-						return;
-				case 8:
-		        case 9:
-
-						colourSchemeForSession = new VowelDigraphs ();
-						return;
-				case 10:
-				case 11:
-
-						colourSchemeForSession = new RControlledVowel ();
-						return;
-				default:
-						colourSchemeForSession = new NoColour ();
-						return;
 		
-				}
-
-			
-
-
-		}
-		/* only if we want sub directories for words for different types of problems (slightly faster searching)*/
-		string GetPathToWord ()
-		{
-				return "audio/words/";
-		}
 
 		public Problem GetNextProblem ()
 		{       
@@ -280,8 +157,6 @@ public class ProblemsRepository : MonoBehaviour
 						return result;
 				} else
 						return problemsForSession [0];
-
-	
 		}
 
 		public bool AllProblemsDone ()
