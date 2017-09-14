@@ -22,7 +22,7 @@ public class SessionsDirector : MonoBehaviour
 		public GameObject studentModeButton;
 		public GameObject studentNameInputField;
 		public GameObject dataTables;
-		InputField studentName;
+		NameInputField studentName;
 		public AudioClip noDataForStudentName;
 		public AudioClip enterAgainToCreateNewFile;
 		public static DateTime assessmentStartTime;
@@ -33,7 +33,7 @@ public class SessionsDirector : MonoBehaviour
 		
 				instance = this;
 			
-				studentName = studentNameInputField.GetComponent<InputField> ();
+				studentName = studentNameInputField.GetComponent<NameInputField> ();
 				SetupModeSelectionMenu ();
 				Events.Dispatcher.RecordInputTypeSelected (inputType);
 				Events.Dispatcher.OnActivitySelected += (Activity obj) => {
@@ -91,7 +91,7 @@ public class SessionsDirector : MonoBehaviour
 
 
 				if (studentNameInputField.activeSelf) {
-						string nameEntered = studentName.stringToEdit.Trim ().ToLower ();
+						string nameEntered = studentName.Name.Trim ().ToLower ();
 						if (nameEntered.Length > 0) {
 		
 								nameEntered = CreateNewFileIfNeeded (nameEntered);

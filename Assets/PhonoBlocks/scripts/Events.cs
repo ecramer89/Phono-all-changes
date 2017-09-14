@@ -27,6 +27,11 @@ public class Events: MonoBehaviour  {
 		OnModeSelected (mode);
 	}
 
+	public event Action<string> OnStudentNameEntered = (string name) => {};
+	public void RecordStudentNameEntered(string name){
+		OnStudentNameEntered (name);
+	}
+
 	public event Action<int> OnSessionSelected = (int session) => {};
 	public void RecordSessionSelected(int session){
 		OnSessionSelected (session);
@@ -54,11 +59,6 @@ public class Events: MonoBehaviour  {
 	public void IncrementTimesAttemptedCurrentProblem(){
 		OnTimesAttemptedCurrentProblemIncremented ();
 	}
-
-	/*public event Action<AudioClip[]> OnCurrentProblemInstructionsSet = (AudioClip[] instructions) => {};
-	public void SetCurrentProblemInstructions(AudioClip[] instructions){
-		OnCurrentProblemInstructionsSet (instructions);
-	}*/
 		
 
 	public event Action OnUserInputLettersUpdated = () => {};

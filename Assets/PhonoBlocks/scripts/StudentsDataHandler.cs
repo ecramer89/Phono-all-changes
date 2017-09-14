@@ -28,6 +28,9 @@ public class StudentsDataHandler: MonoBehaviour
 
 
 		public void Start(){
+			Events.Dispatcher.OnStudentNameEntered += (string name) => {
+
+			};
 			Events.Dispatcher.OnSessionSelected += (int session) => {
 				UpdateUsersSession (session);
 			};
