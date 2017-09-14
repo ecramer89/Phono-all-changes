@@ -2,7 +2,18 @@
 //only do this when you have finished accomplishing all todos and cleaning up dependencies as best we can
 using UnityEngine;
 
-public class Parameters {
+public class Parameters : MonoBehaviour {
+
+	[SerializeField] InputType inputType;
+
+	void Start ()
+	{     
+
+		Events.Dispatcher.RecordInputTypeSelected (inputType);
+		Events.Dispatcher.OnActivitySelected += (Activity obj) => {
+			Application.LoadLevel ("Activity");
+		};
+	}
 
 	public class UI{
 		public static readonly int ONSCREEN_LETTER_SPACES = 6;

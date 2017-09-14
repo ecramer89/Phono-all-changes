@@ -25,9 +25,10 @@ public class StudentsDataHandler: MonoBehaviour
 
 		const string valDelimiter = ",";
 		const int asciiFor0 = 48;
-
+		DateTime assessmentStartTime; 
 
 		public void Start(){
+			assessmentStartTime = DateTime.Now;
 			Events.Dispatcher.OnStudentNameEntered += (string name) => {
 				string nameEntered = name.Trim ().ToLower ();
 				if (nameEntered.Length > 0) {
@@ -334,7 +335,7 @@ public class StudentsDataHandler: MonoBehaviour
 		{       //only log events in activity mode.
 		
 				
-				string fileName = currUser.studentName + "_" + currUser.CurrentSession + "_" + SessionsDirector.assessmentStartTime.ToString ("yyyyMMdd_hh_mm_ss") + ".csv";
+				string fileName = currUser.studentName + "_" + currUser.CurrentSession + "_" + assessmentStartTime.ToString ("yyyyMMdd_hh_mm_ss") + ".csv";
 				
 				string filePath = System.IO.Path.Combine (DATA_FILE_DIRECTORY, fileName);
 				System.IO.StreamWriter file = new System.IO.StreamWriter (filePath, true);
@@ -396,7 +397,7 @@ public class StudentsDataHandler: MonoBehaviour
 
 		void SetFileName ()
 		{
-				fileName = currUser.studentName + "_" + currUser.CurrentSession + "_" + SessionsDirector.assessmentStartTime.ToString ("yyyyMMdd_hh_mm_ss") + ".csv";
+				fileName = currUser.studentName + "_" + currUser.CurrentSession + "_" + assessmentStartTime.ToString ("yyyyMMdd_hh_mm_ss") + ".csv";
 		}
 
 		public void LogEvent (string eventName, string eventParam1, string eventParam2)
