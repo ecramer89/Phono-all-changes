@@ -96,7 +96,6 @@ public class StudentActivityController : MonoBehaviour
 			//in case the user removed and then replaced a letter correctly.
 			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
 			return;
-
 		}
 		//otherwise, don't update the UI letters but do flash the error to indicate that child didn't place the right letter.	
 		asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Parameters.Colors.DEFAULT_OFF_COLOR);
@@ -122,15 +121,10 @@ public class StudentActivityController : MonoBehaviour
 		
 	 void SetUpNextProblem ()
 		{  
-			
-				Problem currProblem = ProblemsRepository.instance.GetNextProblem ();
-			
-				Events.Dispatcher.SetCurrentProblemInstructions (currProblem.Instructions);
-
-		        Events.Dispatcher.RecordNewProblemBegun (currProblem);
+		        Events.Dispatcher.RecordNewProblemBegun (
+					ProblemsRepository.instance.GetNextProblem ()
+				);
 				Events.Dispatcher.EnterMainActivity ();
-
-
 				AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
 
 				

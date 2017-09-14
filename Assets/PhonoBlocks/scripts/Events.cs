@@ -44,11 +44,6 @@ public class Events: MonoBehaviour  {
 	}
 
 
-	/*public event Action<string> OnTargetWordSet = (string targetWord) => { };
-	public void SetTargetWord(string targetWord){
-		OnTargetWordSet (targetWord);
-	}*/
-
 	public event Action<Color[]> OnTargetColorsSet = (Color[] targetColors) => {};
 	public void SetTargetColors(Color[] targetColors){
 		OnTargetColorsSet (targetColors);
@@ -60,16 +55,11 @@ public class Events: MonoBehaviour  {
 		OnTimesAttemptedCurrentProblemIncremented ();
 	}
 
-	public event Action<AudioClip[]> OnCurrentProblemInstructionsSet = (AudioClip[] instructions) => {};
+	/*public event Action<AudioClip[]> OnCurrentProblemInstructionsSet = (AudioClip[] instructions) => {};
 	public void SetCurrentProblemInstructions(AudioClip[] instructions){
 		OnCurrentProblemInstructionsSet (instructions);
-	}
-
-	/*public event Action<string> OnProblemPlaceholderLettersSet = (string initialLetters) => {};
-	public void SetProblemPlaceHolderLetters(string initial){
-		OnProblemPlaceholderLettersSet (initial);
 	}*/
-
+		
 
 	public event Action OnUserInputLettersUpdated = () => {};
 	public event Action<char, int> OnUserEnteredNewLetter = (char newLetter, int atPosition) => {};

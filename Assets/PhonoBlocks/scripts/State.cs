@@ -44,6 +44,7 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
 			placeHolderLetters = problem.InitialWord;
 			this.targetWord = problem.TargetWord(true);
+			currentProblemInstrutions = problem.Instructions;
 			timesAttemptedCurrentProblem = 0;
 			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
 			currentHintNumber = 0;
@@ -52,11 +53,7 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnTimesAttemptedCurrentProblemIncremented += () => {
 			timesAttemptedCurrentProblem++;
 		};
-
-		Events.Dispatcher.OnCurrentProblemInstructionsSet += (AudioClip[] instuctions) => {
-			currentProblemInstrutions = instuctions;
-		};
-
+			
 	 
 		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 			previousUserInputLetters = userInputLetters;
