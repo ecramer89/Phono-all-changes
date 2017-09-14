@@ -17,7 +17,7 @@ public class CheckedWordImageController : MonoBehaviour
 			void Start (){
 
 				//remove the old image, if it's still there
-				Events.Dispatcher.OnNewProblemBegun += () => {
+				Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
 					EndDisplay ();
 				};
 				//display the target word image

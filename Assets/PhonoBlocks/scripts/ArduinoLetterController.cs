@@ -28,16 +28,12 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 				
 
-				Events.Dispatcher.OnProblemPlaceholderLettersSet += (string initialProblemLetters) => {
+				Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
 					ReplaceEachLetterWithBlank ();
-					PlaceWordInLetterGrid (initialProblemLetters);
-	
+					PlaceWordInLetterGrid (problem.InitialWord);
+					activateLinesBeneathLettersOfWord(problem.TargetWord(true));
 				};
-
-				Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
-					activateLinesBeneathLettersOfWord(targetWord);
-				};
-
+				
 				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 						if (scene.name == "Activity") {
 							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();

@@ -36,17 +36,19 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
 			this.uILetters = letters;
 		};
-
-		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
-			this.targetWord = targetWord;
-		};
-
+			
 		Events.Dispatcher.OnTargetColorsSet += (Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
 		};
-		Events.Dispatcher.OnNewProblemBegun += () => {
+
+		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
+			placeHolderLetters = problem.InitialWord;
+			this.targetWord = problem.TargetWord(true);
 			timesAttemptedCurrentProblem = 0;
+			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
+			currentHintNumber = 0;
 		};
+	
 		Events.Dispatcher.OnTimesAttemptedCurrentProblemIncremented += () => {
 			timesAttemptedCurrentProblem++;
 		};
@@ -55,10 +57,7 @@ public class State: MonoBehaviour  {
 			currentProblemInstrutions = instuctions;
 		};
 
-		Events.Dispatcher.OnProblemPlaceholderLettersSet += (string initialLetters) => {
-			placeHolderLetters = initialLetters;
-		};
-
+	 
 		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 			previousUserInputLetters = userInputLetters;
 			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
@@ -74,10 +73,7 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnEnterForceRemoveAllLetters += () => {
 			activityState = ActivityStates.REMOVE_ALL_LETTERS;
 		};
-		Events.Dispatcher.OnNewProblemBegun += () => {
-			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
-			currentHintNumber = 0;
-		};
+
 		Events.Dispatcher.OnUIInputUnLocked += () => {
 			uIInputLocked = false;
 		};

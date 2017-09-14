@@ -41,14 +41,12 @@ public class Colorer : MonoBehaviour   {
 			RegisterLettersToColorer(letters);
 		};
 
+	
 
-		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
+		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
 			InitializeRuleBasedColorer();
-			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(targetWord));
-		};
-
-		Events.Dispatcher.OnNewProblemBegun += () => {
 			TurnAllLettersOff();
+			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(problem.TargetWord(true)));
 		};
 
 

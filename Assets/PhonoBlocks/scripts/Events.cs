@@ -44,10 +44,10 @@ public class Events: MonoBehaviour  {
 	}
 
 
-	public event Action<string> OnTargetWordSet = (string targetWord) => { };
+	/*public event Action<string> OnTargetWordSet = (string targetWord) => { };
 	public void SetTargetWord(string targetWord){
 		OnTargetWordSet (targetWord);
-	}
+	}*/
 
 	public event Action<Color[]> OnTargetColorsSet = (Color[] targetColors) => {};
 	public void SetTargetColors(Color[] targetColors){
@@ -65,10 +65,10 @@ public class Events: MonoBehaviour  {
 		OnCurrentProblemInstructionsSet (instructions);
 	}
 
-	public event Action<string> OnProblemPlaceholderLettersSet = (string initialLetters) => {};
+	/*public event Action<string> OnProblemPlaceholderLettersSet = (string initialLetters) => {};
 	public void SetProblemPlaceHolderLetters(string initial){
 		OnProblemPlaceholderLettersSet (initial);
-	}
+	}*/
 
 
 	public event Action OnUserInputLettersUpdated = () => {};
@@ -78,9 +78,9 @@ public class Events: MonoBehaviour  {
 		OnUserInputLettersUpdated ();
 	}
 
-	public event Action OnNewProblemBegun = () => {};
-	public void BeginNewProblem(){
-		OnNewProblemBegun ();
+	public event Action<Problem> OnNewProblemBegun = (Problem problem) => {};
+	public void RecordNewProblemBegun(Problem problem){
+		OnNewProblemBegun (problem);
 	}
 	//distinguished from activity begun; may need to transition back into main activity state from a different state,
 	//i.e. such as force correct letter placement.
