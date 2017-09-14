@@ -32,6 +32,11 @@ public class Events: MonoBehaviour  {
 		OnStudentNameEntered (name);
 	}
 
+	public event Action OnStudentDataRetrieved = ()=>{};
+	public void RecordStudentDataRetrieved(){
+		OnStudentDataRetrieved ();
+	}
+
 	public event Action<int> OnSessionSelected = (int session) => {};
 	public void RecordSessionSelected(int session){
 		OnSessionSelected (session);

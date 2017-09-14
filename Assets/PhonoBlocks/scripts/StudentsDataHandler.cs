@@ -29,8 +29,23 @@ public class StudentsDataHandler: MonoBehaviour
 
 		public void Start(){
 			Events.Dispatcher.OnStudentNameEntered += (string name) => {
+				string nameEntered = name.Trim ().ToLower ();
+				if (nameEntered.Length > 0) {
+				        
+					nameEntered = CreateNewFileIfNeeded (nameEntered);
 
+					bool wasStoredDataForName = LoadStudentData (nameEntered);
+
+					if (wasStoredDataForName) {
+						Events.Dispatcher.RecordStudentDataRetrieved ();
+
+					} else {
+						Debug.Log ("No data recorded for this student");
+
+					}
+				}
 			};
+
 			Events.Dispatcher.OnSessionSelected += (int session) => {
 				UpdateUsersSession (session);
 			};
@@ -140,6 +155,27 @@ public class StudentsDataHandler: MonoBehaviour
 
 		static Dictionary<int,StudentData> dummyData;
 		static StudentData currUser;
+
+
+
+
+		string CreateNewFileIfNeeded (string nameEntered)
+		{     
+			bool createNewFile = nameEntered [nameEntered.Length - 1] == '*'; //mark new file with asterik
+
+			if (createNewFile) {
+
+
+				nameEntered = nameEntered.Substring (0, nameEntered.Length - 1);
+
+
+				Debug.Log ("Created file for " + nameEntered);
+				PlayerPrefs.SetString (nameEntered, templateForExperimentWideParams); 
+
+			}
+
+			return nameEntered;
+		}
 
 		public void CreateNewStudentFile (string studentName)
 		{

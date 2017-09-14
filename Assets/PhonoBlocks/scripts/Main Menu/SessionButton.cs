@@ -8,8 +8,8 @@ public class SessionButton : MonoBehaviour {
 
 	void Start(){
 		gameObject.SetActive(false);
-		Events.Dispatcher.OnModeSelected += (Mode mode) => {
-			if (mode == Mode.STUDENT) {
+		Events.Dispatcher.OnStudentDataRetrieved += () => {
+			if (State.Current.Mode == Mode.STUDENT) {
 				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "SelectSession";

@@ -86,7 +86,7 @@ public class SessionsDirector : MonoBehaviour
 		}
 
 
-		public void SelectStudentMode ()
+		/*public void SelectStudentMode ()
 	{       	
 
 
@@ -130,7 +130,7 @@ public class SessionsDirector : MonoBehaviour
 				}
 
 				return nameEntered;
-		}
+		}*/
 
 
 
