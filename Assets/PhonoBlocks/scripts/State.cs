@@ -44,7 +44,9 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnTargetColorsSet += (Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
 		};
-
+		Events.Dispatcher.OnNewProblemBegun += () => {
+			timesAttemptedCurrentProblem = 0;
+		};
 		Events.Dispatcher.OnTimesAttemptedCurrentProblemIncremented += () => {
 			timesAttemptedCurrentProblem++;
 		};

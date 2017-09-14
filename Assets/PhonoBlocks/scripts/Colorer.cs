@@ -39,13 +39,16 @@ public class Colorer : MonoBehaviour   {
 
 		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
 			RegisterLettersToColorer(letters);
-			TurnAllLettersOff();
 		};
 
 
 		Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
 			InitializeRuleBasedColorer();
 			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(targetWord));
+		};
+
+		Events.Dispatcher.OnNewProblemBegun += () => {
+			TurnAllLettersOff();
 		};
 
 

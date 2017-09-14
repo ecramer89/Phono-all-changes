@@ -49,7 +49,7 @@ public class UserStarGridController : MonoBehaviour
 		}
 
 		public void AddNewUserStar (bool flash, int at)
-		{
+	{       	
 				UITexture newCellTexture = userStarGrid.transform.GetChild (at).GetComponent<UITexture> ();
 				newCellTexture.mainTexture = userStarImg;
 				userStarGrid.GetComponent<UIGrid> ().Reposition ();
