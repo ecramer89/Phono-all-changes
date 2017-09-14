@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class Parameters : MonoBehaviour {
 
@@ -16,122 +17,116 @@ public class Parameters : MonoBehaviour {
 	}
 
 	public class StudentMode{
-		
-		public static Activity ActivityForSession(int session){
-			switch (session) {
-			case 0:
-			case 1:
-				return Activity.OPEN_CLOSED_SYLLABLE;
+		public static int PROBLEMS_PER_SESSION;
 
-			case 2:
-			case 3:
-				return Activity.CONSONANT_BLENDS;
+		struct SessionData{
+			public Activity spellingRule;
+			public string[] placeHolderLetters;
+			public string[] targetWords;
 
-			case 4:
-			case 5:
-				return Activity.CONSONANT_DIGRAPHS;
-
-
-			case 6:
-			case 7:
-				return Activity.MAGIC_E;
-
-			case 8:
-			case 9:
-				return Activity.VOWEL_DIGRAPHS;
-			case 10:
-			case 11:
-
-				return Activity.R_CONTROLLED_VOWELS;
-
+			public SessionData(Activity spellingRule, string[] targetWords, string[] placeHolderLetters){
+				this.spellingRule = spellingRule;
+				this.placeHolderLetters=placeHolderLetters;
+				this.targetWords=targetWords;
+				if(placeHolderLetters.Length != targetWords.Length) throw new Exception("Error: number of target words must equal number of placeholder words");
+				if(PROBLEMS_PER_SESSION == 0) PROBLEMS_PER_SESSION = placeHolderLetters.Length;
+				else if(PROBLEMS_PER_SESSION !=  placeHolderLetters.Length) throw new Exception("Each session must have the same number of problems.");
 			}
-			throw new Exception($"Invalid session: {session}");
-
 		}
-		static string[][][] SESSION_WORD_SETS = {
-			//session 1
-			new string[][]{
-				new string[]{"bet","dad","tin"}, //target words
-				new string[]{"b t","d d","t n"} //placeholder letters initially placed
-			},
 
-			//session 2
-			new string[][]{
-				new string[]{"pup","hit","web"},
-				new string[]{"p p","h t","w b"}
-			},
-			//session 3
-			new string[][]{
-				new string[]{"flag","skin","stop"},
-				new string[]{"ag","in","op"}
-			},
-			//session 4
-			new string[][]{
-				new string[]{"trip","drop","crab"},
-				new string[]{"ip","op","ab"}
-			},
-			//session 5
-			new string[][]{
-				new string[]{"thin","shop","chip"},
-				new string[]{"in","op","ip"}
-			},
+		static List<SessionData> PROBLEM_SETS = new List<SessionData>{
+			
+				new SessionData(
+				Activity.OPEN_CLOSED_SYLLABLE, 
+					new string[]{"bet","dad","tin"}, //target words
+					new string[]{"b t","d d","t n"} //placeholder letters initially placed
+				),
+				new SessionData(
+					Activity.OPEN_CLOSED_SYLLABLE, 
+						new string[]{"pup","hit","web"},
+						new string[]{"p p","h t","w b"}
+				),
+				new SessionData(
+					Activity.CONSONANT_BLENDS,
+							new string[]{"flag","skin","stop"},
+							new string[]{"ag","in","op"}
+						
+				),
+				new SessionData(
+					Activity.CONSONANT_BLENDS,
 
-			//session 6
-			new string[][]{
-				new string[]{"path","wish","lunch",},
-				new string[]{"pa","wi","lun"}
-			},
-			//session 7
-			new string[][]{
-				new string[]{"game","tape","cake"},
-				new string[]{"g m","t p","c k"}
-			},
-			//session 8
-			new string[][]{
-				new string[]{"side","wide","late"},
-				new string[]{"s d","w d","l t"}
-			},
-			//session 9
-			new string[][]{
-				new string[]{"eat","boat","paid"},
-				new string[]{"t","b  t","p  d"}
-			},
+							new string[]{"trip","drop","crab"},
+							new string[]{"ip","op","ab"}
+						
+				),
+			new SessionData(
+				Activity.CONSONANT_DIGRAPHS, 
+						new string[]{"thin","shop","chip"},
+						new string[]{"in","op","ip"}
+			),
+			new SessionData(
+				Activity.CONSONANT_DIGRAPHS, 
+				//session 6
+					new string[]{"path","wish","lunch",},
+					new string[]{"pa","wi","lun"}
+			),
+			new SessionData(
+				Activity.MAGIC_E,
 
-			//session 10
-			new string[][]{
-				new string[]{"seat","coat","bait"},
-				new string[]{"s  t","c  t","b  t"}
-			}, 
-			//session 1
-			new string[][]{
-				new string[]{"car","jar","fir"},
-				new string[]{"c","j","f"}
-			},
-			//session 1
-			new string[][]{
-				new string[]{"hurt","horn","part"},
-				new string[]{"h  t","h  n","p  t"}
-			}
+						new string[]{"game","tape","cake"},
+						new string[]{"g m","t p","c k"}
+					
+			),
+			new SessionData(
+				Activity.MAGIC_E,
+			
+					new string[]{"side","wide","late"},
+					new string[]{"s d","w d","l t"}
+
+			),
+			new SessionData(
+				Activity.VOWEL_DIGRAPHS,
+						new string[]{"eat","boat","paid"},
+						new string[]{"t","b  t","p  d"}
+			),
+			new SessionData(
+				Activity.VOWEL_DIGRAPHS,
+					new string[]{"seat","coat","bait"},
+					new string[]{"s  t","c  t","b  t"}
+			),
+			new SessionData(
+				Activity.R_CONTROLLED_VOWELS,
+						new string[]{"car","jar","fir"},
+						new string[]{"c","j","f"}
+			),
+			new SessionData(
+				Activity.R_CONTROLLED_VOWELS,
+					new string[]{"hurt","horn","part"},
+					new string[]{"h  t","h  n","p  t"}
+			),
 		};
-		public static int NUM_SESSIONS = SESSION_WORD_SETS.Length;
-		public static int PROBLEMS_PER_SESSION = SESSION_WORD_SETS[0][0].Length;
 
+		public static int NUM_SESSIONS = PROBLEM_SETS.Count;
+
+		public static Activity ActivityForSession(int session){
+			if (session < NUM_SESSIONS)
+				return PROBLEM_SETS [0].spellingRule;
+				throw new Exception($"Invalid session: {session}");
+			}
 
 		public static string PlaceholderLettersFor(int session, int problem){
 			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
-				return SESSION_WORD_SETS [session][1] [problem];
+				return PROBLEM_SETS [session].placeHolderLetters[problem];
 			}
 			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
 
 		}
 		public static string TargetWordFor(int session, int problem){
-			if (session < SESSION_WORD_SETS.Length && problem < PROBLEMS_PER_SESSION) {
-				return SESSION_WORD_SETS [session][0] [problem];
+			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
+				return PROBLEM_SETS [session].targetWords[problem];
 			}
 			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
 		}
-
-
 	}
 
 	public class UI{
