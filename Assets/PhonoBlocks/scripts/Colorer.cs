@@ -39,6 +39,7 @@ public class Colorer : MonoBehaviour   {
 
 		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
 			RegisterLettersToColorer(letters);
+			TurnAllLettersOff();
 		};
 
 
@@ -46,6 +47,8 @@ public class Colorer : MonoBehaviour   {
 			InitializeRuleBasedColorer();
 			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(targetWord));
 		};
+
+
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
@@ -83,6 +86,12 @@ public class Colorer : MonoBehaviour   {
 
 	};
 
+	static Action TurnAllLettersOff = () => {
+		State.Current.UILetters.ForEach (UILetter => {
+			UILetter.UpdateInputDerivedAndDisplayColor (offColor);
+		});
+	};
+
 
 	static Action<string> ReapplyDefaultOrOff = (string updatedUserInputLetters) => {
 		int index = 0;
@@ -96,7 +105,10 @@ public class Colorer : MonoBehaviour   {
 	static event Action ResetAllInteractiveLetterFlashConfigurations = () => {};
 	static event Action StartAllInteractiveLetterFlashes = ()=>{};
 
-	public static void RegisterLettersToColorer(List<InteractiveLetter> letters){
+	//subscribe each interactive letter to the colorer's batch events,
+	//which tell each interactive letter to start the flash routine/clear out old flash configuration.
+	//enables us to start and clear flashes of all letters simultaneously.
+	static void RegisterLettersToColorer(List<InteractiveLetter> letters){
 		State.Current.UILetters.ForEach (UILetter => {
 			StartAllInteractiveLetterFlashes += UILetter.StartFlash;
 			ResetAllInteractiveLetterFlashConfigurations += UILetter.ResetFlashParameters;
@@ -137,6 +149,12 @@ public class Colorer : MonoBehaviour   {
 		StartAllInteractiveLetterFlashes ();
 
 	
+	}
+
+	public static void ChangeDisplayColourOfASingleLetter(int at, Color newDisplayColor){
+		if (at >= State.Current.UILetters.Count)
+			return;
+		State.Current.UILetters [at].UpdateDisplayColour (newDisplayColor);
 	}
 
 	//todo: color schemes that return a reduced or otherwise modified list of UI letters can't do that here sicne the indices need to stay aligned.

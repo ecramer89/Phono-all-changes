@@ -26,10 +26,10 @@ public class InteractiveLetter : MonoBehaviour{
 
 		public delegate void SelectAction (bool wasSelected,GameObject o);
 
-		public static event SelectAction LetterSelectedDeSelected;
+		public event SelectAction LetterSelectedDeSelected;
 		public delegate void PressAction (GameObject o);
 
-		public static event PressAction LetterPressed;
+		public event PressAction LetterPressed;
 
 		UITexture selectHighlight;
 		Color selectColor = Color.clear;
@@ -53,32 +53,29 @@ public class InteractiveLetter : MonoBehaviour{
 
 		int flashCounter = 0;
 		Color[] flashColors = new Color[2];
-		public void SetFlashColors(Color a, Color b){
-			flashColors [0] = a;
-			flashColors [1] = b;
-		}
+
 		float[] flashDurations = new float[2];
-		public void SetFlashDurations(float a, float b){
-			flashDurations [0] = a;
-			flashDurations [1] = b;
-		}
+
 		int numFlashCycles;
-		public void SetNumFlashCycles(int numFlashCycles){
-			this.numFlashCycles = numFlashCycles;
-		}
 
 
 	public void ConfigureFlashParameters(
 		Color a, Color b, float durationA, float durationB, int numCycles){
-		SetFlashColors (a, b);
-		SetFlashDurations (durationA, durationB);
-		SetNumFlashCycles (numCycles);
+		flashColors [0] = a;
+		flashColors [1] = b;
+
+		flashDurations [0] = durationA;
+		flashDurations [1] = durationB;
+
+		this.numFlashCycles = numFlashCycles;
 	}
 
 	public void ResetFlashParameters(){
-		SetFlashColors (colorDerivedFromInput, colorDerivedFromInput);
-		SetFlashDurations (0f, 0f);
-		SetNumFlashCycles (0);
+		flashColors [0] = colorDerivedFromInput;
+		flashColors [1] = colorDerivedFromInput;
+		flashDurations [0] = 0f;
+		flashDurations [1] = 0f;
+		this.numFlashCycles = 0;
 	}
 
 
@@ -143,35 +140,35 @@ public class InteractiveLetter : MonoBehaviour{
 				return inputLetter [0] == ' ';
 		}
 
-	public void StartFlash(){
-		IEnumerator coroutine = Flash();
-		StartCoroutine (coroutine);
-	}
-	private IEnumerator Flash(){
-		int timesToFlash = numFlashCycles * 2;//i.e. times to appear in the flash color. since switching back to default color requires another
-		//invocation of the couroutine, must iterate twice as many times as requested times to flash
-		float durationOfFlash;
-		Color a = flashColors [0];
-		Color b = flashColors [1];
-		float durationA = flashDurations [0];
-		float durationB = flashDurations [1];
-		while (flashCounter<timesToFlash) {
-
-			if (flashCounter % 2 == 0) {
-				UpdateDisplayColour (a);
-				durationOfFlash = durationA;
-			} else {
-				UpdateDisplayColour (b);
-				durationOfFlash = durationB;
-			}
-			flashCounter++;
-
-			yield return new WaitForSeconds (durationOfFlash);
+		public void StartFlash(){
+			IEnumerator coroutine = Flash();
+			StartCoroutine (coroutine);
 		}
-		//restore default color
-		UpdateDisplayColour (colorDerivedFromInput);
-		flashCounter = 0;
-	}
+		private IEnumerator Flash(){
+			int timesToFlash = numFlashCycles * 2;//i.e. times to appear in the flash color. since switching back to default color requires another
+			//invocation of the couroutine, must iterate twice as many times as requested times to flash
+			float durationOfFlash;
+			Color a = flashColors [0];
+			Color b = flashColors [1];
+			float durationA = flashDurations [0];
+			float durationB = flashDurations [1];
+			while (flashCounter<timesToFlash) {
+
+				if (flashCounter % 2 == 0) {
+					UpdateDisplayColour (a);
+					durationOfFlash = durationA;
+				} else {
+					UpdateDisplayColour (b);
+					durationOfFlash = durationB;
+				}
+				flashCounter++;
+
+				yield return new WaitForSeconds (durationOfFlash);
+			}
+			//restore default color
+			UpdateDisplayColour (colorDerivedFromInput);
+			flashCounter = 0;
+		}
 		
 		public void UpdateDisplayColour (Color c)
 		{
@@ -223,6 +220,7 @@ public class InteractiveLetter : MonoBehaviour{
 		{
 				gameObject.GetComponent<UITexture> ().mainTexture = img;
 		}
+		
 
 		public void UpdateInputLetterButNotInputDerivedColor (String letter, Texture2D img)
 		{
@@ -246,16 +244,7 @@ public class InteractiveLetter : MonoBehaviour{
 			colorDerivedFromInput = c == Color.clear ? Color.white : c;
 
 		}
-
-		public void  SwitchImageTo (Texture2D img)
-		{
-				
-		        
-				GetComponent<UITexture> ().mainTexture = img;
-
-
-		}
-
+		
 		void Update ()
 		{
 	

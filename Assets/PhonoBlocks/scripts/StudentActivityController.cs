@@ -126,7 +126,7 @@ public class StudentActivityController : MonoBehaviour
 				Problem currProblem = ProblemsRepository.instance.GetNextProblem ();
 				Events.Dispatcher.SetTargetWord (currProblem.TargetWord(true));
 				Events.Dispatcher.SetCurrentProblemInstructions (currProblem.Instructions);
-				Events.Dispatcher.SetInitialProblemLetters (currProblem.InitialWord);
+				Events.Dispatcher.SetProblemPlaceHolderLetters (currProblem.InitialWord);
 				Events.Dispatcher.BeginNewProblem ();
 				Events.Dispatcher.EnterMainActivity ();
 
@@ -172,7 +172,6 @@ public class StudentActivityController : MonoBehaviour
 				AudioSourceController.PushClip (youDidIt);
 			else
 				AudioSourceController.PushClip (excellent);
-			AudioSourceController.PushClip (AudioSourceController.GetWordFromResources(State.Current.TargetWord));
 			CurrentProblemCompleted ();
 		}
 

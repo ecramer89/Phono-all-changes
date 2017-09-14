@@ -28,10 +28,10 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 				
 
-				Events.Dispatcher.OnInitialProblemLettersSet += (string initialProblemLetters) => {
+				Events.Dispatcher.OnProblemPlaceholderLettersSet += (string initialProblemLetters) => {
 					ReplaceEachLetterWithBlank ();
 					PlaceWordInLetterGrid (initialProblemLetters);
-					TurnAllLettersOff ();
+	
 				};
 
 				Events.Dispatcher.OnTargetWordSet += (string targetWord) => {
@@ -50,15 +50,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				};
 
 		}
-
-
-			public void TurnAllLettersOff(){
-				ChangeDisplayColourOfCells (Color.gray); 
-
-			}
 		
-
-
 		public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter)
 		{
 			ChangeTheLetterOfASingleCell (atPosition, newLetter + "");
@@ -72,34 +64,12 @@ public class ArduinoLetterController : MonoBehaviour{
 			letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
 		}
 
-		public void ChangeDisplayColourOfCells (Color newColour, bool onlySelected=false, int start=-1, int count=7)
-		{
-				start = (start < 0 ? 0 : start);
-				count = (count > Parameters.UI.ONSCREEN_LETTER_SPACES ? Parameters.UI.ONSCREEN_LETTER_SPACES : count);
-				if (!onlySelected) {
-						for (int i=start; i<count; i++) {
-								ChangeDisplayColourOfASingleCell (i, newColour);
 
-						}
-				} else {
-					
-						for (int i=start; i<count; i++) {
-								if (selectedUserControlledLettersAsStringBuilder [i] != ' ')
-										ChangeDisplayColourOfASingleCell (i, newColour);
-						}
-
-				}
-		}
-
-		public void ChangeDisplayColourOfASingleCell (int atPosition, Color newColour)
-	{       
-			letterGrid.GetInteractiveLetter (atPosition).UpdateDisplayColour (newColour);
-		}
 
 		void ChangeTheImageOfASingleCell (int atPosition, Texture2D newImage)
 		{
 				InteractiveLetter i = letterGrid.GetInteractiveLetter (atPosition);
-				i.SwitchImageTo (newImage);
+				i.UpdateDisplayImageButNotInputLetter (newImage);
 
 
 		}

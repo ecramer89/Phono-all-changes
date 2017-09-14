@@ -65,9 +65,9 @@ public class Events: MonoBehaviour  {
 		OnCurrentProblemInstructionsSet (instructions);
 	}
 
-	public event Action<string> OnInitialProblemLettersSet = (string initialLetters) => {};
-	public void SetInitialProblemLetters(string initial){
-		OnInitialProblemLettersSet (initial);
+	public event Action<string> OnProblemPlaceholderLettersSet = (string initialLetters) => {};
+	public void SetProblemPlaceHolderLetters(string initial){
+		OnProblemPlaceholderLettersSet (initial);
 	}
 
 

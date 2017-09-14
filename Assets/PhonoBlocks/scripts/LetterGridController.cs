@@ -93,14 +93,7 @@ public class LetterGridController : MonoBehaviour
 	
 		}
 
-		public void RemoveImageOfLetter (int position)
-		{
-
-				GameObject letterCell = GetLetterCell (position);
-				letterCell.GetComponent<InteractiveLetter> ().SwitchImageTo (letterImageTable.without_line_blank);
-
-
-		}
+		
 
 		void MatchLetterImageToGridCellDimensions ()
 		{
@@ -253,15 +246,6 @@ public class LetterGridController : MonoBehaviour
 				return list;
 		
 		}
-
-
-
-
-	
-
-
-
-
 	  
 	
 }

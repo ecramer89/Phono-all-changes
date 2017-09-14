@@ -97,7 +97,10 @@ public class KeyboardLetterInput : MonoBehaviour {
 
 	void UpdateLetterBarIfPositionAndLetterSpecified ()
 	{
-		if (testPosition != -1 && testLetter != null) {
+		if (testPosition != -1 && testLetter != null && 
+			//in student mode, easier if we just don't register letters that are placed outside the boundaries of the target word.
+			(State.Current.Mode == Mode.TEACHER || testPosition < State.Current.TargetWord.Length)) {
+			
 			Events.Dispatcher.RecordNewUserInputLetter(testLetter [0], testPosition);
 			ClearTestPosition ();
 

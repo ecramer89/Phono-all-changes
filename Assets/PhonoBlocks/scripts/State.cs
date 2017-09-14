@@ -53,8 +53,8 @@ public class State: MonoBehaviour  {
 			currentProblemInstrutions = instuctions;
 		};
 
-		Events.Dispatcher.OnInitialProblemLettersSet += (string initialLetters) => {
-			initialTargetLetters = initialLetters;
+		Events.Dispatcher.OnProblemPlaceholderLettersSet += (string initialLetters) => {
+			placeHolderLetters = initialLetters;
 		};
 
 		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
@@ -162,11 +162,11 @@ public class State: MonoBehaviour  {
 	}
 		
 
-	private string initialTargetLetters;
-	public string InitialTargetLetters{
+	private string placeHolderLetters;
+	public string PlaceHolderLetters{
 		get {
 
-			return initialTargetLetters;
+			return placeHolderLetters;
 		}
 
 	}

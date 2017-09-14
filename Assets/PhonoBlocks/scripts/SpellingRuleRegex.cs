@@ -5,19 +5,6 @@ using System.Linq;
 using System;
 using UnityEngine;
 
-
-public enum Rule{
-	Vowel, 
-	Consonant, 
-	VowelDigraph, 
-	ConsonantDigraph, 
-	ConsonantBlend, 
-	OpenSyllable, 
-	ClosedSyllable, 
-	MagicE, 
-	RControlledVowel
-}
-	
 public static class SpellingRuleRegex  {
 
 	//Vowel Regex
@@ -51,7 +38,7 @@ public static class SpellingRuleRegex  {
 		
 	//Consonant Blend Regex
 	static string[] consonantBlends = new string[]{
-		"sp","sh", "sl", "sk", "str", "spr", "scr", "spl", "squ", "shr",
+		"sp","sh", "sl", "sk", "str", "st", "spr", "scr", "spl", "squ", "shr",
 		"ll", "bl", "gl", "cl", "pl", "fl", "cr", "tr", "dr", "ft", "nd", 
 		"mp", "nt","thr"
 	};

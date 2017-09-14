@@ -35,7 +35,6 @@ public class WordHistoryController : MonoBehaviour
 					lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
 					wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
 					letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
-					InteractiveLetter.LetterPressed += PlayWordOfPressedLetter;
 				}
 			};
 
@@ -60,15 +59,16 @@ public class WordHistoryController : MonoBehaviour
 				int position = words.Count * Parameters.UI.ONSCREEN_LETTER_SPACES;
 				foreach (InteractiveLetter l in State.Current.UILetters) {
 					
-						
-			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (l.InputLetter (), l.CurrentDisplayImage (), (position++) + "", l.ColorDerivedFromInput);
-				
+			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (
+							l.InputLetter (), 
+							l.CurrentDisplayImage (), 
+							(position++) + "", l.ColorDerivedFromInput
+						);
 
+						letterInWord.GetComponent<InteractiveLetter>().LetterPressed+=PlayWordOfPressedLetter;
 						letterInWord.AddComponent<BoxCollider> ();
 						letterInWord.AddComponent<UIDragPanelContents> ();
-				
-						UIDragPanelContents drag = letterInWord.GetComponent<UIDragPanelContents> ();
-						drag.draggablePanel = gameObject.GetComponent<UIDraggablePanel> ();
+
 						currentWordAsString.Append (l.InputLetter ());
 						
 				}

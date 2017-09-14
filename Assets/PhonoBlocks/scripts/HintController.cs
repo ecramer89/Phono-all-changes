@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Extensions;
 
 public class HintController : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class HintController : MonoBehaviour
 						    //place the target letters and colors in the grid
 						for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
 							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);
-							ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterIndex, State.Current.TargetWordColors [letterIndex]);
+							Colorer.ChangeDisplayColourOfASingleLetter (letterIndex, State.Current.TargetWordColors [letterIndex]);
 						}
 						Events.Dispatcher.ForceCorrectLetterPlacement ();
 					break;
@@ -60,7 +61,7 @@ public class HintController : MonoBehaviour
 						string targetWord = State.Current.TargetWord;
 
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, targetWord[letterindex]);
-						ArduinoLetterController.instance.ChangeDisplayColourOfASingleCell (letterindex, State.Current.TargetWordColors[letterindex]);
+						Colorer.ChangeDisplayColourOfASingleLetter (letterindex, State.Current.TargetWordColors[letterindex]);
 						string pathTo = $"audio/sounded_out_words/{targetWord}/{targetWord[letterindex]}";
 						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
 						AudioSourceController.PushClip (targetSound);
@@ -68,7 +69,9 @@ public class HintController : MonoBehaviour
 					}
 				}
 				Events.Dispatcher.UnLockUIInput ();
-				ArduinoLetterController.instance.PlaceWordInLetterGrid (State.Current.UserInputLetters);
+				ArduinoLetterController.instance.PlaceWordInLetterGrid (
+						State.Current.UserInputLetters.Union(State.Current.PlaceHolderLetters)
+				);
 				State.Current.UILetters.ForEach(UILetter=>UILetter.RevertToInputDerivedColor ()); 
 			}
 

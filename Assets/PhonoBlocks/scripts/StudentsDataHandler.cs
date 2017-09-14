@@ -50,7 +50,7 @@ public class StudentsDataHandler: MonoBehaviour
 				State.Current.UserInputLetters, 
 				Selector.Instance.SolvedOnFirstTry);
 
-				SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.InitialTargetLetters);
+				SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.PlaceHolderLetters);
 
 			};
 			
