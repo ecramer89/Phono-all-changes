@@ -44,7 +44,7 @@ public class Colorer : MonoBehaviour   {
 	
 
 		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
-			InitializeRuleBasedColorer();
+
 			TurnAllLettersOff();
 			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(problem.TargetWord(true)));
 		};
@@ -53,16 +53,6 @@ public class Colorer : MonoBehaviour   {
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
-		//this is a bit of a smell. The issue is that in Student Mode the Student Activity controller
-		//dispatches target word set within its handler for activity set. 
-		//in consequence, since the SAC's handler for activity set was posted before the colorer's, 
-		//the colorer's handler for target word set is invoked before its handler for the (preceding)
-		//activity set.
-		//in teacher mode, this handler would have the job of initializing the rule based colorer.
-		//but in student mode this handler wouldn't typically do anything as I also conditionally initialize
-		//the rule based color within other handlers that use it.
-		if (ruleBasedColorer != null)
-			return; 
 		switch (State.Current.Activity) {
 		case Activity.CONSONANT_BLENDS:
 			ruleBasedColorer = consonantBlendsColorer;
