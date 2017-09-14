@@ -39,7 +39,7 @@ public class UserStarGridController : MonoBehaviour
 
 		void PlaceUserStarOutlinesInGrid ()
 		{
-				int numStars = ProblemsRepository.instance.PROBLEMS_PER_SESSION;
+				int numStars = Parameters.StudentMode.PROBLEMS_PER_SESSION;
 				for (int i=0; i<numStars; i++) {
 						CreateStarCellInGrid ();
 

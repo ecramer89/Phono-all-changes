@@ -1,6 +1,6 @@
-﻿//todo make globally accessible state and event files that ar ealso organized in this way
-//only do this when you have finished accomplishing all todos and cleaning up dependencies as best we can
+﻿
 using UnityEngine;
+using System;
 
 public class Parameters : MonoBehaviour {
 
@@ -13,6 +13,125 @@ public class Parameters : MonoBehaviour {
 		Events.Dispatcher.OnActivitySelected += (Activity obj) => {
 			Application.LoadLevel ("Activity");
 		};
+	}
+
+	public class StudentMode{
+		
+		public static Activity ActivityForSession(int session){
+			switch (session) {
+			case 0:
+			case 1:
+				return Activity.OPEN_CLOSED_SYLLABLE;
+
+			case 2:
+			case 3:
+				return Activity.CONSONANT_BLENDS;
+
+			case 4:
+			case 5:
+				return Activity.CONSONANT_DIGRAPHS;
+
+
+			case 6:
+			case 7:
+				return Activity.MAGIC_E;
+
+			case 8:
+			case 9:
+				return Activity.VOWEL_DIGRAPHS;
+			case 10:
+			case 11:
+
+				return Activity.R_CONTROLLED_VOWELS;
+
+			}
+			throw new Exception($"Invalid session: {session}");
+
+		}
+		static string[][][] SESSION_WORD_SETS = {
+			//session 1
+			new string[][]{
+				new string[]{"bet","dad","tin"}, //target words
+				new string[]{"b t","d d","t n"} //placeholder letters initially placed
+			},
+
+			//session 2
+			new string[][]{
+				new string[]{"pup","hit","web"},
+				new string[]{"p p","h t","w b"}
+			},
+			//session 3
+			new string[][]{
+				new string[]{"flag","skin","stop"},
+				new string[]{"ag","in","op"}
+			},
+			//session 4
+			new string[][]{
+				new string[]{"trip","drop","crab"},
+				new string[]{"ip","op","ab"}
+			},
+			//session 5
+			new string[][]{
+				new string[]{"thin","shop","chip"},
+				new string[]{"in","op","ip"}
+			},
+
+			//session 6
+			new string[][]{
+				new string[]{"path","wish","lunch",},
+				new string[]{"pa","wi","lun"}
+			},
+			//session 7
+			new string[][]{
+				new string[]{"game","tape","cake"},
+				new string[]{"g m","t p","c k"}
+			},
+			//session 8
+			new string[][]{
+				new string[]{"side","wide","late"},
+				new string[]{"s d","w d","l t"}
+			},
+			//session 9
+			new string[][]{
+				new string[]{"eat","boat","paid"},
+				new string[]{"t","b  t","p  d"}
+			},
+
+			//session 10
+			new string[][]{
+				new string[]{"seat","coat","bait"},
+				new string[]{"s  t","c  t","b  t"}
+			}, 
+			//session 1
+			new string[][]{
+				new string[]{"car","jar","fir"},
+				new string[]{"c","j","f"}
+			},
+			//session 1
+			new string[][]{
+				new string[]{"hurt","horn","part"},
+				new string[]{"h  t","h  n","p  t"}
+			}
+		};
+		public static int NUM_SESSIONS = SESSION_WORD_SETS.Length;
+		public static int PROBLEMS_PER_SESSION = SESSION_WORD_SETS[0][0].Length;
+
+
+		public static string PlaceholderLettersFor(int session, int problem){
+			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
+				return SESSION_WORD_SETS [session][1] [problem];
+			}
+			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
+
+		}
+		public static string TargetWordFor(int session, int problem){
+			if (session < SESSION_WORD_SETS.Length && problem < PROBLEMS_PER_SESSION) {
+				return SESSION_WORD_SETS [session][0] [problem];
+			}
+			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
+		}
+
+
 	}
 
 	public class UI{

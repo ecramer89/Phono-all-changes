@@ -34,7 +34,7 @@ public class SessionButton : MonoBehaviour {
 		if (Int32.TryParse (gameObject.name, out session)) {
 			session--; //Unity seems to force indexing of grid children to start at 1, so just need to sub 1 to accommodate 0 based indexing of problem data in arrays.
 			Events.Dispatcher.RecordSessionSelected (session);
-			Events.Dispatcher.RecordActivitySelected (ProblemsRepository.instance.ActivityForSession (session));
+			Events.Dispatcher.RecordActivitySelected (Parameters.StudentMode.ActivityForSession (session));
 		} else throw new Exception($"Check the names of the session buttons. Each should be an integer corresponding to the session number.");
 
 	}
