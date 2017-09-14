@@ -82,7 +82,11 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnUIInputLocked += () => {
 			uIInputLocked = true;
 		};
+		Events.Dispatcher.OnUserSubmittedIncorrectAnswer += () => {
+			this.hintAvailable=this.currentHintNumber < Parameters.Hints.NUM_HINTS;
+		};
 		Events.Dispatcher.OnHintProvided += () => {
+			this.hintAvailable = false;
 			this.currentHintNumber++;
 		};
 	
@@ -204,6 +208,13 @@ public class State: MonoBehaviour  {
 			return activityState;
 		}
 
+	}
+
+	private bool hintAvailable;
+	public bool HintAvailable{
+		get {
+			return hintAvailable;
+		}
 	}
 
 	private int currentHintNumber;
