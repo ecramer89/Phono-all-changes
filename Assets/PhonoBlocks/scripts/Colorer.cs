@@ -148,7 +148,7 @@ public class Colorer : MonoBehaviour   {
 		State.Current.UILetters [at].UpdateDisplayColour (newDisplayColor);
 	}
 
-	//todo: color schemes that return a reduced or otherwise modified list of UI letters can't do that here sicne the indices need to stay aligned.
+
 	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput,string target){
 		List<InteractiveLetter> UILetters = State.Current.UILetters;
 		for (int i = 0; i < UILetters.Count; i++) {

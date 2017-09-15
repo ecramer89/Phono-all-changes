@@ -67,7 +67,7 @@ public class InteractiveLetter : MonoBehaviour{
 		flashDurations [0] = durationA;
 		flashDurations [1] = durationB;
 
-		this.numFlashCycles = numFlashCycles;
+		this.numFlashCycles = numCycles;
 	}
 
 	public void ResetFlashParameters(){
@@ -141,9 +141,13 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 
 		public void StartFlash(){
+			if (numFlashCycles == 0)
+				return;
+
 			IEnumerator coroutine = Flash();
 			StartCoroutine (coroutine);
 		}
+
 		private IEnumerator Flash(){
 			int timesToFlash = numFlashCycles * 2;//i.e. times to appear in the flash color. since switching back to default color requires another
 			//invocation of the couroutine, must iterate twice as many times as requested times to flash
