@@ -43,10 +43,10 @@ public class Colorer : MonoBehaviour   {
 
 	
 
-		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
+		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 
 			TurnAllLettersOff();
-			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(problem.TargetWord(true)));
+			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(problem.targetWord));
 		};
 
 

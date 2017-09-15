@@ -28,10 +28,10 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 				
 
-				Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
+		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 					ReplaceEachLetterWithBlank ();
-					PlaceWordInLetterGrid (problem.InitialWord);
-					activateLinesBeneathLettersOfWord(problem.TargetWord(true));
+					PlaceWordInLetterGrid (problem.initialWord);
+					activateLinesBeneathLettersOfWord(problem.targetWord);
 				};
 				
 				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {

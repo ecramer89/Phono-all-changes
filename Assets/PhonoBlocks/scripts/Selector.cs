@@ -17,7 +17,7 @@ public class Selector : MonoBehaviour {
 	}
 
 	public void SubscribeToEvents(){
-		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
+			Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
 			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
@@ -27,7 +27,7 @@ public class Selector : MonoBehaviour {
 			//there are two spaces left after "n"; since there isn't anything there to begin with, 
 			//those spots are correctly placed.
 		
-			for(int i=problem.TargetWord(true).Length;i<correctlyPlacedLetters.Length;i++){
+			for(int i=problem.targetWord.Length;i<correctlyPlacedLetters.Length;i++){
 				correctlyPlacedLetters[i] = true;
 			}
 		};

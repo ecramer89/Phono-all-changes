@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class ProblemsRepository : MonoBehaviour
 {   
-		Problem[] problemsForSession; 
+		ProblemData[] problemsForSession; 
 		int currProblem = 0;
 
 		public int ProblemsCompleted {
@@ -16,28 +16,24 @@ public class ProblemsRepository : MonoBehaviour
 
 		}
 		
-
 		public static ProblemsRepository instance = new ProblemsRepository ();
 
 
 		public void Initialize (int sessionIndex)
 		{
-			problemsForSession = new Problem[Parameters.StudentMode.PROBLEMS_PER_SESSION];
+			problemsForSession = new ProblemData[Parameters.StudentMode.PROBLEMS_PER_SESSION];
 
 			for (int problemNum=0; problemNum<problemsForSession.Length; problemNum++) {
-				problemsForSession [problemNum] = new Problem (
-					Parameters.StudentMode.PlaceholderLettersFor(sessionIndex, problemNum), 
-					Parameters.StudentMode.TargetWordFor(sessionIndex, problemNum)
-				);
+				problemsForSession [problemNum] = Parameters.StudentMode.GetProblem (sessionIndex, problemNum);
 			}
 	
 		}
 		
 
-		public Problem GetNextProblem ()
+		public ProblemData GetNextProblem ()
 		{       
 				if (!AllProblemsDone ()) {
-						Problem result = problemsForSession [currProblem];
+						ProblemData result = problemsForSession [currProblem];
 						currProblem++;
 						return result;
 				} else

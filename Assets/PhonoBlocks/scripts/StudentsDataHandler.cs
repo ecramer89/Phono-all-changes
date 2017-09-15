@@ -53,8 +53,8 @@ public class StudentsDataHandler: MonoBehaviour
 			Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 				LogEvent ("change_letter", newLetter + "", atPosition + "");
 			};
-			Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
-				RecordActivityTargetWord (problem.TargetWord(true));
+			Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+				RecordActivityTargetWord (problem.targetWord);
 			};
 			Events.Dispatcher.OnHintProvided += () => {
 				LogEvent ("requested_hint", $"{State.Current.CurrentHintNumber}", "NA");

@@ -73,8 +73,8 @@ public class Events: MonoBehaviour  {
 		OnUserInputLettersUpdated ();
 	}
 
-	public event Action<Problem> OnNewProblemBegun = (Problem problem) => {};
-	public void RecordNewProblemBegun(Problem problem){
+	public event Action<ProblemData> OnNewProblemBegun = (ProblemData problem) => {};
+	public void RecordNewProblemBegun(ProblemData problem){
 		OnNewProblemBegun (problem);
 	}
 	//distinguished from activity begun; may need to transition back into main activity state from a different state,

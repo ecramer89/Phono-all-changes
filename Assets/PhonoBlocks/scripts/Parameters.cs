@@ -1,6 +1,8 @@
 ﻿
 using UnityEngine;
 using System;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 public class Parameters : MonoBehaviour {
@@ -16,23 +18,42 @@ public class Parameters : MonoBehaviour {
 		};
 	}
 
+
 	public class StudentMode{
 		public static int PROBLEMS_PER_SESSION;
 
-		struct SessionData{
+		 class SessionData{
 			public Activity spellingRule;
 			public string[] placeHolderLetters;
 			public string[] targetWords;
+			public AudioClip[] instructions;
+			public ProblemData[] problems;
 
 			public SessionData(Activity spellingRule, string[] targetWords, string[] placeHolderLetters){
 				this.spellingRule = spellingRule;
-				this.placeHolderLetters=placeHolderLetters;
-				this.targetWords=targetWords;
+			
 				if(placeHolderLetters.Length != targetWords.Length) throw new Exception("Error: number of target words must equal number of placeholder words");
 				if(PROBLEMS_PER_SESSION == 0) PROBLEMS_PER_SESSION = placeHolderLetters.Length;
 				else if(PROBLEMS_PER_SESSION !=  placeHolderLetters.Length) throw new Exception("Each session must have the same number of problems.");
+
+				problems = new ProblemData[PROBLEMS_PER_SESSION];
+				for(int i=0;i<problems.Length;i++){
+					string targetWord = targetWords[i];
+					string placeHolder = placeHolderLetters[i];
+					problems[i]=new ProblemData(
+						targetWord,
+						placeHolder,
+						new AudioClip[]
+						{
+							InstructionsAudio.instance.makeTheWord,
+							AudioSourceController.GetWordFromResources (targetWord)
+						}
+					);
+
+				}
 			}
 		}
+			
 
 		static List<SessionData> PROBLEM_SETS = new List<SessionData>{
 			
@@ -54,28 +75,24 @@ public class Parameters : MonoBehaviour {
 				),
 				new SessionData(
 					Activity.CONSONANT_BLENDS,
-
 							new string[]{"trip","drop","crab"},
 							new string[]{"ip","op","ab"}
-						
+					),
+				new SessionData(
+					Activity.CONSONANT_DIGRAPHS, 
+							new string[]{"thin","shop","chip"},
+							new string[]{"in","op","ip"}
+				),
+				new SessionData(
+					Activity.CONSONANT_DIGRAPHS, 
+					//session 6
+						new string[]{"path","wish","lunch",},
+						new string[]{"pa","wi","lun"}
 				),
 			new SessionData(
-				Activity.CONSONANT_DIGRAPHS, 
-						new string[]{"thin","shop","chip"},
-						new string[]{"in","op","ip"}
-			),
-			new SessionData(
-				Activity.CONSONANT_DIGRAPHS, 
-				//session 6
-					new string[]{"path","wish","lunch",},
-					new string[]{"pa","wi","lun"}
-			),
-			new SessionData(
 				Activity.MAGIC_E,
-
 						new string[]{"game","tape","cake"},
 						new string[]{"g m","t p","c k"}
-					
 			),
 			new SessionData(
 				Activity.MAGIC_E,
@@ -114,19 +131,13 @@ public class Parameters : MonoBehaviour {
 				throw new Exception($"Invalid session: {session}");
 			}
 
-		public static string PlaceholderLettersFor(int session, int problem){
+		public static ProblemData GetProblem(int session, int problem){
 			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
-				return PROBLEM_SETS [session].placeHolderLetters[problem];
+				return PROBLEM_SETS [session].problems [problem];
 			}
 			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
+		}
 
-		}
-		public static string TargetWordFor(int session, int problem){
-			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
-				return PROBLEM_SETS [session].targetWords[problem];
-			}
-			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
-		}
 	}
 
 	public class UI{
@@ -239,6 +250,59 @@ public class Parameters : MonoBehaviour {
 			public static readonly float CORRECT_OFF = .5f;
 
 		}
+	}
+
+}
+
+public class ProblemData{
+	public string targetWord;
+	public string initialWord;
+	public AudioClip[] instructions;
+	public ProblemData(string targetWord, string initialWord, AudioClip[] instructions){
+		this.targetWord = targetWord;
+		this.initialWord = AppendBlanksToFrontOrEnd (initialWord, targetWord);
+		this.instructions = instructions;
+	}
+
+	//will append blanks to the beginning or end of initial so that
+	//lengths of initial and target are equal and the matching characters between target and initial are aligned.
+	//the user needs to insert medial blanks for cases such as 
+	//target = "peak" and initial letters are "p" and "k"; user just needs to input "p  k" as initial.
+	string AppendBlanksToFrontOrEnd (string initialWord, string targetWord)
+	{
+		if (initialWord.Length == targetWord.Length)
+			return initialWord;
+		
+		StringBuilder s = new StringBuilder (initialWord);
+
+		int numBlanksToAppendToFront = FindDifferenceInIndexesOfFirstMatchingLetter (initialWord, targetWord);
+		for (int i=0; i<numBlanksToAppendToFront; i++) {
+			s.Insert (0, ' ');
+
+		}
+		int numBlanksToAppendToEnd = targetWord.Length - s.Length;
+		for (int i=0; i<numBlanksToAppendToEnd; i++)
+			s.Append (' ');
+
+		string afterAppendBlank = s.ToString ();
+
+		return afterAppendBlank;
+
+
+	}
+
+	int FindDifferenceInIndexesOfFirstMatchingLetter (string initialWord, string targetWord)
+	{
+		for (int i=0; i<initialWord.Length; i++) {
+			char a = initialWord [i];
+			for (int j=0; j<targetWord.Length; j++) {
+				char b = targetWord [j];
+				if (a == b) 
+					return j - i;
+
+			}
+		}
+		return targetWord.Length - initialWord.Length;
 	}
 
 }

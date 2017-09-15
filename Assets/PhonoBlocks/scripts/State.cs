@@ -41,10 +41,10 @@ public class State: MonoBehaviour  {
 			this.targetWordColors = targetWordColors;
 		};
 
-		Events.Dispatcher.OnNewProblemBegun += (Problem problem) => {
-			placeHolderLetters = problem.InitialWord;
-			this.targetWord = problem.TargetWord(true);
-			currentProblemInstrutions = problem.Instructions;
+		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+			placeHolderLetters = problem.initialWord;
+			this.targetWord = problem.targetWord;
+			currentProblemInstrutions = problem.instructions;
 			timesAttemptedCurrentProblem = 0;
 			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
 			currentHintNumber = 0;
