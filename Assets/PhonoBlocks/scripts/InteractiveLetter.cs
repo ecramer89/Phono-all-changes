@@ -8,7 +8,7 @@ using System;
 public class InteractiveLetter : MonoBehaviour{
 
 		String inputLetter;
-		Color colorDerivedFromInput; //the 
+		Color colorDerivedFromInput;  
 		public Color ColorDerivedFromInput {
 				get {
 

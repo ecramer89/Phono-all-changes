@@ -20,6 +20,8 @@ public class Parameters : MonoBehaviour {
 		Events.Dispatcher.OnActivitySelected += (Activity obj) => {
 			Application.LoadLevel ("Activity");
 		};
+
+		PhonoBlocksExtensions.TestAlign();
 			
 	}
 
@@ -45,13 +47,13 @@ public class Parameters : MonoBehaviour {
 				0,
 			Activity.OPEN_CLOSED_SYLLABLE, 
 				new string[]{"bet","dad","tin"}, //target words
-				new string[]{"b t","d d","t n"} //placeholder letters initially placed
+				new string[]{"bt","dd","tn"} //placeholder letters initially placed
 			),
 			new SessionData(
 				1,
 				Activity.OPEN_CLOSED_SYLLABLE, 
 					new string[]{"pup","hit","web"},
-					new string[]{"p p","h t","w b"}
+					new string[]{"pp","ht","wb"}
 			),
 			new SessionData(
 				2,
@@ -81,25 +83,25 @@ public class Parameters : MonoBehaviour {
 				6,
 				Activity.MAGIC_E,
 						new string[]{"game","tape","cake"},
-						new string[]{"g m","t p","c k"}
+						new string[]{"gm","tp","ck"}
 			),
 			new SessionData(
 				7,
 				Activity.MAGIC_E,
 					new string[]{"side","wide","late"},
-					new string[]{"s d","w d","l t"}
+					new string[]{"sd","wd","lt"}
 			),
 			new SessionData(
 				8,
 				Activity.VOWEL_DIGRAPHS,
 						new string[]{"eat","boat","paid"},
-						new string[]{"t","b  t","p  d"}
+						new string[]{"t","bt","pd"}
 			),
 			new SessionData(
 				9,
 				Activity.VOWEL_DIGRAPHS,
 					new string[]{"seat","coat","bait"},
-					new string[]{"s  t","c  t","b  t"}
+					new string[]{"st","ct","bt"}
 			),
 			new SessionData(
 				10,
@@ -111,7 +113,7 @@ public class Parameters : MonoBehaviour {
 				11,
 				Activity.R_CONTROLLED_VOWELS,
 					new string[]{"hurt","horn","part"},
-					new string[]{"h  t","h  n","p  t"}
+					new string[]{"ht","hn","pt"}
 			),
 		};
 
@@ -284,49 +286,8 @@ public class ProblemData{
 	public AudioClip[] instructions;
 	public ProblemData(string targetWord, string initialWord, AudioClip[] instructions){
 		this.targetWord = targetWord;
-		this.initialWord = AlignMatchingLetters (initialWord, targetWord);
+		this.initialWord = targetWord.Align(initialWord);
 		this.instructions = instructions;
 	}
-
-	//will append blanks to the beginning or end of initial so that
-	//lengths of initial and target are equal and the matching characters between target and initial are aligned.
-	//the user needs to insert medial blanks for cases such as 
-	//target = "peak" and initial letters are "p" and "k"; user just needs to input "p  k" as initial.
-	string AlignMatchingLetters (string initialWord, string targetWord)
-	{
-		if (initialWord.Length == targetWord.Length)
-			return initialWord;
 		
-		StringBuilder s = new StringBuilder (initialWord);
-
-		int numBlanksToAppendToFront = FindDifferenceInIndexesOfFirstMatchingLetter (initialWord, targetWord);
-		for (int i=0; i<numBlanksToAppendToFront; i++) {
-			s.Insert (0, ' ');
-
-		}
-		int numBlanksToAppendToEnd = targetWord.Length - s.Length;
-		for (int i=0; i<numBlanksToAppendToEnd; i++)
-			s.Append (' ');
-
-		string afterAppendBlank = s.ToString ();
-
-		return afterAppendBlank;
-
-
-	}
-
-	int FindDifferenceInIndexesOfFirstMatchingLetter (string initialWord, string targetWord)
-	{
-		for (int i=0; i<initialWord.Length; i++) {
-			char a = initialWord [i];
-			for (int j=0; j<targetWord.Length; j++) {
-				char b = targetWord [j];
-				if (a == b) 
-					return j - i;
-
-			}
-		}
-		return targetWord.Length - initialWord.Length;
-	}
-
 }

@@ -2,17 +2,28 @@
 using System;
 using System.Text;
 using System.Linq;
+using UnityEngine;
 
-public static class PhonoBlocksExtensions {
 
-		public static String Fill(this String str, char with, int times=-1){
-			times = times == -1 ? str.Length : times;
-			StringBuilder res = new StringBuilder();
-			for(int i=0;i<times;i++){
-				res.Append(""+with);
-			}
-			return res.ToString();
+/*
+ * c# doesn't currently support Static extension methods, but similar effect achieved by just defining these Static
+ * _ classes that expose different utility-type functions that operate on instances of the class.
+ * 
+ * 
+ * */
+public static class _String{
+	 //construct a new String consisting of 'with' the given number of times.
+	public static String Fill(String with, int times){
+		StringBuilder res = new StringBuilder();
+		for(int i=0;i<times;i++){
+			res.Append(""+with);
 		}
+		return res.ToString();
+	}
+}
+
+
+	public static class PhonoBlocksExtensions {
 
 		//returns a new string representing the union of this and other.
 		//return string is as long as the longer of this and other
@@ -50,7 +61,7 @@ public static class PhonoBlocksExtensions {
 		public static String ReplaceRangeWith(this String str, char with, int start, int length){
 			StringBuilder buff = new StringBuilder ();
 			buff.Append(str.Substring(0, start));
-			buff.Append("".Fill(with, length));
+			buff.Append(_String.Fill($"{with}", length));
 			if(start + length < str.Length) buff.Append (str.Substring (start + length, str.Length - start - length));
 			return buff.ToString ();
 		}
@@ -67,6 +78,66 @@ public static class PhonoBlocksExtensions {
 		public static String Stringify<T>(this T[] arr){
 			return arr.Aggregate("", (acc, nxt)=>$"{acc}, {nxt.ToString()}");
 		}
+
+		/*
+		 * constructs a new string by aligning argument 'other' with this.
+		 * the alignment of two strings is a string of equal length to this,
+		 * where each character that this and other have in common and in the same order appear
+		 * in the index at which they appear in this, and all remaining indices are blank.
+		 * ASSUMES:
+		 *  -other is not longer than this
+		 *  -this and other have at least one character in common
+		 *  -if this and other have multiple characters in common they appear in the same order in other and this
+		 *   (see test cases in TestAlign function below for examples)
+		 * used mostly to construct the initial placeholder string (which must include blanks in place of missing letters)
+		 * given input letters (e.g., "pk" when target is "peak"; full placeholder string must be "p  k").
+		 * */
+		public static String Align(this String str, string other){
+			if(other.Length == str.Length) {
+				if(other != str) throw new Exception(
+					$"Align argument exception: {str} and {other} have equal length but have uncommon characters." +
+						"\nPlease check inputs.");
+				return other;
+			}
+			if(other.Length > str.Length) {
+				throw new Exception(
+					$"Align argument exception: length of {other} exceeds length of {str}." +
+					"\nPlease check inputs.");
+			}
+			if(other == null) return _String.Fill(" ", str.Length);
+			StringBuilder result = new StringBuilder();
+			int inOther = 0;
+			for(int i=0;i<str.Length;i++){
+				if(inOther == other.Length) {
+					result.Append(_String.Fill(" ", str.Length - i));
+					return result.ToString();
+				}
+				char nxt = other[inOther];
+				if(nxt == str[i]){
+					result.Append(nxt);
+					inOther++;
+					continue;
+				}
+				result.Append(" "); 
+			}
+			return result.ToString();
+		}
+
+		public static void TestAlign(){
+			Action<string, string, string> test = (string a, string b, string expect) => {
+				string actual = a.Align(b);
+				Debug.Log($"Given {a} and {b} expect {expect}: {actual} {expect==actual ? "passed" : "failed"}");
+			};
+
+			test("game", "gm", "g m ");
+			test("lunch", "lun", "lun  ");
+			test("stop", "op", "  op");
+			test("peak", "pk", "p  k");
+			test("car", "c", "c  ");
+
+		}
+
+
 
 
 	}

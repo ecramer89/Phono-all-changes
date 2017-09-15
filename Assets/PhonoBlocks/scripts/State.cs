@@ -46,7 +46,7 @@ public class State: MonoBehaviour  {
 			this.targetWord = problem.targetWord;
 			currentProblemInstrutions = problem.instructions;
 			timesAttemptedCurrentProblem = 0;
-			userInputLetters = "".Fill(' ', Parameters.UI.ONSCREEN_LETTER_SPACES);
+			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			currentHintNumber = 0;
 		};
 	
