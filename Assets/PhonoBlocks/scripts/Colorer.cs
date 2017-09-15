@@ -46,7 +46,13 @@ public class Colorer : MonoBehaviour   {
 		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 
 			TurnAllLettersOff();
-			Events.Dispatcher.SetTargetColors(ruleBasedColorer.GetColorsOf(problem.targetWord));
+			Events.Dispatcher.SetTargetColors(
+				ruleBasedColorer.GetColorsOf(
+					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
+					//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite
+					//indieces that correspond to those of target word.
+					problem.targetWord
+				));
 		};
 
 
@@ -125,8 +131,11 @@ public class Colorer : MonoBehaviour   {
 		} else {
 			string targetWord = State.Current.TargetWord;
 			ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
-				updatedUserInputLetters, 
-				previousUserInputLetters,
+				updatedUserInputLetters.Substring(0,targetWord.Length), //only want the special rule-based colors
+				//to apply to letters that the user placed in the spaces that match those of the target word.
+				//letters placed outside of this range are incorrect by default since they don't exist in the target word,
+				//and as such, should be turned off (not colored)
+				previousUserInputLetters.Substring(0,targetWord.Length),
 				targetWord
 			);
 
@@ -147,15 +156,14 @@ public class Colorer : MonoBehaviour   {
 			return;
 		State.Current.UILetters [at].UpdateDisplayColour (newDisplayColor);
 	}
-
-
+		
 	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput,string target){
 		List<InteractiveLetter> UILetters = State.Current.UILetters;
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
-			//index can exceed length of target word since target word doesn't take trailing blanks into account. (e.g., "_ame___", vs "game")
-			//if the letter is an error and is different from previous
-			if (i < target.Length && input [i] != target[i]){ 
+			//letter is incorrectly placed if it was placed outside the bounds or the target word OR
+			//it doesn't match the letter at the corresponding position in target
+			if (i>=target.Length || input [i] != target[i]){ 
 				UILetter.UpdateInputDerivedAndDisplayColor (offColor);
 				//only flash if it's a new error
 				if(previousInput [i] != input [i]) {
@@ -178,8 +186,7 @@ public class Colorer : MonoBehaviour   {
 		);
 	}
 
-	static Color[] GetColorsOfMultiLetterUnits(string word, Regex unitRegex, Color unitColor){
-		Color[] result = new Color[word.Length];
+	static Color[] GetColorsOfMultiLetterUnits(Color[] colors, string word, Regex unitRegex, Color unitColor){
 		string unmatched = word;
 		Match matchedUnit;
 		while (true) {
@@ -190,7 +197,7 @@ public class Colorer : MonoBehaviour   {
 
 		
 			for (int i = 0; i < matchedUnit.Length; i++) {
-				result [matchedUnit.Index + i] = unitColor;
+				colors [matchedUnit.Index + i] = unitColor;
 			}
 
 			unmatched = unmatched.ReplaceRangeWith ('#', matchedUnit.Index, matchedUnit.Length);
@@ -198,11 +205,11 @@ public class Colorer : MonoBehaviour   {
 
 		for (int i = 0; i < unmatched.Length; i++) {
 			if (unmatched [i] != '#')
-				result [i] = onColor;
+				colors [i] = onColor;
 
 		}
 
-		return result;
+		return colors;
 
 	}
 
@@ -317,8 +324,9 @@ public class Colorer : MonoBehaviour   {
 		Action<InteractiveLetter> hintNewPartialMatches = (InteractiveLetter letter)=>{return;};
 
 
-		public Color[] GetColorsOf(string word){
+		public Color[] GetColorsOf(Color[] colors, string word){
 			return GetColorsOfMultiLetterUnits (
+				colors,
 				word, 
 				SpellingRuleRegex.ConsonantBlend, 
 				blendedColor
@@ -391,8 +399,9 @@ public class Colorer : MonoBehaviour   {
 		static Color singleMemberOfTargetDigraphColor = Parameters.Colors.ConsonantDigraphColors.SINGLE_MEMBER_OF_TARGET_DIGRAPH_COLOR;
 		static Action<InteractiveLetter> hintPartialMatch = (InteractiveLetter letter) => flashCorrectLettersOfTargetMultiLetterUnit (letter, digraphColor, singleMemberOfTargetDigraphColor);
 
-		public Color[] GetColorsOf(string word){
+		public Color[] GetColorsOf(Color[] colors, string word){
 			return GetColorsOfMultiLetterUnits (
+				colors,
 				word, 
 				SpellingRuleRegex.ConsonantDigraph, 
 				digraphColor
@@ -439,8 +448,9 @@ public class Colorer : MonoBehaviour   {
 		static Color singleMemberOfTargetDigraphColor = Parameters.Colors.VowelDigraphColors.SINGLE_MEMBER_OF_TARGET_DIGRAPH_COLOR;
 		static Action<InteractiveLetter> hintPartialMatch = (InteractiveLetter letter) => flashCorrectLettersOfTargetMultiLetterUnit (letter, digraphColor, singleMemberOfTargetDigraphColor);
 
-		public Color[] GetColorsOf(string word){
+		public Color[] GetColorsOf(Color[] colors, string word){
 			return GetColorsOfMultiLetterUnits (
+				colors,
 				word, 
 				SpellingRuleRegex.VowelDigraph, 
 				digraphColor
@@ -488,8 +498,9 @@ public class Colorer : MonoBehaviour   {
 		static Action<InteractiveLetter> hintPartialMatch = (InteractiveLetter letter) => flashCorrectLettersOfTargetMultiLetterUnit (letter, rControlledVowelColor, singleMemberOfRControlledVowelColor);
 
 
-		public Color[] GetColorsOf(string word){
+		public Color[] GetColorsOf(Color[] colors, string word){
 			return GetColorsOfMultiLetterUnits (
+				colors,
 				word, 
 				SpellingRuleRegex.RControlledVowel, 
 				rControlledVowelColor
@@ -543,8 +554,7 @@ public class Colorer : MonoBehaviour   {
 	
 
 
-		public Color[] GetColorsOf(string word){
-			Color[] result = new Color[word.Length];
+		public Color[] GetColorsOf(Color[] colors, string word){
 			string unmatched = word;
 
 			Match matchedSyllable;
@@ -561,14 +571,14 @@ public class Colorer : MonoBehaviour   {
 				MatchCollection consonants = SpellingRuleRegex.AnyConsonant.Matches (matchedSyllable.Value);
 				foreach (Match consonant in consonants) {
 					for (int i = 0; i < consonant.Value.Length; i++) {
-						result [matchedSyllable.Index + consonant.Index + i] = i % 2 == 0 ? consonantColorFirstAlternation : consonantColorSecondAlternation;
+						colors [matchedSyllable.Index + consonant.Index + i] = i % 2 == 0 ? consonantColorFirstAlternation : consonantColorSecondAlternation;
 					}
 
 				}
 
 				Match vowel = SpellingRuleRegex.AnyVowel.Match (matchedSyllable.Value);
 				for (int i = 0; i < vowel.Value.Length; i++) {
-					result [matchedSyllable.Index + vowel.Index + i] = matchClosed.Success ? shortVowelColor : longVowelColor;
+					colors [matchedSyllable.Index + vowel.Index + i] = matchClosed.Success ? shortVowelColor : longVowelColor;
 				}
 					
 				unmatched = unmatched.ReplaceRangeWith ('#', matchedSyllable.Index, matchedSyllable.Length);
@@ -578,10 +588,10 @@ public class Colorer : MonoBehaviour   {
 			//so just let them be white.
 			for (int i = 0; i < unmatched.Length; i++) {
 				if (unmatched [i] != '#')
-					result [i] = onColor;
+					colors [i] = onColor;
 			}
 
-			return result;
+			return colors;
 
 		}
 
@@ -665,10 +675,10 @@ public class Colorer : MonoBehaviour   {
 		static Color silentEColor = Parameters.Colors.MagicEColors.SILENT_E;
 
 
-		public Color[] GetColorsOf(string word){
+		public Color[] GetColorsOf(Color[] colors, string word){
 			//assumes there would just be one instance of a magic e word in input.
 			//generalizing to longer strings (i.e. sentences) requires same recursive trick as before
-			Color[] colors = new Color[word.Length];
+
 			Match magicE = SpellingRuleRegex.MagicERegex.Match (word);
 			if (magicE.Success) {
 				MatchCollection consonants = SpellingRuleRegex.AnyConsonant.Matches (magicE.Value);
@@ -781,7 +791,7 @@ interface RuleBasedColorer{
 		string previousUserInputLetters,
 		string targetWord);
 
-	Color[] GetColorsOf (string word);
+	Color[] GetColorsOf (Color[] colors, string word);
 
 
 }

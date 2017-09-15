@@ -24,115 +24,7 @@ public class Parameters : MonoBehaviour {
 		PhonoBlocksExtensions.TestAlign();
 			
 	}
-
-
-	public class StudentMode{
-		public static int PROBLEMS_PER_SESSION;
-
-		/*
-		 * template for defining a session:
-		 * new SessionData(
-		 *   sessionNumber (begin counting at 0, so session 1-first session = 0),
-		 *   activity type (e.g. OPEN_CLOSED_SYLLABLE. please refer to Activity enum in enums file)
-		 *   an array of target words
-		 *   an array of initial "placeholder" letters.
-		 *   REQUIREMENTS:
-		 *     -the lengths of target and placeholder words must be equal
-		 *     -each session needs to have the same number of problems (system assumes this for now)
-		 *     the constructor for session data will throw exception if these requirements aren't met.
-		 * */
-
-		public static List<SessionData> PROBLEM_SETS = new List<SessionData>{
-			new SessionData(
-				0,
-			Activity.OPEN_CLOSED_SYLLABLE, 
-				new string[]{"bet","dad","tin"}, //target words
-				new string[]{"bt","dd","tn"} //placeholder letters initially placed
-			),
-			new SessionData(
-				1,
-				Activity.OPEN_CLOSED_SYLLABLE, 
-					new string[]{"pup","hit","web"},
-					new string[]{"pp","ht","wb"}
-			),
-			new SessionData(
-				2,
-				Activity.CONSONANT_BLENDS,
-						new string[]{"flag","skin","stop"},
-						new string[]{"ag","in","op"}
-			),
-			new SessionData(
-				3,
-				Activity.CONSONANT_BLENDS,
-						new string[]{"trip","drop","crab"},
-						new string[]{"ip","op","ab"}
-				),
-			new SessionData(
-				4,
-				Activity.CONSONANT_DIGRAPHS, 
-						new string[]{"thin","shop","chip"},
-						new string[]{"in","op","ip"}
-			),
-			new SessionData(
-				5,
-				Activity.CONSONANT_DIGRAPHS, 
-					new string[]{"path","wish","lunch",},
-					new string[]{"pa","wi","lun"}
-			),
-			new SessionData(
-				6,
-				Activity.MAGIC_E,
-						new string[]{"game","tape","cake"},
-						new string[]{"gm","tp","ck"}
-			),
-			new SessionData(
-				7,
-				Activity.MAGIC_E,
-					new string[]{"side","wide","late"},
-					new string[]{"sd","wd","lt"}
-			),
-			new SessionData(
-				8,
-				Activity.VOWEL_DIGRAPHS,
-						new string[]{"eat","boat","paid"},
-						new string[]{"t","bt","pd"}
-			),
-			new SessionData(
-				9,
-				Activity.VOWEL_DIGRAPHS,
-					new string[]{"seat","coat","bait"},
-					new string[]{"st","ct","bt"}
-			),
-			new SessionData(
-				10,
-				Activity.R_CONTROLLED_VOWELS,
-						new string[]{"car","jar","fir"},
-						new string[]{"c","j","f"}
-			),
-			new SessionData(
-				11,
-				Activity.R_CONTROLLED_VOWELS,
-					new string[]{"hurt","horn","part"},
-					new string[]{"ht","hn","pt"}
-			),
-		};
-
-		public static int NUM_SESSIONS = PROBLEM_SETS.Count;
-
-		public static Activity ActivityForSession(int session){
-			if (session < NUM_SESSIONS)
-				return PROBLEM_SETS [session].activity;
-				throw new Exception($"Invalid session: {session}");
-			}
-
-		public static ProblemData GetProblem(int session, int problem){
-			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
-				return PROBLEM_SETS [session].problems [problem];
-			}
-			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
-		}
-
-	}
+		
 
 	public class UI{
 		public static readonly int ONSCREEN_LETTER_SPACES = 6;
@@ -209,6 +101,114 @@ public class Parameters : MonoBehaviour {
 			//separate colors for the r and the vowel will require minor changes to the code in the r controlled vowel
 			//colorer.
 			public static Color SINGLE_MEMBER_OF_TARGET_R_CONTROLLED_VOWEL_COLOR = Color.gray;
+		}
+
+	}
+
+	public class StudentMode{
+		public static int PROBLEMS_PER_SESSION;
+
+		/*
+		 * template for defining a session:
+		 * new SessionData(
+		 *   sessionNumber (begin counting at 0, so session 1-first session = 0),
+		 *   activity type (e.g. OPEN_CLOSED_SYLLABLE. please refer to Activity enum in enums file)
+		 *   an array of target words
+		 *   an array of initial "placeholder" letters.
+		 *   REQUIREMENTS:
+		 *     -the lengths of target and placeholder words must be equal
+		 *     -each session needs to have the same number of problems (system assumes this for now)
+		 *     the constructor for session data will throw exception if these requirements aren't met.
+		 * */
+
+		public static List<SessionData> PROBLEM_SETS = new List<SessionData>{
+			new SessionData(
+				0,
+				Activity.OPEN_CLOSED_SYLLABLE, 
+				new string[]{"bet","dad","tin"}, //target words
+				new string[]{"bt","dd","tn"} //placeholder letters initially placed
+			),
+			new SessionData(
+				1,
+				Activity.OPEN_CLOSED_SYLLABLE, 
+				new string[]{"pup","hit","web"},
+				new string[]{"pp","ht","wb"}
+			),
+			new SessionData(
+				2,
+				Activity.CONSONANT_BLENDS,
+				new string[]{"flag","skin","stop"},
+				new string[]{"ag","in","op"}
+			),
+			new SessionData(
+				3,
+				Activity.CONSONANT_BLENDS,
+				new string[]{"trip","drop","crab"},
+				new string[]{"ip","op","ab"}
+			),
+			new SessionData(
+				4,
+				Activity.CONSONANT_DIGRAPHS, 
+				new string[]{"thin","shop","chip"},
+				new string[]{"in","op","ip"}
+			),
+			new SessionData(
+				5,
+				Activity.CONSONANT_DIGRAPHS, 
+				new string[]{"path","wish","lunch",},
+				new string[]{"pa","wi","lun"}
+			),
+			new SessionData(
+				6,
+				Activity.MAGIC_E,
+				new string[]{"game","tape","cake"},
+				new string[]{"gm","tp","ck"}
+			),
+			new SessionData(
+				7,
+				Activity.MAGIC_E,
+				new string[]{"side","wide","late"},
+				new string[]{"sd","wd","lt"}
+			),
+			new SessionData(
+				8,
+				Activity.VOWEL_DIGRAPHS,
+				new string[]{"eat","boat","paid"},
+				new string[]{"t","bt","pd"}
+			),
+			new SessionData(
+				9,
+				Activity.VOWEL_DIGRAPHS,
+				new string[]{"seat","coat","bait"},
+				new string[]{"st","ct","bt"}
+			),
+			new SessionData(
+				10,
+				Activity.R_CONTROLLED_VOWELS,
+				new string[]{"car","jar","fir"},
+				new string[]{"c","j","f"}
+			),
+			new SessionData(
+				11,
+				Activity.R_CONTROLLED_VOWELS,
+				new string[]{"hurt","horn","part"},
+				new string[]{"ht","hn","pt"}
+			),
+		};
+
+		public static int NUM_SESSIONS = PROBLEM_SETS.Count;
+
+		public static Activity ActivityForSession(int session){
+			if (session < NUM_SESSIONS)
+				return PROBLEM_SETS [session].activity;
+			throw new Exception($"Invalid session: {session}");
+		}
+
+		public static ProblemData GetProblem(int session, int problem){
+			if (session < NUM_SESSIONS && problem < PROBLEMS_PER_SESSION) {
+				return PROBLEM_SETS [session].problems [problem];
+			}
+			throw new Exception($"Either session ({session}) exceeds {NUM_SESSIONS} or problem ({problem}) exceeds {PROBLEMS_PER_SESSION}");
 		}
 
 	}

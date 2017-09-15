@@ -30,6 +30,8 @@ public class Selector : MonoBehaviour {
 			for(int i=problem.targetWord.Length;i<correctlyPlacedLetters.Length;i++){
 				correctlyPlacedLetters[i] = true;
 			}
+
+			targetWordWithBlanksOnEnd = string.Concat(problem.targetWord, _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES-problem.targetWord.Length));
 		};
 			
 			
@@ -46,6 +48,13 @@ public class Selector : MonoBehaviour {
 		Events.Dispatcher.OnCurrentProblemCompleted += () => {
 			solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
 		};
+	}
+
+	private string targetWordWithBlanksOnEnd;
+	public string TargetWordWithBlanksForUnusedPositions{
+		get {
+			return targetWordWithBlanksOnEnd;
+		}
 	}
 
 

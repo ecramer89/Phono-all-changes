@@ -93,6 +93,7 @@ public static class _String{
 		 * given input letters (e.g., "pk" when target is "peak"; full placeholder string must be "p  k").
 		 * */
 		public static String Align(this String str, string other){
+			if(other == null) return _String.Fill(" ", str.Length);
 			if(other.Length == str.Length) {
 				if(other != str) throw new Exception(
 					$"Align argument exception: {str} and {other} have equal length but have uncommon characters." +
@@ -104,7 +105,6 @@ public static class _String{
 					$"Align argument exception: length of {other} exceeds length of {str}." +
 					"\nPlease check inputs.");
 			}
-			if(other == null) return _String.Fill(" ", str.Length);
 			StringBuilder result = new StringBuilder();
 			int inOther = 0;
 			for(int i=0;i<str.Length;i++){

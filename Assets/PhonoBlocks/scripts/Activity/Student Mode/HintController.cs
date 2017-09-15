@@ -30,8 +30,10 @@ public class HintController : MonoBehaviour
 					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT:
 						AudioSourceController.PushClip (AudioSourceController.GetWordFromResources (State.Current.TargetWord));
 						    //place the target letters and colors in the grid
-						for (int letterIndex = 0; letterIndex < State.Current.TargetWord.Length; letterIndex++) {
-							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterIndex, State.Current.TargetWord [letterIndex]);
+						for (int letterIndex=0; letterIndex < Parameters.UI.ONSCREEN_LETTER_SPACES; letterIndex++) {
+							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (
+								letterIndex, 
+								Selector.Instance.TargetWordWithBlanksForUnusedPositions [letterIndex]);
 							Colorer.ChangeDisplayColourOfASingleLetter (letterIndex, State.Current.TargetWordColors [letterIndex]);
 						}
 						Events.Dispatcher.ForceCorrectLetterPlacement ();
