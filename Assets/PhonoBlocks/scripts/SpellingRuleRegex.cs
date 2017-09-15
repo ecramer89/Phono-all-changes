@@ -9,7 +9,7 @@ using Extensions;
 public static class SpellingRuleRegex  {
 
 	//Vowel Regex
-	static string[] vowels = new string[]{"a","e","i","o","u"};
+	static string[] vowels = new string[]{"a","e","i","o","u", "y"};
 	static string vowel = MatchAnyOf (vowels);
 	static Regex vowelRegex = Make(vowel);
 
@@ -77,6 +77,8 @@ public static class SpellingRuleRegex  {
 	}
 
 
+
+
 	static string anyConsonant = MatchAnyOf(new string[]{consonant, consonantDigraph, consonantBlend});
 	static Regex anyConsonantRegex = Make (anyConsonant);
 	public static Regex AnyConsonant{
@@ -124,50 +126,49 @@ public static class SpellingRuleRegex  {
 
 	}
 
-	/*static string anyStartsWithVowel = $"{anyVowel}({anyConsonant})?(?=>{anyConsonant})e";
-	static Regex OneConsonantDivision = Make($"{closedSyllable}{anyStartsWithVowel}");
-	static string SyllabifyOneConsonant(Match oneConsonantMatch, String original, List<Match> result){
-		return SyllabifyIntoTwo(oneConsonantMatch,original,result,
-			closedSyllable, anyStartsWithVowel);
-	}
+	static Regex any = new Regex(".*");
+	static string[] stableSyllables = new string[]{
+		$"({anyConsonant})le", $"({anyConsonant})({anyVowel})r"
+	};
+	static string stableSyllable = MatchAnyOf(stableSyllables);
+	static Regex stableSyllableRegex = Make(stableSyllable);
+		
+	static Regex OneConsonantDivision = Make($"({anyVowel})({anyConsonant})({anyVowel})");
+	static Func<int, string> Quantify = (int number) => "{"+number+"}";
+	static Regex TwoConsonantDivision = Make($"({anyVowel})({anyConsonant}){Quantify(2)}({anyVowel})");
 
-
-	static string anyStartsWithConsonant = $"{anyConsonant}{anyVowel}({anyConsonant})?(?=>{anyConsonant})e";
-	static Regex TwoConsonantDivision = Make($"{closedSyllable}{anyStartsWithConsonant}");
-	static string SyllabifyTwoConsonant(Match twoConsonantMatch, String original, List<Match> result){
-		return SyllabifyIntoTwo(twoConsonantMatch,original,result,
-			closedSyllable, anyStartsWithConsonant);
-	}
-
-	static string SyllabifyIntoTwo(Match match, String original, List<Match> result, String firstPattern, String secondPattern){
-		if(!match.Success) throw new Exception("Error! Invalid match");
-		String onlyMatching = match.Value.Union(_String.Fill(" ", original.Length));
-		result.Add(Regex.Match(onlyMatching, firstPattern));
-		original=original.ReplaceRangeWith(' ', result[0].Index, result[0].Length);
-		result.Add(Regex.Match(onlyMatching, secondPattern));
-		original=original.ReplaceRangeWith(' ', result[1].Index, result[1].Length);
-		return original;
-	}
-
+ 
 	public static List<Match> Syllabify(String word){
 		List<Match> result = new List<Match>();
-		Debug.Log(word);
-			Match oneCons = OneConsonantDivision.Match(word);
-			if(oneCons.Success) {
-				word = SyllabifyOneConsonant(oneCons,word,result);
-
+		Match oneCons = OneConsonantDivision.Match(word);
+		if(oneCons.Success){
+			
+			Match consonant = AnyConsonant.Match(oneCons.Value);
+			int startIndexOfConsonantInWord = oneCons.Index + consonant.Index;
+			string firstHalf = word.Substring(0, startIndexOfConsonantInWord + consonant.Length);
+			string secondHalf = word.Substring(startIndexOfConsonantInWord, word.Length - startIndexOfConsonantInWord);
+			if(stableSyllableRegex.IsMatch(secondHalf)){
+				result.Add(any.Match(secondHalf));
+				result.Add(any.Match(firstHalf.Substring(0,firstHalf.Length-consonant.Length)));
+				return result;
 			}
-		else {
-			Match twoCons = TwoConsonantDivision.Match(word);
-			if(twoCons.Success) {
-				word = SyllabifyTwoConsonant(oneCons,word,result);
-
-			}
+			result.Add(any.Match(firstHalf));
+			result.Add(any.Match(secondHalf.Substring(startIndexOfConsonantInWord + consonant.Length, word.Length - (startIndexOfConsonantInWord + consonant.Length))));
+			return result;
 		}
-		Debug.Log(word);
+
+		Match twoCons = TwoConsonantDivision.Match(word);
+		if(twoCons.Success){
+			Match firstConsonant = AnyConsonant.Match(twoCons.Value);
+			int startIndexOfConsonantInWord = twoCons.Index + firstConsonant.Index;
+			string firstHalf = word.Substring(0, startIndexOfConsonantInWord + firstConsonant.Length);
+			result.Add(any.Match(firstHalf));
+			result.Add(any.Match(word.Substring(firstHalf.Length, word.Length-firstHalf.Length)));
+			return result;
+		}
 
 		return result;
-	}*/
+	}
 		
 
 	static string MatchAnyOf(string[] patterns){
@@ -181,14 +182,31 @@ public static class SpellingRuleRegex  {
 		
 
 	public static void Test(){
+		TestSyllabify();
 
-		/*TestMatchMagicERule ();
-		TestClosedSyllable ();
+	}
+	static Action<Regex, bool, string> testConsDiv= (Regex reg, bool expect, string input) => {
+		Match m = reg.Match(input);
+		Debug.Log($"Expect {m.Success} to be {expect}: given {input} matched {m.Value}");
+	};
 
-		TestRControlledVowel ();
-		TestOpenSyllable ();*/
+	static void TestOneConsonantDivision(){
+		testConsDiv(OneConsonantDivision, false, "cat");
+		testConsDiv(OneConsonantDivision, true, "water");
+		testConsDiv(OneConsonantDivision, true, "wanky");
+		testConsDiv(OneConsonantDivision, true, "anky");
+		testConsDiv(OneConsonantDivision, true, "maple");
+		testConsDiv(TwoConsonantDivision, false, "catnip");
 
-		//TestSyllabify();
+	}
+
+	static void TestTwoConsonantDivision(){
+		testConsDiv(TwoConsonantDivision, false, "cat");
+		testConsDiv(TwoConsonantDivision, false, "water");
+		testConsDiv(TwoConsonantDivision, true, "wanky");
+		testConsDiv(TwoConsonantDivision, true, "anky");
+		testConsDiv(TwoConsonantDivision, true, "maple");
+		testConsDiv(TwoConsonantDivision, true, "catnip");
 
 	}
 
@@ -208,33 +226,17 @@ public static class SpellingRuleRegex  {
 		//a -> returns empty
 	
 
-		/*Action<String, String, String> test = (String input, String expectFirst, String expectSecond) => {
-			List<Match> result = Syllabify(input);
-			if(result.Count != 2){
-				Debug.Log($"Failed: {input}- {expectFirst} {expectSecond} not found. Result has {result.Count} entries.");
-
-			}
-			else {
-				string first = result[0].Value;
-				string second = result[1].Value;
-				Debug.Log($"First is {first}, expected {expectFirst}");
-				Debug.Log($"Second is {second}, expected {expectSecond}");
-
-			}
-
-		};
-
-
-		test("relish", "rel", "ish");
-		test("cabin", "rel", "ish");
-		test("polite", "po", "lite");
-		test("mascot", "mas", "cot");
-		test("admit", "ad", "mit");
-		test("jacket", "jack", "et");
-		test("rocket", "rock", "et");
-		test("respond", "res", "pond");
-		test("banzwbanan", "ban", "an");
-		test("bananaz", "ban", "an");*/
+		Debug.Log(Syllabify("input").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
+		Debug.Log(Syllabify("relish").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
+		Debug.Log(Syllabify("polite").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
+		Debug.Log(Syllabify("cabin").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
+		Debug.Log(Syllabify("admit").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
+		Debug.Log(Syllabify("jacket").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
+		Debug.Log(Syllabify("rocket").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
+		Debug.Log(Syllabify("respond").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
+		Debug.Log(Syllabify("banzwbanan").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
+		Debug.Log(Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
+		Debug.Log(Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
 	}
 
 	/*
