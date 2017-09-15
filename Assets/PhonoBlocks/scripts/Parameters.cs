@@ -21,7 +21,8 @@ public class Parameters : MonoBehaviour {
 			Application.LoadLevel ("Activity");
 		};
 
-		PhonoBlocksExtensions.TestAlign();
+
+		SpellingRuleRegex.Test();
 			
 	}
 		

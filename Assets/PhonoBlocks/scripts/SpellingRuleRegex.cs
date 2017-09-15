@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System;
 using UnityEngine;
+using Extensions;
 
 public static class SpellingRuleRegex  {
 
@@ -101,22 +102,73 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Open syllable regex
-	static Regex openSyllable = Make($"({anyConsonant})?({anyVowel})(?!\\w)");
+	static string openSyllable = $"({anyConsonant})?({anyVowel})";
+	static Regex openSyllableRegex = Make($"{openSyllable}(?!\\w)");//in open/closed syllable mode,
+	//we disqualify strings that have characters after the vowel. 
+	//but for definitional purposes (and for syllable division mode)
+	//an open syllable can exist in words wherein they are followed by (independent) closed syllables
 	public static Regex OpenSyllable{
 		get {
-			return openSyllable;
+			return openSyllableRegex;
 		}
 
 	}
 
 	//Closed syllable regex
-	static Regex closedSyllable = Make($"({anyConsonant})?({vowel})(?!r)({anyConsonant})(?!e)");
+	static string closedSyllable = $"({anyConsonant})?({vowel})(?!r)({anyConsonant})";
+	static Regex closedSyllableRegex = Make($"{closedSyllable}(?!e)");
 	public static Regex ClosedSyllable{
 		get {
-			return closedSyllable;
+			return closedSyllableRegex;
 		}
 
 	}
+
+	static string anyStartsWithVowel = $"{anyVowel}({anyConsonant})?(?=>{anyConsonant})e";
+	static Regex OneConsonantDivision = Make($"{closedSyllable}{anyStartsWithVowel}");
+	static string SyllabifyOneConsonant(Match oneConsonantMatch, String original, List<Match> result){
+		return SyllabifyIntoTwo(oneConsonantMatch,original,result,
+			closedSyllable, anyStartsWithVowel);
+	}
+
+
+	static string anyStartsWithConsonant = $"{anyConsonant}{anyVowel}({anyConsonant})?(?=>{anyConsonant})e";
+	static Regex TwoConsonantDivision = Make($"{closedSyllable}{anyStartsWithConsonant}");
+	static string SyllabifyTwoConsonant(Match twoConsonantMatch, String original, List<Match> result){
+		return SyllabifyIntoTwo(twoConsonantMatch,original,result,
+			closedSyllable, anyStartsWithConsonant);
+	}
+
+	static string SyllabifyIntoTwo(Match match, String original, List<Match> result, String firstPattern, String secondPattern){
+		if(!match.Success) throw new Exception("Error! Invalid match");
+		String onlyMatching = match.Value.Union(_String.Fill(" ", original.Length));
+		result.Add(Regex.Match(onlyMatching, firstPattern));
+		original=original.ReplaceRangeWith(' ', result[0].Index, result[0].Length);
+		result.Add(Regex.Match(onlyMatching, secondPattern));
+		original=original.ReplaceRangeWith(' ', result[1].Index, result[1].Length);
+		return original;
+	}
+
+	public static List<Match> Syllabify(String word){
+		List<Match> result = new List<Match>();
+		Debug.Log(word);
+			Match oneCons = OneConsonantDivision.Match(word);
+			if(oneCons.Success) {
+				word = SyllabifyOneConsonant(oneCons,word,result);
+
+			}
+		else {
+			Match twoCons = TwoConsonantDivision.Match(word);
+			if(twoCons.Success) {
+				word = SyllabifyTwoConsonant(oneCons,word,result);
+
+			}
+		}
+		Debug.Log(word);
+
+		return result;
+	}
+		
 
 	static string MatchAnyOf(string[] patterns){
 		return patterns.Aggregate((acc, nxt)=>$"{acc}|{nxt}");
@@ -130,14 +182,62 @@ public static class SpellingRuleRegex  {
 
 	public static void Test(){
 
-		TestMatchMagicERule ();
+		/*TestMatchMagicERule ();
 		TestClosedSyllable ();
 
 		TestRControlledVowel ();
-		TestOpenSyllable ();
+		TestOpenSyllable ();*/
+
+		//TestSyllabify();
 
 	}
 
+	static void TestSyllabify(){
+		//given
+		//relish -> rel ish
+		//cabin -> cab in
+		//polite -> pol ite
+		//admit -> ad mit
+		//mascot -> mas cot
+		//jacket -> jack et
+		//rocket -> rock et
+		//respond -> res pond 
+		//flan -> returns empty
+		//banzwbanan -> returns ban an 
+		//bananaz -> returns ban an
+		//a -> returns empty
+	
+
+		Action<String, String, String> test = (String input, String expectFirst, String expectSecond) => {
+			List<Match> result = Syllabify(input);
+			if(result.Count != 2){
+				Debug.Log($"Failed: {input}- {expectFirst} {expectSecond} not found. Result has {result.Count} entries.");
+
+			}
+			else {
+				string first = result[0].Value;
+				string second = result[1].Value;
+				Debug.Log($"First is {first}, expected {expectFirst}");
+				Debug.Log($"Second is {second}, expected {expectSecond}");
+
+			}
+
+		};
+
+
+		test("relish", "rel", "ish");
+		test("cabin", "rel", "ish");
+		test("polite", "po", "lite");
+		test("mascot", "mas", "cot");
+		test("admit", "ad", "mit");
+		test("jacket", "jack", "et");
+		test("rocket", "rock", "et");
+		test("respond", "res", "pond");
+		test("banzwbanan", "ban", "an");
+		test("bananaz", "ban", "an");
+	}
+
+	/*
 	static void TestMatchMagicERule(){
 		Debug.Log("--------TEST MAGIC E RULE------");
 		Debug.Log ($"Matches game: {magicERule.IsMatch("game")}"); 
@@ -223,6 +323,6 @@ public static class SpellingRuleRegex  {
 		Debug.Log($"Does not match ra: {!rControlledVowelRegex.IsMatch("ra")}");
 		Debug.Log($"Does not match rad: {!rControlledVowelRegex.IsMatch("rad")}");
 		Debug.Log($"Does not match r a: {!rControlledVowelRegex.IsMatch("r a")}");
-	}
+	}*/
 
 }
