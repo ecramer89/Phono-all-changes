@@ -124,7 +124,7 @@ public static class SpellingRuleRegex  {
 
 	}
 
-	static string anyStartsWithVowel = $"{anyVowel}({anyConsonant})?(?=>{anyConsonant})e";
+	/*static string anyStartsWithVowel = $"{anyVowel}({anyConsonant})?(?=>{anyConsonant})e";
 	static Regex OneConsonantDivision = Make($"{closedSyllable}{anyStartsWithVowel}");
 	static string SyllabifyOneConsonant(Match oneConsonantMatch, String original, List<Match> result){
 		return SyllabifyIntoTwo(oneConsonantMatch,original,result,
@@ -167,7 +167,7 @@ public static class SpellingRuleRegex  {
 		Debug.Log(word);
 
 		return result;
-	}
+	}*/
 		
 
 	static string MatchAnyOf(string[] patterns){
@@ -208,7 +208,7 @@ public static class SpellingRuleRegex  {
 		//a -> returns empty
 	
 
-		Action<String, String, String> test = (String input, String expectFirst, String expectSecond) => {
+		/*Action<String, String, String> test = (String input, String expectFirst, String expectSecond) => {
 			List<Match> result = Syllabify(input);
 			if(result.Count != 2){
 				Debug.Log($"Failed: {input}- {expectFirst} {expectSecond} not found. Result has {result.Count} entries.");
@@ -234,7 +234,7 @@ public static class SpellingRuleRegex  {
 		test("rocket", "rock", "et");
 		test("respond", "res", "pond");
 		test("banzwbanan", "ban", "an");
-		test("bananaz", "ban", "an");
+		test("bananaz", "ban", "an");*/
 	}
 
 	/*
