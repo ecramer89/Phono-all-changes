@@ -27,6 +27,7 @@ public class State: MonoBehaviour  {
 
 		Events.Dispatcher.OnModeSelected += (Mode mode) => {
 			this.mode = mode;
+			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 		};
 
 		Events.Dispatcher.OnSessionSelected += (int session) => {

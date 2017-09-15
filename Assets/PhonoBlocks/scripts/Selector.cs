@@ -17,6 +17,7 @@ public class Selector : MonoBehaviour {
 	}
 
 	public void SubscribeToEvents(){
+		
 			Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
@@ -36,6 +37,8 @@ public class Selector : MonoBehaviour {
 			
 			
 		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+			if(State.Current.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
+			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
 			//it's outside the bounds of target word and is blank.
 			correctlyPlacedLetters[atPosition] = 
