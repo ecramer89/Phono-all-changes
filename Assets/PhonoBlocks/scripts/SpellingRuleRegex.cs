@@ -34,8 +34,12 @@ public static class SpellingRuleRegex  {
 		"ck", "ng","nk"
 	};
 
+	static string[] consonantDigraphsEither = new string[]{
+		"th","ch","sh"
+	};
 
-	static string[] consonantDigraphs = new string[]{"th","ch","sh"}.Concat(consonantDigraphsInitial).Concat(consonantDigraphsFinal).ToArray();
+
+	static string[] consonantDigraphs = consonantDigraphsEither.Concat(consonantDigraphsInitial).Concat(consonantDigraphsFinal).ToArray();
 	static string consonantDigraph = MatchAnyOf (consonantDigraphs);
 	static Regex consonantDigraphRegex = Make(consonantDigraph);
 	public static Regex ConsonantDigraph{
@@ -49,18 +53,20 @@ public static class SpellingRuleRegex  {
 		
 	//Consonant Blend Regex
 	//can only appear at the end of a syllable
-	static string[] consonantBlendsInitial = new string[]{
+	static string[] consonantBlendsFinal = new string[]{
 		"ft", "nd", "mp", "nt","thr", "nz","str"
 	};
 
 	//can only appear at the beginning of a syllable
-	static string[] consonantBlendsFinal = new string[]{
+	static string[] consonantBlendsInitial = new string[]{
 		"sp", "sl", "spr", "scr", "spl", "squ", "shr", "bl", "gl", "pl", "cl", "fl", "cr", "tr", "dr"
 	};
 
+	static string[] consonantBlendsEither = new string[]{"sh", "sk", "st", "ll"};
+
 	//those defined within initial literal can appear in either position within a syllable.
 	//contenate to initial and final blends for all blends.
-	static string[] consonantBlends = new string[]{"sh", "sk", "st", "ll"}.Concat(consonantBlendsFinal).Concat(consonantBlendsInitial).ToArray();
+	static string[] consonantBlends = consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantBlendsInitial).ToArray();
 
 
 	static string consonantBlend = MatchAnyOf (consonantBlends);
@@ -108,8 +114,8 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
-	public static string AcceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsInitial.Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
-	public static string AcceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsFinal.Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
+	public static string acceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
+	public static string acceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
 
 	static string anyVowel = MatchAnyOf (new string[]{ vowelDigraph, vowel });
 	static Regex anyVowelRegex = Make (anyVowel);
@@ -121,7 +127,7 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Magic-E rule regex
-	static Regex magicERule = Make($"({AcceptableInitialConsonant})?({vowel})(?!r)({AcceptableFinalConsonant})e(?!\\w)");
+	static Regex magicERule = Make($"({acceptableInitialConsonant})?({vowel})(?!r)({acceptableFinalConsonant})e(?!\\w)");
 	public static Regex MagicERegex{
 		get {
 			return magicERule;
@@ -129,11 +135,8 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Open syllable regex
-	static string openSyllable = $"({AcceptableInitialConsonant})?({anyVowel})";
-	static Regex openSyllableRegex = Make($"{openSyllable}(?!\\w)");//in open/closed syllable mode,
-	//we disqualify strings that have characters after the vowel. 
-	//but for definitional purposes (and for syllable division mode)
-	//an open syllable can exist in words wherein they are followed by (independent) closed syllables
+	static string openSyllable = $"({acceptableInitialConsonant})?({anyVowel})";
+	static Regex openSyllableRegex = Make($"{openSyllable}(?!\\w)");
 	public static Regex OpenSyllable{
 		get {
 			return openSyllableRegex;
@@ -142,18 +145,18 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Closed syllable regex
-	static string closedSyllable = $"({AcceptableInitialConsonant})?({vowel})(?!r)({AcceptableFinalConsonant})";
-	static Regex closedSyllableRegex = Make($"{closedSyllable}(?!e)");
+	static string closedSyllable = $"({acceptableInitialConsonant})?({vowel})(?!r)({acceptableFinalConsonant})";
+	static Regex closedSyllableRegex = Make($"{closedSyllable}");
 	public static Regex ClosedSyllable{
 		get {
 			return closedSyllableRegex;
 		}
-
+		//(?!e)
 	}
 
 	static Regex any = new Regex(".*");
 	static string[] stableSyllables = new string[]{
-		$"({anyConsonant})le", $"({AcceptableInitialConsonant})({anyVowel})r"
+		$"({anyConsonant})le", $"({acceptableInitialConsonant})({anyVowel})r"
 	};
 	static string stableSyllable = MatchAnyOf(stableSyllables);
 	static Regex stableSyllableRegex = Make(stableSyllable);
@@ -196,7 +199,7 @@ public static class SpellingRuleRegex  {
 		
 
 	public static void Test(){
-		Debug.Log(closedSyllableRegex.Match("jacket").Value);
+		TestSyllabify();
 
 	}
 	static Action<Regex, bool, string> testConsDiv= (Regex reg, bool expect, string input) => {
@@ -256,8 +259,8 @@ public static class SpellingRuleRegex  {
 
 
 	static void TestAcceptableEndAndInitialConsonant(){
-		Regex init = Make(AcceptableInitialConsonant);
-		Regex end = Make(AcceptableFinalConsonant);
+		Regex init = Make(acceptableInitialConsonant);
+		Regex end = Make(acceptableFinalConsonant);
 		foreach(string initBlend in consonantBlendsInitial){
 			Match mn = init.Match(initBlend);
 			Debug.Log($"expect match is true: {mn.Success} and matches blend {initBlend} = {mn.Value}? ");
