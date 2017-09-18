@@ -54,7 +54,7 @@ public static class SpellingRuleRegex  {
 	//Consonant Blend Regex
 	//can only appear at the end of a syllable
 	static string[] consonantBlendsFinal = new string[]{
-		"ft", "nd", "mp", "nt","thr", "nz","str"
+		"ft","rn", "nd", "mp", "nt","thr", "nz","str"
 	};
 
 
@@ -79,6 +79,8 @@ public static class SpellingRuleRegex  {
 
 	}
 
+	static string[] finalConsonants = consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray();
+	static string[] initialConsonants = consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray();
 
 	static string[] vowelDigraphs = new string[] {
 		"ea", "ai", "ae", "aa", "ee", "ie", "oe", "ue", "ou", "ay", "oa"
@@ -91,11 +93,15 @@ public static class SpellingRuleRegex  {
 		}
 
 	}
+	//change so that this expression is a custom regex, any vowel followed by any acceptable final consonant
 
-	static string[] rControlledVowels = new string[]{
+	static string[] anyRFinalBlendOrDigraph = finalConsonants.Where(blend=>blend[0]=='r').ToArray();
+	/* new string[]{
 		"er", "ur", "or","ir","ar"
-	};
-	static string rControlledVowel = MatchAnyOf (rControlledVowels);
+	};*/
+
+
+	static string rControlledVowel = $"({anyVowel})({MatchAnyOf (anyRFinalBlendOrDigraph)}|r)";
 	static Regex rControlledVowelRegex = Make(rControlledVowel);
 	public static Regex RControlledVowel{
 		get{
@@ -118,6 +124,8 @@ public static class SpellingRuleRegex  {
 	//order matters here. 
 	//syllable division- need to keep consonant blends/digraphs together (i.e. jacket -< jack and et not jac and ket).
 	//as such, be sure to put digraphs and blends ahead of single consonants so that it matches the larger units first.
+
+
 	public static string acceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
 	public static string acceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
 
@@ -158,8 +166,9 @@ public static class SpellingRuleRegex  {
 	}
 
 	static Regex any = new Regex(".*");
+
 	static string[] stableSyllables = new string[]{
-		$"({anyConsonant})le", $"({acceptableInitialConsonant})({anyVowel})r"
+		$"({anyConsonant})le", $"({acceptableInitialConsonant})({rControlledVowel})(?!\\w)"
 	};
 	static string stableSyllable = MatchAnyOf(stableSyllables);
 	static Regex stableSyllableRegex = Make(stableSyllable);
