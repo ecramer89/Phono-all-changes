@@ -41,7 +41,7 @@ public static class SpellingRuleRegex  {
 	static string[] consonantBlends = new string[]{
 		"sp","sh", "sl", "sk", "str", "st", "spr", "scr", "spl", "squ", "shr",
 		"ll", "bl", "gl", "cl", "pl", "fl", "cr", "tr", "dr", "ft", "nd", 
-		"mp", "nt","thr"
+		"mp", "nt","thr", "nz"
 	};
 	static string consonantBlend = MatchAnyOf (consonantBlends);
 	static Regex consonantBlendRegex = Make(consonantBlend);
@@ -79,14 +79,14 @@ public static class SpellingRuleRegex  {
 
 
 
-	static string anyConsonant = MatchAnyOf(new string[]{consonant, consonantDigraph, consonantBlend});
+	static string anyConsonant = MatchAnyOf(new string[]{consonantDigraph, consonantBlend, consonant});
 	static Regex anyConsonantRegex = Make (anyConsonant);
 	public static Regex AnyConsonant{
 		get {
 			return anyConsonantRegex;
 		}
 	}
-	static string anyVowel = MatchAnyOf (new string[]{ vowel, vowelDigraph });
+	static string anyVowel = MatchAnyOf (new string[]{ vowelDigraph, vowel });
 	static Regex anyVowelRegex = Make (anyVowel);
 	public static Regex AnyVowel{
 		get {
@@ -139,6 +139,30 @@ public static class SpellingRuleRegex  {
 
  
 	public static List<Match> Syllabify(String word){
+		List<Match> syllables = new List<Match>();
+		word = ExtractAll(stableSyllableRegex,word,syllables); 
+		word = ExtractAll(MagicERegex, word, syllables);
+		word = ExtractAll(ClosedSyllable, word, syllables);
+		word = ExtractAll(OpenSyllable, word, syllables);
+		syllables.Sort((Match x, Match y) => x.Index - y.Index);
+		return syllables;
+
+	}
+
+	static string ExtractAll(Regex rule,String word, List<Match> results){
+		while(true){
+			Match next = rule.Match(word);
+			if(!next.Success) return word;
+			results.Add(next);
+			word = word.ReplaceRangeWith(' ', next.Index, next.Length);
+		}
+		return word;
+	}
+
+
+
+
+	/*public static List<Match> Syllabify(String word){
 		List<Match> result = new List<Match>();
 		Match oneCons = OneConsonantDivision.Match(word);
 		if(oneCons.Success){
@@ -168,7 +192,7 @@ public static class SpellingRuleRegex  {
 		}
 
 		return result;
-	}
+	}*/
 		
 
 	static string MatchAnyOf(string[] patterns){
@@ -226,17 +250,17 @@ public static class SpellingRuleRegex  {
 		//a -> returns empty
 	
 
-		Debug.Log(Syllabify("input").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
-		Debug.Log(Syllabify("relish").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
-		Debug.Log(Syllabify("polite").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
-		Debug.Log(Syllabify("cabin").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
-		Debug.Log(Syllabify("admit").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
-		Debug.Log(Syllabify("jacket").Aggregate("", (string acc, Match m) => acc+" "+m.Value)); 
-		Debug.Log(Syllabify("rocket").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
-		Debug.Log(Syllabify("respond").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
-		Debug.Log(Syllabify("banzwbanan").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
-		Debug.Log(Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
-		Debug.Log(Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value));
+		Debug.Log($"expect in put {Syllabify("input").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
+		Debug.Log($"expect rel ish {Syllabify("relish").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
+		Debug.Log($"expect po lite {Syllabify("polite").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
+		Debug.Log($"expect ca bin {Syllabify("cabin").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
+		Debug.Log($"expect ad mit {Syllabify("admit").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
+		Debug.Log($"expect jack et {Syllabify("jacket").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
+		Debug.Log($"expect rock et {Syllabify("rocket").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect res pond {Syllabify("respond").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect banz ban an {Syllabify("banzwbanan").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect ma ple {Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect ter ror {Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 	}
 
 	/*
