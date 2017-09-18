@@ -773,6 +773,23 @@ public class Colorer : MonoBehaviour   {
 
 	}
 
+	class SyllableDivisionColorer : RuleBasedColorer{
+		void ColorAndConfigureFlashForTeacherMode (
+			string updatedUserInputLetters,
+			string previousUserInputLetters
+		){}
+
+		void ColorAndConfigureFlashForStudentMode( 
+			string updatedUserInputLetters, 
+			string previousUserInputLetters,
+			string targetWord){}
+
+		Color[] GetColorsOf (Color[] colors, string word){
+			return null;
+		}
+
+	}
+
 
 }
 

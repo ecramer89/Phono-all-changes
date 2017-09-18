@@ -151,7 +151,6 @@ public static class SpellingRuleRegex  {
 		get {
 			return closedSyllableRegex;
 		}
-		//(?!e)
 	}
 
 	static Regex any = new Regex(".*");
@@ -165,7 +164,14 @@ public static class SpellingRuleRegex  {
 	static Func<int, string> Quantify = (int number) => "{"+number+"}";
 	static Regex TwoConsonantDivision = Make($"({anyVowel})({anyConsonant}){Quantify(2)}({anyVowel})");
 
- 
+    /*
+     * order is important. needs to find stable syllables first, then magic e, then closed, then open.
+     * any letters that aren't included in syllables (e.g. randomly interjected consonants) won't be included
+     * in anything in the returned list of matches.
+     * each match has indices that correspond to the match's position relative to the entire input word.
+     * e.g., input "maple" -> "ma" and "ple", index of "ma" =0 and index of "ple" = 2
+     * 
+     * */
 	public static List<Match> Syllabify(String word){
 		List<Match> syllables = new List<Match>();
 		word = ExtractAll(stableSyllableRegex,word,syllables); 
@@ -174,9 +180,13 @@ public static class SpellingRuleRegex  {
 		word = ExtractAll(OpenSyllable, word, syllables);
 		syllables.Sort((Match x, Match y) => x.Index - y.Index);
 		return syllables;
-
 	}
 
+	//tricky part is preserving the length and indices of the input word so that the resulting match objects have indices
+	//that will be aligned with the input word. 
+	//accomplish this by getting matches one at a time, each time get a match, replace those letters with blanks
+	//in the inut word so that they won't be matched again
+	//this way the colorers can use the match indices to determine which range of UI letters to color.
 	static string ExtractAll(Regex rule,String word, List<Match> results){
 		while(true){
 			Match next = rule.Match(word);
@@ -228,21 +238,7 @@ public static class SpellingRuleRegex  {
 	}
 
 	static void TestSyllabify(){
-		//given
-		//relish -> rel ish
-		//cabin -> cab in
-		//polite -> pol ite
-		//admit -> ad mit
-		//mascot -> mas cot
-		//jacket -> jack et
-		//rocket -> rock et
-		//respond -> res pond 
-		//flan -> returns empty
-		//banzwbanan -> returns ban an 
-		//bananaz -> returns ban an
-		//a -> returns empty
-	
-
+		Debug.Log($"expect wa ter {Syllabify("water").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect in put {Syllabify("input").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect rel ish {Syllabify("relish").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect po lite {Syllabify("polite").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
