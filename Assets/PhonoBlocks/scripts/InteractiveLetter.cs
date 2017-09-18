@@ -2,17 +2,20 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-//container for the letter of this cell.
-//stores data the image, the letter and the color
-//but isn't responsible for using this data to do anything.
+
 public class InteractiveLetter : MonoBehaviour{
 
-		String inputLetter;
-		Color colorDerivedFromInput;  
-		public Color ColorDerivedFromInput {
+		String letterFromUserInput; //letter the user has physically placed at the position of this interactive letter.
+		public String LetterFromUserInput
+		{ 		get{
+				return letterFromUserInput;
+			}
+		}
+		Color colorFromInput;  //color derived from the letterFromUserInput
+		public Color ColorFromInput {
 				get {
 
-						return colorDerivedFromInput;
+						return colorFromInput;
 				}
 		}
 
@@ -71,8 +74,8 @@ public class InteractiveLetter : MonoBehaviour{
 	}
 
 	public void ResetFlashParameters(){
-		flashColors [0] = colorDerivedFromInput;
-		flashColors [1] = colorDerivedFromInput;
+		flashColors [0] = colorFromInput;
+		flashColors [1] = colorFromInput;
 		flashDurations [0] = 0f;
 		flashDurations [1] = 0f;
 		this.numFlashCycles = 0;
@@ -119,11 +122,6 @@ public class InteractiveLetter : MonoBehaviour{
 
 		}
 
-
-		public String InputLetter ()
-		{
-				return inputLetter;
-		}
 	
 		public Texture2D CurrentDisplayImage ()
 		{
@@ -137,7 +135,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 		public bool IsBlank ()
 		{
-				return inputLetter [0] == ' ';
+				return letterFromUserInput [0] == ' ';
 		}
 
 		public void StartFlash(){
@@ -170,7 +168,7 @@ public class InteractiveLetter : MonoBehaviour{
 				yield return new WaitForSeconds (durationOfFlash);
 			}
 			//restore default color
-			UpdateDisplayColour (colorDerivedFromInput);
+			UpdateDisplayColour (colorFromInput);
 			flashCounter = 0;
 		}
 		
@@ -188,7 +186,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 		public void RevertToInputDerivedColor ()
 		{
-				UpdateDisplayColour (colorDerivedFromInput);
+				UpdateDisplayColour (colorFromInput);
 
 		}
 
@@ -229,7 +227,7 @@ public class InteractiveLetter : MonoBehaviour{
 		public void UpdateInputLetterButNotInputDerivedColor (String letter, Texture2D img)
 		{
 			
-				inputLetter = letter;
+				letter = letter;
 
 				//de-select this cell if it was selected
 				if (isSelected)
@@ -245,7 +243,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 		public void UpdateDefaultColour (Color c)
 		{
-			colorDerivedFromInput = c == Color.clear ? Color.white : c;
+			colorFromInput = c == Color.clear ? Color.white : c;
 
 		}
 		
@@ -299,7 +297,7 @@ public class InteractiveLetter : MonoBehaviour{
 								if (selectHighlight)
 										selectHighlight.enabled = false;
 						} else
-								UpdateDisplayColour (colorDerivedFromInput);
+								UpdateDisplayColour (colorFromInput);
 						if (notifyObservers && LetterSelectedDeSelected != null)
 								LetterSelectedDeSelected (false, gameObject);
 				}

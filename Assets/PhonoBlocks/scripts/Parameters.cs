@@ -63,6 +63,13 @@ public class Parameters : MonoBehaviour {
 			(float)98 / (float)255
 		);
 
+	
+		static Color pink = new Color(
+			(float)247 / (float)255,
+			(float)98 / (float)255,
+			(float)162 / (float)255
+		);
+
 		public static Color DEFAULT_ON_COLOR=Color.white;
 		public static Color DEFAULT_OFF_COLOR=Color.gray;
 
@@ -102,6 +109,12 @@ public class Parameters : MonoBehaviour {
 			//separate colors for the r and the vowel will require minor changes to the code in the r controlled vowel
 			//colorer.
 			public static Color SINGLE_MEMBER_OF_TARGET_R_CONTROLLED_VOWEL_COLOR = Color.gray;
+		}
+
+		public class SyllableDivisionColors{
+			public static Color WHOLE_WORD_COLOR=pink;
+			public static Color DIVIDED_FIRST_SYLLABLE_COLOR=blue;
+			public static Color DIVIDED_SECOND_SYLLABLE_COLOR=green;
 		}
 
 	}
