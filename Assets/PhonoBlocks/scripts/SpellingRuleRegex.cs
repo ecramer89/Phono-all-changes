@@ -25,7 +25,17 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Consonant Digraph regex
-	static string[] consonantDigraphs = new string[]{"th","ch","sh","qu","ck","ng","nk","wh"};
+	//can only appear at the end of a syllable
+	static string[] consonantDigraphsInitial = new string[]{
+		"qu", "wh"
+	};
+	//can only appear at the beginning of a syllable
+	static string[] consonantDigraphsFinal = new string[]{
+		"ck", "ng","nk"
+	};
+
+
+	static string[] consonantDigraphs = new string[]{"th","ch","sh"}.Concat(consonantDigraphsInitial).Concat(consonantDigraphsFinal).ToArray();
 	static string consonantDigraph = MatchAnyOf (consonantDigraphs);
 	static Regex consonantDigraphRegex = Make(consonantDigraph);
 	public static Regex ConsonantDigraph{
@@ -38,11 +48,21 @@ public static class SpellingRuleRegex  {
 
 		
 	//Consonant Blend Regex
-	static string[] consonantBlends = new string[]{
-		"sp","sh", "sl", "sk", "str", "st", "spr", "scr", "spl", "squ", "shr",
-		"ll", "bl", "gl", "cl", "pl", "fl", "cr", "tr", "dr", "ft", "nd", 
-		"mp", "nt","thr", "nz"
+	//can only appear at the end of a syllable
+	static string[] consonantBlendsInitial = new string[]{
+		"ft", "nd", "mp", "nt","thr", "nz","str"
 	};
+
+	//can only appear at the beginning of a syllable
+	static string[] consonantBlendsFinal = new string[]{
+		"sp", "sl", "spr", "scr", "spl", "squ", "shr", "bl", "gl", "pl", "cl", "fl", "cr", "tr", "dr"
+	};
+
+	//those defined within initial literal can appear in either position within a syllable.
+	//contenate to initial and final blends for all blends.
+	static string[] consonantBlends = new string[]{"sh", "sk", "st", "ll"}.Concat(consonantBlendsFinal).Concat(consonantBlendsInitial).ToArray();
+
+
 	static string consonantBlend = MatchAnyOf (consonantBlends);
 	static Regex consonantBlendRegex = Make(consonantBlend);
 	public static Regex ConsonantBlend{
@@ -51,6 +71,7 @@ public static class SpellingRuleRegex  {
 		}
 
 	}
+
 
 	static string[] vowelDigraphs = new string[] {
 		"ea", "ai", "ae", "aa", "ee", "ie", "oe", "ue", "ou", "ay", "oa"
@@ -86,6 +107,10 @@ public static class SpellingRuleRegex  {
 			return anyConsonantRegex;
 		}
 	}
+
+	public static string AcceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsInitial.Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
+	public static string AcceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsFinal.Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
+
 	static string anyVowel = MatchAnyOf (new string[]{ vowelDigraph, vowel });
 	static Regex anyVowelRegex = Make (anyVowel);
 	public static Regex AnyVowel{
@@ -96,7 +121,7 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Magic-E rule regex
-	static Regex magicERule = Make($"({anyConsonant})?({vowel})(?!r)({consonant})e(?!\\w)");
+	static Regex magicERule = Make($"({AcceptableInitialConsonant})?({vowel})(?!r)({AcceptableFinalConsonant})e(?!\\w)");
 	public static Regex MagicERegex{
 		get {
 			return magicERule;
@@ -104,7 +129,7 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Open syllable regex
-	static string openSyllable = $"({anyConsonant})?({anyVowel})";
+	static string openSyllable = $"({AcceptableInitialConsonant})?({anyVowel})";
 	static Regex openSyllableRegex = Make($"{openSyllable}(?!\\w)");//in open/closed syllable mode,
 	//we disqualify strings that have characters after the vowel. 
 	//but for definitional purposes (and for syllable division mode)
@@ -117,7 +142,7 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Closed syllable regex
-	static string closedSyllable = $"({anyConsonant})?({vowel})(?!r)({anyConsonant})";
+	static string closedSyllable = $"({AcceptableInitialConsonant})?({vowel})(?!r)({AcceptableFinalConsonant})";
 	static Regex closedSyllableRegex = Make($"{closedSyllable}(?!e)");
 	public static Regex ClosedSyllable{
 		get {
@@ -128,7 +153,7 @@ public static class SpellingRuleRegex  {
 
 	static Regex any = new Regex(".*");
 	static string[] stableSyllables = new string[]{
-		$"({anyConsonant})le", $"({anyConsonant})({anyVowel})r"
+		$"({anyConsonant})le", $"({AcceptableInitialConsonant})({anyVowel})r"
 	};
 	static string stableSyllable = MatchAnyOf(stableSyllables);
 	static Regex stableSyllableRegex = Make(stableSyllable);
@@ -160,41 +185,6 @@ public static class SpellingRuleRegex  {
 	}
 
 
-
-
-	/*public static List<Match> Syllabify(String word){
-		List<Match> result = new List<Match>();
-		Match oneCons = OneConsonantDivision.Match(word);
-		if(oneCons.Success){
-			
-			Match consonant = AnyConsonant.Match(oneCons.Value);
-			int startIndexOfConsonantInWord = oneCons.Index + consonant.Index;
-			string firstHalf = word.Substring(0, startIndexOfConsonantInWord + consonant.Length);
-			string secondHalf = word.Substring(startIndexOfConsonantInWord, word.Length - startIndexOfConsonantInWord);
-			if(stableSyllableRegex.IsMatch(secondHalf)){
-				result.Add(any.Match(secondHalf));
-				result.Add(any.Match(firstHalf.Substring(0,firstHalf.Length-consonant.Length)));
-				return result;
-			}
-			result.Add(any.Match(firstHalf));
-			result.Add(any.Match(secondHalf.Substring(startIndexOfConsonantInWord + consonant.Length, word.Length - (startIndexOfConsonantInWord + consonant.Length))));
-			return result;
-		}
-
-		Match twoCons = TwoConsonantDivision.Match(word);
-		if(twoCons.Success){
-			Match firstConsonant = AnyConsonant.Match(twoCons.Value);
-			int startIndexOfConsonantInWord = twoCons.Index + firstConsonant.Index;
-			string firstHalf = word.Substring(0, startIndexOfConsonantInWord + firstConsonant.Length);
-			result.Add(any.Match(firstHalf));
-			result.Add(any.Match(word.Substring(firstHalf.Length, word.Length-firstHalf.Length)));
-			return result;
-		}
-
-		return result;
-	}*/
-		
-
 	static string MatchAnyOf(string[] patterns){
 		return patterns.Aggregate((acc, nxt)=>$"{acc}|{nxt}");
 	}
@@ -206,7 +196,7 @@ public static class SpellingRuleRegex  {
 		
 
 	public static void Test(){
-		TestSyllabify();
+		Debug.Log(closedSyllableRegex.Match("jacket").Value);
 
 	}
 	static Action<Regex, bool, string> testConsDiv= (Regex reg, bool expect, string input) => {
@@ -262,6 +252,36 @@ public static class SpellingRuleRegex  {
 		Debug.Log($"expect ma ple {Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ter ror {Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 	}
+
+
+
+	static void TestAcceptableEndAndInitialConsonant(){
+		Regex init = Make(AcceptableInitialConsonant);
+		Regex end = Make(AcceptableFinalConsonant);
+		foreach(string initBlend in consonantBlendsInitial){
+			Match mn = init.Match(initBlend);
+			Debug.Log($"expect match is true: {mn.Success} and matches blend {initBlend} = {mn.Value}? ");
+
+		}
+		foreach(string initDig in consonantDigraphsInitial){
+			Match mn = init.Match(initDig);
+			Debug.Log($"expect match is true: {mn.Success} and matches blend {initDig} = {mn.Value}? ");
+
+		}
+
+		foreach(string endBlend in consonantBlendsFinal){
+			Match mn = end.Match(endBlend);
+			Debug.Log($"expect match is true: {mn.Success} and matches blend {endBlend} = {mn.Value}? ");
+
+		}
+		foreach(string endDig in consonantDigraphsFinal){
+			Match mn = end.Match(endDig);
+			Debug.Log($"expect match is true: {mn.Success} and matches blend {endDig} = {mn.Value}? ");
+
+		}
+	}
+
+
 
 	/*
 	static void TestMatchMagicERule(){
