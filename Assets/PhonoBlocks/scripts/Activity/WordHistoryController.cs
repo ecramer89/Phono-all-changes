@@ -60,16 +60,16 @@ public class WordHistoryController : MonoBehaviour
 				foreach (InteractiveLetter l in State.Current.UILetters) {
 					
 			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (
-							l.InputLetter (), 
+						l.LetterFromUserInput, 
 							l.CurrentDisplayImage (), 
-							(position++) + "", l.ColorDerivedFromInput
+							(position++) + "", l.ColorFromInput
 						);
 
 						letterInWord.GetComponent<InteractiveLetter>().LetterPressed+=PlayWordOfPressedLetter;
 						letterInWord.AddComponent<BoxCollider> ();
 						letterInWord.AddComponent<UIDragPanelContents> ();
 
-						currentWordAsString.Append (l.InputLetter ());
+						currentWordAsString.Append (l.LetterFromUserInput);
 						
 				}
 				wordHistoryGrid.GetComponent<UIGrid> ().Reposition ();

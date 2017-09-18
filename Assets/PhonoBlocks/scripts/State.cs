@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Extensions;
+using UnityEngine.SceneManagement;
 
 public class State: MonoBehaviour  {
 	private static State current;
@@ -17,12 +18,22 @@ public class State: MonoBehaviour  {
 	}
 
 	public void SubscribeToEvents(){
+
+		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
+			if(scene.name == "Activity"){
+				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+			}
+		};
+
 		Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
 			inputType = type;
 		};
 
 		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
 			this.activity = activity;
+			if(activity == Activity.SYLLABLE_DIVISION){
+				syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+			}
 		};
 
 		Events.Dispatcher.OnModeSelected += (Mode mode) => {
@@ -48,6 +59,9 @@ public class State: MonoBehaviour  {
 			timesAttemptedCurrentProblem = 0;
 			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			currentHintNumber = 0;
+			//only matters in syllable division activity, but may as well reset whenever.
+			syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+
 		};
 	
 		Events.Dispatcher.OnTimesAttemptedCurrentProblemIncremented += () => {
@@ -61,14 +75,14 @@ public class State: MonoBehaviour  {
 				
 		};
 	
-		Events.Dispatcher.OnEnterMainActivity += () => {
-			activityState = ActivityStates.MAIN_ACTIVITY;
+		Events.Dispatcher.OnEnterStudentModeMainActivity += () => {
+			studentModeState = StudentModeStates.MAIN_ACTIVITY;
 		};
 		Events.Dispatcher.OnEnterForceCorrectLetterPlacement += () => {
-			activityState = ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT;
+			studentModeState = StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT;
 		};
 		Events.Dispatcher.OnEnterForceRemoveAllLetters += () => {
-			activityState = ActivityStates.REMOVE_ALL_LETTERS;
+			studentModeState = StudentModeStates.REMOVE_ALL_LETTERS;
 		};
 
 		Events.Dispatcher.OnUIInputUnLocked += () => {
@@ -83,6 +97,10 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnHintProvided += () => {
 			this.hintAvailable = false;
 			this.currentHintNumber++;
+		};
+		Events.Dispatcher.OnSyllableDivisionShowStateToggled += () => {
+			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
+				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
 		};
 	
 	}
@@ -196,11 +214,11 @@ public class State: MonoBehaviour  {
 	}
 
 
-	private ActivityStates activityState;
-	public ActivityStates ActivityState{
+	private StudentModeStates studentModeState;
+	public StudentModeStates StudentModeState{
 		get {
 
-			return activityState;
+			return studentModeState;
 		}
 
 	}
@@ -216,6 +234,14 @@ public class State: MonoBehaviour  {
 	public int CurrentHintNumber{
 		get {
 			return currentHintNumber;
+		}
+
+	}
+
+	private SyllableDivisionShowStates syllableDivisionShowState;
+	public SyllableDivisionShowStates SyllableDivisionShowState{
+		get {
+			return syllableDivisionShowState;
 		}
 
 	}

@@ -7,8 +7,8 @@ public class RequestHintButton : MonoBehaviour {
 
 
 	void Start(){
-			if (State.Current.Mode == Mode.STUDENT) {
-				gameObject.SetActive(false); //inactive to begin with.
+			gameObject.SetActive(false); //inactive to begin with.
+			if (State.Current.Mode == Mode.STUDENT) { //only bother subscribing to events that would set active in student mode
 				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "RequestHint";
@@ -31,14 +31,9 @@ public class RequestHintButton : MonoBehaviour {
 					gameObject.SetActive (false);
 				};
 				Events.Dispatcher.OnUserSubmittedIncorrectAnswer += () => {
-					if (State.Current.ActivityState == ActivityStates.MAIN_ACTIVITY) {
-
-						gameObject.SetActive (true);
-					}
+					gameObject.SetActive(State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
 				};
-			} else {
-				gameObject.SetActive(false);
-			}
+		}
 	}
 
 

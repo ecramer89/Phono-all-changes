@@ -24,7 +24,7 @@ public class Colorer : MonoBehaviour   {
 	static RuleBasedColorer openClosedVowelColorer = new OpenClosedVowelColorer();
 	static RuleBasedColorer rControlledVowelsColorer = new RControlledVowelsColorer();
 	static RuleBasedColorer vowelDigraphsColorer = new VowelDigraphsColorer();
-
+	static RuleBasedColorer syllableDivisionColorer = new SyllableDivisionColorer();
 
 	static RuleBasedColorer ruleBasedColorer; 
 
@@ -41,11 +41,11 @@ public class Colorer : MonoBehaviour   {
 			RegisterLettersToColorer(letters);
 		};
 
-	
 
 		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 
 			TurnAllLettersOff();
+
 			Events.Dispatcher.SetTargetColors(
 				ruleBasedColorer.GetColorsOf(
 					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
@@ -55,7 +55,22 @@ public class Colorer : MonoBehaviour   {
 				));
 		};
 
+		Events.Dispatcher.OnSyllableDivisionShowStateToggled += ()=>{
+			ReColor(); //want the colors to update immediately.
 
+			if(State.Current.Mode == Mode.TEACHER) return;
+			//in student mode; update the target colors to reflect the change in desired color scheme
+			//todo, would be a good idea to cache the variants.
+			Events.Dispatcher.SetTargetColors(
+				ruleBasedColorer.GetColorsOf(
+					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
+					//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite
+					//indieces that correspond to those of target word.
+					State.Current.TargetWord
+				));
+			
+
+		};
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
@@ -78,7 +93,9 @@ public class Colorer : MonoBehaviour   {
 		case Activity.OPEN_CLOSED_SYLLABLE:
 			ruleBasedColorer = openClosedVowelColorer;
 			break;
-
+		case Activity.SYLLABLE_DIVISION:
+			ruleBasedColorer = syllableDivisionColorer;
+			break;
 		}
 
 	};
@@ -773,13 +790,82 @@ public class Colorer : MonoBehaviour   {
 
 	}
 
+	class SyllableDivisionColorer : RuleBasedColorer{
+		static Color wholeWordColor = Parameters.Colors.SyllableDivisionColors.WHOLE_WORD_COLOR;
+		static Color dividedFirstSyllableColor = Parameters.Colors.SyllableDivisionColors.DIVIDED_FIRST_SYLLABLE_COLOR;
+		static Color dividedSecondSyllableColor = Parameters.Colors.SyllableDivisionColors.DIVIDED_SECOND_SYLLABLE_COLOR;
+
+		static Func<int, Color> AlternateBy = (int seed) => seed%2==0 ? dividedFirstSyllableColor : dividedSecondSyllableColor;
+
+
+
+		static Action<string> colorSyllables = (string updatedUserInputLetters)=>{
+			List<Match> syllables = SpellingRuleRegex.Syllabify(updatedUserInputLetters);
+			//note: we should take the trouble of parsing the input into sylables even if it's the "whole word" coloring code.
+			//the rationale is that syllabify algorithm won't include phonotactically illegal letters 
+			//(e.g., "banwnban", will return "ban ban") so these will be colored white so as to indicate that they
+			//have no place in any phonotactically legal string.
+			for(int i=0;i<syllables.Count;i++){
+				Match syllable = syllables[i];
+				List<InteractiveLetter> letters = State.Current.UILetters.GetRange(syllable.Index, syllable.Length);
+				foreach(InteractiveLetter letter in letters){
+					letter.UpdateInputDerivedAndDisplayColor(
+						State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
+						wholeWordColor : AlternateBy(i));
+				}
+			}
+
+		};
+
+
+		public void ColorAndConfigureFlashForTeacherMode (
+			string updatedUserInputLetters,
+			string previousUserInputLetters
+		){
+			colorSyllables(updatedUserInputLetters);
+		}
+
+		public void ColorAndConfigureFlashForStudentMode( 
+			string updatedUserInputLetters, 
+			string previousUserInputLetters,
+			string targetWord){
+
+			//if it's whole word mode, color each letter pink provided it matches the target word.
+			//if it's show division mode, then only if the user input letter currently matches target
+			//should we show the divided colors.
+			bool divided=State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
+			if(divided && targetWord == updatedUserInputLetters.Trim()){
+				colorSyllables(updatedUserInputLetters);
+			}
+
+			//otherwise we just color the letters pink, provided they are correctly placed.
+			List<InteractiveLetter> letters = State.Current.UILetters.GetRange(0, targetWord.Length);
+			for(int i=0;i<letters.Count;i++){
+				InteractiveLetter letter = letters[i];
+				if(updatedUserInputLetters[i] == targetWord[i]){
+					letter.UpdateInputDerivedAndDisplayColor(wholeWordColor);
+				}
+			}
+		}
+
+		public Color[] GetColorsOf (Color[] colors, string word){
+			bool wholeWord = State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+			List<Match> syllables = SpellingRuleRegex.Syllabify(word);
+			for(int syllableIndex=0;syllableIndex<syllables.Count;syllableIndex++){
+				Match syllable = syllables[syllableIndex];
+				for(int letterIndex=syllable.Index;letterIndex<syllable.Index+syllable.Length;letterIndex++){
+					colors[letterIndex]=wholeWord ? wholeWordColor : AlternateBy(syllableIndex);
+				}
+			}
+			return colors;
+		}
+
+	}
+
 
 }
 
-//note: the digraph colorer will need to update the derived and display color of members of the target digraph that do not 
-//match the entire digraph. this needs to occur in the flash partial matches method
-//likewise 
-	
+//todo, these functions should all query state for necessary inputs. 
 interface RuleBasedColorer{
 	void ColorAndConfigureFlashForTeacherMode (
 		string updatedUserInputLetters,
