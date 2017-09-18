@@ -21,8 +21,6 @@ public class Parameters : MonoBehaviour {
 			Application.LoadLevel ("Activity");
 		};
 
-
-		SpellingRuleRegex.Test();
 			
 	}
 		
