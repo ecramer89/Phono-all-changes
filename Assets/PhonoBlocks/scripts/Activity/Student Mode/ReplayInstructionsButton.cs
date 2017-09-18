@@ -7,6 +7,7 @@ public class ReplayInstructionsButton : MonoBehaviour {
 
 	void Start(){
 			if (State.Current.Mode == Mode.STUDENT) {
+				gameObject.SetActive(true);
 				UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "ReplayInstructions";

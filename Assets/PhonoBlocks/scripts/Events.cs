@@ -79,9 +79,9 @@ public class Events: MonoBehaviour  {
 	}
 	//distinguished from activity begun; may need to transition back into main activity state from a different state,
 	//i.e. such as force correct letter placement.
-	public event Action OnEnterMainActivity = () => {};
-	public void EnterMainActivity(){
-		OnEnterMainActivity ();
+	public event Action OnEnterStudentModeMainActivity = () => {};
+	public void EnterStudentModeMainActivity(){
+		OnEnterStudentModeMainActivity ();
 	}
 	public event Action OnEnterForceCorrectLetterPlacement = () => {};
 	public void ForceCorrectLetterPlacement(){

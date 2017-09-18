@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Extensions;
+using UnityEngine.SceneManagement;
 
 public class State: MonoBehaviour  {
 	private static State current;
@@ -17,6 +18,13 @@ public class State: MonoBehaviour  {
 	}
 
 	public void SubscribeToEvents(){
+
+		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
+			if(scene.name == "Activity"){
+				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+			}
+		};
+
 		Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
 			inputType = type;
 		};
@@ -67,7 +75,7 @@ public class State: MonoBehaviour  {
 				
 		};
 	
-		Events.Dispatcher.OnEnterMainActivity += () => {
+		Events.Dispatcher.OnEnterStudentModeMainActivity += () => {
 			studentModeState = StudentModeStates.MAIN_ACTIVITY;
 		};
 		Events.Dispatcher.OnEnterForceCorrectLetterPlacement += () => {

@@ -124,7 +124,7 @@ public class StudentActivityController : MonoBehaviour
 		        Events.Dispatcher.RecordNewProblemBegun (
 					ProblemsRepository.instance.GetNextProblem ()
 				);
-				Events.Dispatcher.EnterMainActivity ();
+				Events.Dispatcher.EnterStudentModeMainActivity ();
 				AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
 
 				

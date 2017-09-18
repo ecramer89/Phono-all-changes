@@ -55,8 +55,12 @@ public class Colorer : MonoBehaviour   {
 				));
 		};
 
-		//todo, would be a good idea to cache the variants.
 		Events.Dispatcher.OnSyllableDivisionShowStateToggled += ()=>{
+			ReColor(); //want the colors to update immediately.
+
+			if(State.Current.Mode == Mode.TEACHER) return;
+			//in student mode; update the target colors to reflect the change in desired color scheme
+			//todo, would be a good idea to cache the variants.
 			Events.Dispatcher.SetTargetColors(
 				ruleBasedColorer.GetColorsOf(
 					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
@@ -64,8 +68,8 @@ public class Colorer : MonoBehaviour   {
 					//indieces that correspond to those of target word.
 					State.Current.TargetWord
 				));
+			
 
-			ReColor(); //want the colors to update immediately.
 		};
 	}
 
