@@ -135,7 +135,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 		public bool IsBlank ()
 		{
-				return letterFromUserInput [0] == ' ';
+			return letterFromUserInput == null || letterFromUserInput.Length ==0 || letterFromUserInput == " ";
 		}
 
 		public void StartFlash(){
