@@ -206,6 +206,11 @@ public class Parameters : MonoBehaviour {
 				new string[]{"hurt","horn","part"},
 				new string[]{"ht","hn","pt"}
 			),
+			new SessionData(
+			12, 
+			),
+			new SessionData(
+			13,)
 		};
 
 		public static int NUM_SESSIONS = PROBLEM_SETS.Count;
