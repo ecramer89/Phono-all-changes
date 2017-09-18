@@ -57,6 +57,7 @@ public static class SpellingRuleRegex  {
 		"ft", "nd", "mp", "nt","thr", "nz","str"
 	};
 
+
 	//can only appear at the beginning of a syllable
 	static string[] consonantBlendsInitial = new string[]{
 		"sp", "sl", "spr", "scr", "spl", "squ", "shr", "bl", "gl", "pl", "cl", "fl", "cr", "tr", "dr"
@@ -114,6 +115,9 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
+	//order matters here. 
+	//syllable division- need to keep consonant blends/digraphs together (i.e. jacket -< jack and et not jac and ket).
+	//as such, be sure to put digraphs and blends ahead of single consonants so that it matches the larger units first.
 	public static string acceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
 	public static string acceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
 

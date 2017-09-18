@@ -153,6 +153,11 @@ public class Events: MonoBehaviour  {
 		OnSessionCompleted ();
 	}
 
+	public Action OnSyllableDivisionShowStateToggled = () => {};
+	public void RecordSyllableDivisionShowStateToggled(){
+		OnSyllableDivisionShowStateToggled ();
+	}
+
 	void Awake(){
 		events = this;
 		//gaurantees that state is first subscriber whose methods are invoked when new events occur.

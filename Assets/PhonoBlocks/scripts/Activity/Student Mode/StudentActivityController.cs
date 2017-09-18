@@ -71,14 +71,14 @@ public class StudentActivityController : MonoBehaviour
 	}
 
 	void HandleNewArduinoLetter(char newLetter, int atPosition){
-		switch (State.Current.ActivityState) {
-		case ActivityStates.MAIN_ACTIVITY:
+		switch (State.Current.StudentModeState) {
+		case StudentModeStates.MAIN_ACTIVITY:
 			MainActivityNewLetterHandler(newLetter, atPosition);
 			break;
-		case ActivityStates.FORCE_CORRECT_LETTER_PLACEMENT:
+		case StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT:
 			ForceCorrectPlacementNewLetterHandler(newLetter, atPosition);
 			break;
-		case ActivityStates.REMOVE_ALL_LETTERS:
+		case StudentModeStates.REMOVE_ALL_LETTERS:
 			RemoveAllLettersNewLetterHandler(newLetter, atPosition);
 			break;
 		}
@@ -174,7 +174,7 @@ public class StudentActivityController : MonoBehaviour
 				Events.Dispatcher.RecordUserSubmittedIncorrectAnswer ();
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
-				if(State.Current.ActivityState == ActivityStates.MAIN_ACTIVITY) 
+				if(State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
 					AudioSourceController.PushClip (offerHint);
 		}
 

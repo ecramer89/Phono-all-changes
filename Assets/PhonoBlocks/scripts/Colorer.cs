@@ -774,17 +774,22 @@ public class Colorer : MonoBehaviour   {
 	}
 
 	class SyllableDivisionColorer : RuleBasedColorer{
-		void ColorAndConfigureFlashForTeacherMode (
+		public void ColorAndConfigureFlashForTeacherMode (
 			string updatedUserInputLetters,
 			string previousUserInputLetters
-		){}
+		){
+			//if user wants to see whole word, then pink. otherwise blue green
 
-		void ColorAndConfigureFlashForStudentMode( 
+
+
+		}
+
+		public void ColorAndConfigureFlashForStudentMode( 
 			string updatedUserInputLetters, 
 			string previousUserInputLetters,
 			string targetWord){}
 
-		Color[] GetColorsOf (Color[] colors, string word){
+		public Color[] GetColorsOf (Color[] colors, string word){
 			return null;
 		}
 

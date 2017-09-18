@@ -31,7 +31,7 @@ public class RequestHintButton : MonoBehaviour {
 					gameObject.SetActive (false);
 				};
 				Events.Dispatcher.OnUserSubmittedIncorrectAnswer += () => {
-					if (State.Current.ActivityState == ActivityStates.MAIN_ACTIVITY) {
+					if (State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY) {
 
 						gameObject.SetActive (true);
 					}
