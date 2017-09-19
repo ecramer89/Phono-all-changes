@@ -545,8 +545,6 @@ public class Colorer : MonoBehaviour   {
 	}
 
 
-		
-
 
 	class OpenClosedVowelColorer : RuleBasedColorer{
 
@@ -555,8 +553,7 @@ public class Colorer : MonoBehaviour   {
 		static Color consonantColorFirstAlternation = Parameters.Colors.OpenClosedVowelColors.FIRST_CONSONANT_COLOR;
 		static Color consonantColorSecondAlternation = Parameters.Colors.OpenClosedVowelColors.SECOND_CONSONANT_COLOR;
 	
-
-
+	
 		public Color[] GetColorsOf(Color[] colors, string word){
 			string unmatched = word;
 
