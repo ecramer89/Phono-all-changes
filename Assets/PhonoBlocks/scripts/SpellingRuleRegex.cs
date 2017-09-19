@@ -14,7 +14,8 @@ public static class SpellingRuleRegex  {
 	static Regex vowelRegex = Make(vowel);
 
 	//Consonant Regex
-	static string consonant = $"[^\\W,^{vowel}]";
+	static string[] consonants = new string[]{"b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","z"};
+	static string consonant = MatchAnyOf(consonants);
 	static Regex consonantRegex = Make(consonant);
 	public static Regex Consonant{
 		get {
@@ -54,7 +55,7 @@ public static class SpellingRuleRegex  {
 	//Consonant Blend Regex
 	//can only appear at the end of a syllable
 	static string[] consonantBlendsFinal = new string[]{
-		"ft","rn", "nd", "mp", "nt","thr", "nz","str"
+		"ft","rn", "nd", "mp", "nt","thr", "nz","str","rt"
 	};
 
 
@@ -82,9 +83,11 @@ public static class SpellingRuleRegex  {
 	static string[] acceptableInitialConsonantUnits=consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray();
 	static string[] acceptableFinalConsonantUnits =consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray();
 
-	static string anyInitialConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray());
+	static string anyInitialConsonantUnit = MatchAnyOf(acceptableInitialConsonantUnits);
+	static string anyFinalConsonantUnit = MatchAnyOf(acceptableFinalConsonantUnits);
+
+
 	static Regex anyInitialUnitRegex = Make($"{anyInitialConsonantUnit}|{vowelDigraph}");
-	static string anyFinalConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray());
 	static Regex anyFinalUnitRegex = Make($"{anyFinalConsonantUnit}|{vowelDigraph}");
 
 
@@ -166,8 +169,11 @@ public static class SpellingRuleRegex  {
 	}
 		
 	static string consonantLeSyllable = $"({anyConsonant})le";
-	static string rControlledVowelSyllable=$"({acceptableInitialConsonant})?({anyVowel})r";
+
+
+	static string rControlledVowelSyllable=$"{acceptableInitialConsonant}?{rControlledVowel}";
 	static string vowelYSyllable=$"({acceptableInitialConsonant})y";
+
 	static string[] stableSyllables = new string[]{
 		consonantLeSyllable, rControlledVowelSyllable, vowelYSyllable};
 
@@ -264,7 +270,9 @@ public static class SpellingRuleRegex  {
 		
 
 	public static void Test(){
-
+		TestAcceptableInitialConsonant();
+		TestRControlledVowel();
+		TestRControlledVowelSyllable();
 	}
 
 
@@ -347,8 +355,23 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
+	static void TestAcceptableInitialConsonant(){
+		Regex asRegex = Make(acceptableInitialConsonant);
+		Debug.Log("--------TEST ACCEPTABLE INITIAL------");
+		Debug.Log($"Includes st: {asRegex.Match("st").Value}");
 
+	}
+	static void TestRControlledVowelSyllable(){
+		Regex asRegex = Make(rControlledVowelSyllable);
+		Debug.Log("--------TEST R CONTROLLED VOWEL SYLLABLE------");
+		Debug.Log($"Captures star: {asRegex.Match("star").Value}");
+		Debug.Log($"Captures tern in intern: {asRegex.Match("intern").Value}");
+		Debug.Log($"Captures stern: {asRegex.Match("stern").Value}");
+		Debug.Log($"Captures ter in water: {asRegex.Match("water").Value}");
+		Debug.Log($"Captures hurt in hurt: {asRegex.Match("hurt").Value}");
+		Debug.Log($"Captures tern in pattern: {asRegex.Match("pattern").Value}");
 
+	}
 
 	static void TestMatchMagicERule(){
 		Debug.Log("--------TEST MAGIC E RULE------");
@@ -377,16 +400,16 @@ public static class SpellingRuleRegex  {
 
 	static void TestClosedSyllable(){
 		Debug.Log("--------TEST CLOSED SYLLABLE------");
-		Debug.Log($"Matches cat: {ClosedSyllable.IsMatch("cat")}");
-		Debug.Log($"Matches cat  : {ClosedSyllable.IsMatch("cat  ")}");
-		Debug.Log($"Matches cat  : {ClosedSyllable.IsMatch("  cat")}");
-		Debug.Log($"Matches acat  : {ClosedSyllable.IsMatch("acat")}");
-		Debug.Log($"Matches acata: {ClosedSyllable.IsMatch("acata")}");
-		Debug.Log($"Matches acatat: {ClosedSyllable.IsMatch("acatat")}");
-		Debug.Log($"Matches catcat: {ClosedSyllable.IsMatch("catcat")}");
-		Debug.Log($"Matches chat: {ClosedSyllable.IsMatch("chat")}");
-		Debug.Log($"Matches cash: {ClosedSyllable.IsMatch("cash")}");
-		Debug.Log($"Matches ash: {ClosedSyllable.IsMatch("ash")}");
+		Debug.Log($"Captures cat: {ClosedSyllable.Match("cat").Value}");
+		Debug.Log($"Captures cat  : {ClosedSyllable.Match("cat  ").Value}");
+		Debug.Log($"Captures cat  : {ClosedSyllable.Match("  cat").Value}");
+		Debug.Log($"Captures cat in acat  : {ClosedSyllable.Match("acat").Value}");
+		Debug.Log($"Captures cat in acata: {ClosedSyllable.Match("acata").Value}");
+		Debug.Log($"Captures cat in acatat: {ClosedSyllable.Match("acatat").Value}");
+		Debug.Log($"Captures cat catcat: {ClosedSyllable.Match("catcat").Value}");
+		Debug.Log($"Captures chat in chat: {ClosedSyllable.Match("chat").Value}");
+		Debug.Log($"Captures cash: {ClosedSyllable.Match("cash").Value}");
+		Debug.Log($"Captures ash: {ClosedSyllable.Match("ash").Value}");
 		Debug.Log($"Does not match ca: {!ClosedSyllable.IsMatch("ca")}");
 		Debug.Log($"Does not match car: {!ClosedSyllable.IsMatch("car")}");
 		Debug.Log($"Does not match a: {!ClosedSyllable.IsMatch("a")}");
