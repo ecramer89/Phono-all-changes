@@ -56,7 +56,9 @@ public class ArduinoLetterController : MonoBehaviour{
 		public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter)
 		{   		InteractiveLetter letter = GetInteractiveLetterAt(atPosition);
 		            letter.UpdateLetterImage (letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
-					if(newLetter==" ") letter.ToggleSelectHighlight(false); //deselect letters if they are 'removed'
+					if(newLetter==" ") {
+						Events.Dispatcher.RecordInteractiveLetterDeSelected(letter);
+					}
 		}
 
 
@@ -108,7 +110,6 @@ public class ArduinoLetterController : MonoBehaviour{
 					letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
 		
 				       if(State.Current.UserInputLetters[l.Position] != ' '){
-							l.ToggleSelectHighlight(wasSelected);
 							if(wasSelected){
 								Events.Dispatcher.RecordInteractiveLetterSelected(l);
 							}else{

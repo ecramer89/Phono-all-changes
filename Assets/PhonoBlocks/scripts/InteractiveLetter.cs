@@ -244,6 +244,16 @@ public class InteractiveLetter : MonoBehaviour{
 			colorFromInput = c == Color.clear ? Color.white : c;
 
 		}
+
+
+	public void Start(){
+		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+			if(this == letter) ToggleSelectHighlight(false);
+		};
+		Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+			if(this == letter) ToggleSelectHighlight(true);
+		};
+	}
 		
 		public void Update ()
 	{
