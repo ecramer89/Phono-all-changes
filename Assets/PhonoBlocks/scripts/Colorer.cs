@@ -54,6 +54,7 @@ public class Colorer : MonoBehaviour   {
 					problem.targetWord
 				));
 		};
+			
 
 		Events.Dispatcher.OnSyllableDivisionShowStateToggled += ()=>{
 			ReColor(); //want the colors to update immediately.
@@ -68,9 +69,9 @@ public class Colorer : MonoBehaviour   {
 					//indieces that correspond to those of target word.
 					State.Current.TargetWord
 				));
-			
-
 		};
+
+
 	}
 
 	static Action InitializeRuleBasedColorer = () => {

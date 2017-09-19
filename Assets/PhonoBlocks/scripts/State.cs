@@ -23,6 +23,7 @@ public class State: MonoBehaviour  {
 			if(scene.name == "Activity"){
 				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			}
 		};
 
@@ -58,7 +59,9 @@ public class State: MonoBehaviour  {
 			this.targetWord = problem.targetWord;
 			currentProblemInstrutions = problem.instructions;
 			timesAttemptedCurrentProblem = 0;
+			previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+			selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			currentHintNumber = 0;
 			//only matters in syllable division activity, but may as well reset whenever.
 			syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
@@ -102,6 +105,14 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnSyllableDivisionShowStateToggled += () => {
 			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
 				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
+		};
+		Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
+				userInputLetters[letter.Position]);
+		};
+		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
+				' ');
 		};
 	
 	}

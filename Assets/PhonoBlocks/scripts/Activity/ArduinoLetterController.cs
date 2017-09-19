@@ -39,13 +39,50 @@ public class ArduinoLetterController : MonoBehaviour{
 							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
-							SubscribeToInteractiveLetterEvents (UILetters);
+							SubscribeToInteractiveLetterEvents(UILetters);
 							Events.Dispatcher.UILettersCreated (UILetters);
 						}
 
 				};
 
+				Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+					if(Selector.Instance.AllLettersSelected 
+						&& State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
+							Events.Dispatcher.RecordSyllableDivisionShowStateToggled();
+					}
+				};
+
+
+				Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+
+					if(Selector.Instance.AllLettersDeSelected &&
+						State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+							Events.Dispatcher.RecordSyllableDivisionShowStateToggled();
+					}
+				};
+
 		}
+
+	void SubscribeToInteractiveLetterEvents (List<InteractiveLetter> UILetters)
+	{
+		foreach(InteractiveLetter letter in UILetters){
+			letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
+				if(State.Current.Activity != Activity.SYLLABLE_DIVISION) return;
+				if(State.Current.UserInputLetters[l.Position] == ' ') return;
+				//don't send event if position is already selected or deselected
+				if(wasSelected && State.Current.SelectedUserInputLetters[l.Position] != ' ' || 
+					!wasSelected && State.Current.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
+				if(State.Current.Mode == Mode.STUDENT && !Selector.Instance.CurrentStateOfInputMatchesTarget) return;
+				if(wasSelected){
+					Events.Dispatcher.RecordInteractiveLetterSelected(l);
+				}else{
+					Events.Dispatcher.RecordInteractiveLetterDeSelected(l);
+				}
+
+			};
+
+		}
+	}
 		
 		public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter)
 		{
@@ -103,24 +140,6 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 		
 
-
-		void SubscribeToInteractiveLetterEvents (List<InteractiveLetter> UILetters)
-		{
-				foreach(InteractiveLetter letter in UILetters){
-					letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
-		
-				       if(State.Current.UserInputLetters[l.Position] != ' '){
-							if(wasSelected){
-								Events.Dispatcher.RecordInteractiveLetterSelected(l);
-							}else{
-								Events.Dispatcher.RecordInteractiveLetterDeSelected(l);
-							}
-
-					 	}
-					};
-
-				}
-	}
 
 		         //todo colorer or the arduino l controller will do this, on new event colors of letters updated.
 		//to be dispatched by the coloroer.

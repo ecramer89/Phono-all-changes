@@ -51,6 +51,15 @@ public class Selector : MonoBehaviour {
 		Events.Dispatcher.OnCurrentProblemCompleted += () => {
 			solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
 		};
+
+		Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+			allLettersSelected = State.Current.SelectedUserInputLetters == State.Current.UserInputLetters;
+			allLettersDeSelected = false;
+		};
+		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+			allLettersSelected = false;
+			allLettersDeSelected = State.Current.SelectedUserInputLetters.Trim().Length == 0;
+		};
 	}
 
 	private string targetWordWithBlanksOnEnd;
@@ -78,5 +87,21 @@ public class Selector : MonoBehaviour {
 		get {
 			return solvedOnFirstTry;
 		}
+	}
+
+	private bool allLettersSelected;
+	public bool AllLettersSelected{
+		get { 
+			return allLettersSelected;
+		}
+
+	}
+
+	private bool allLettersDeSelected;
+	public bool AllLettersDeSelected{
+		get { 
+			return allLettersDeSelected;
+		}
+
 	}
 }
