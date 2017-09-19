@@ -35,41 +35,53 @@ public class StudentActivityController : MonoBehaviour
 							Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
 							Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
 							CacheAudioClips ();
-							Events.Dispatcher.OnSessionSelected += (int session) => {
-								ProblemsRepository.instance.Initialize (session);
-							};
-							SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
-								if(scene.name=="Activity"){
-											SetUpNextProblem ();
-								}
-							};
+							SubscribeToEvents();
 						} else {
 							gameObject.SetActive (false);
 						}
-					};
-
-					Events.Dispatcher.OnActivitySelected+=(Activity activity) => {
-						if(activity == Activity.SYLLABLE_DIVISION){
-							Events.Dispatcher.OnNewProblemBegun+=(ProblemData problem)=>{
-								Events.Dispatcher.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
-							};
-						}
-					};
-
-		           //when a new letter is placed, if the letter is blank and the position is one of the placeholder letters
-				  Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
-						for(int i=0;i<problem.initialWord.Length;i++){
-							ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
-						}
-				   };
+					};				
 
 		}
 
 
 
+	void SubscribeToEvents(){
+		Events.Dispatcher.OnSessionSelected += (int session) => {
+			ProblemsRepository.instance.Initialize (session);
+		};
+		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
+			if(scene.name=="Activity"){
+				SetUpNextProblem ();
+			}
+		};
 
+		Events.Dispatcher.OnActivitySelected+=(Activity activity) => {
+			if(activity == Activity.SYLLABLE_DIVISION){
+				Events.Dispatcher.OnNewProblemBegun+=(ProblemData problem)=>{
+					Events.Dispatcher.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
+				};
+			}
+		};
 
+		//placeholder letters have the blank letter outline
+		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+			for(int i=0;i<problem.initialWord.Length;i++){
+				ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
+			}
+		};
+		//if the user removes a letter at a position of a place holder letter,
+		//then restore the dashed letter outline for the placeholder.
+		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+			if(newLetter!=' ' || atPosition >= State.Current.PlaceHolderLetters.Length) return;
+			char placeholderLetter = State.Current.PlaceHolderLetters[atPosition];
+			if(placeholderLetter == ' ') return;
 
+			ArduinoLetterController.instance.ChangeTheImageOfASingleCell(
+				atPosition, 
+				LetterImageTable.instance.GetLetterOutlineImageFromLetter(placeholderLetter));
+
+		};
+	}
 
 
 	void CacheAudioClips(){
