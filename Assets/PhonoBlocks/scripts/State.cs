@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Extensions;
 using UnityEngine.SceneManagement;
-
+using System.Text.RegularExpressions;
+using System.Linq;
 public class State: MonoBehaviour  {
 	private static State current;
 	public static State Current{
@@ -113,6 +114,10 @@ public class State: MonoBehaviour  {
 		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				' ');
+		};
+		Events.Dispatcher.OnTargetWordSyllablesSet += (List<Match> syllables) => {
+			this.targetWordSyllables = syllables;
+			Debug.Log($"target word syllables {syllables.Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		};
 	
 	}
@@ -257,10 +262,21 @@ public class State: MonoBehaviour  {
 
 	}
 
+
+	//only relevant to syllable division mode
 	private SyllableDivisionShowStates syllableDivisionShowState;
 	public SyllableDivisionShowStates SyllableDivisionShowState{
 		get {
 			return syllableDivisionShowState;
+		}
+
+	}
+	//only relevant to syllable division mode
+	private List<Match> targetWordSyllables;
+	public List<Match> TargetWordSyllables{
+		get {
+			return targetWordSyllables;
+
 		}
 
 	}

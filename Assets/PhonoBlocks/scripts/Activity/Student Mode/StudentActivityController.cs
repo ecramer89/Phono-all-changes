@@ -48,6 +48,13 @@ public class StudentActivityController : MonoBehaviour
 						}
 					};
 
+					Events.Dispatcher.OnActivitySelected+=(Activity activity) => {
+						if(activity == Activity.SYLLABLE_DIVISION){
+							Events.Dispatcher.OnNewProblemBegun+=(ProblemData problem)=>{
+								Events.Dispatcher.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
+							};
+						}
+					};
 
 		}
 
@@ -129,6 +136,7 @@ public class StudentActivityController : MonoBehaviour
 		        Events.Dispatcher.RecordNewProblemBegun (
 					ProblemsRepository.instance.GetNextProblem ()
 				);
+			
 				Events.Dispatcher.EnterStudentModeMainActivity ();
 				AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
 

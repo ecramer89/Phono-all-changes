@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Text.RegularExpressions;
 
 
 [RequireComponent(typeof(State))]
@@ -165,6 +166,10 @@ public class Events: MonoBehaviour  {
 	public event Action<InteractiveLetter> OnInteractiveLetterDeSelected = (InteractiveLetter letter) => {};
 	public void RecordInteractiveLetterDeSelected(InteractiveLetter letter){
 		OnInteractiveLetterDeSelected(letter);
+	}
+	public event Action<List<Match>> OnTargetWordSyllablesSet = (List<Match> syllables) => {};
+	public void RecordTargetWordSyllablesSet(List<Match> syllables){
+		OnTargetWordSyllablesSet(syllables);
 	}
 
 
