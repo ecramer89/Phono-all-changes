@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Text;
 using Extensions;
-
+using System.Text.RegularExpressions;
 public class HintController : MonoBehaviour
 {
 	
@@ -23,7 +23,11 @@ public class HintController : MonoBehaviour
 					PRESENT_EACH_TARGET_LETTER_IN_SEQUENCE: 
 						Events.Dispatcher.LockUIInput();
 						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
-						StartCoroutine (PresentTargetLettersAndSoundsOneAtATime());
+						StartCoroutine (
+							State.Current.Activity == Activity.SYLLABLE_DIVISION ? 
+								PresentTargetSyllablesAndSyllableSoundsOneAtATime() :
+								PresentTargetLettersAndSoundsOneAtATime()
+						);
 					break;
 
 				case Parameters.Hints.Descriptions.
@@ -50,6 +54,37 @@ public class HintController : MonoBehaviour
 
 		}
 
+
+
+	IEnumerator PresentTargetSyllablesAndSyllableSoundsOneAtATime(){
+		int syllableIndex = -1;
+		int numSyllables = State.Current.TargetWordSyllables.Count;
+		while(true){
+			syllableIndex++;
+			if (syllableIndex > numSyllables) break;
+			if (syllableIndex == numSyllables)
+				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_FULL_CORRECT_WORD);
+			else {
+				Match targetSyllable = State.Current.TargetWordSyllables[syllableIndex];
+				for(int i=0;i<targetSyllable.Value.Length;i++){
+					int indexOfLetterInTargetWord = targetSyllable.Index+i;
+					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (indexOfLetterInTargetWord, targetSyllable.Value[i]);
+					Colorer.ChangeDisplayColourOfASingleLetter (indexOfLetterInTargetWord, State.Current.TargetWordColors[indexOfLetterInTargetWord]);
+				}
+				//todo, when record the syllables- put them here
+				//string pathTo = $"audio/sounded_out_syllables/{targetWord}/{targetWord[syllableIndex]}";
+				//AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
+				//AudioSourceController.PushClip (targetSound);
+				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
+			}
+		}
+		Events.Dispatcher.UnLockUIInput ();
+		ArduinoLetterController.instance.PlaceWordInLetterGrid (
+			State.Current.UserInputLetters.Union(State.Current.PlaceHolderLetters)
+		);
+		State.Current.UILetters.ForEach(UILetter=>UILetter.RevertToInputDerivedColor ()); 
+
+	}
 
 			IEnumerator PresentTargetLettersAndSoundsOneAtATime(){
 				int letterindex = -1;

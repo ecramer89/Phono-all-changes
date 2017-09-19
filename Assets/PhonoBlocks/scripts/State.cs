@@ -117,7 +117,7 @@ public class State: MonoBehaviour  {
 		};
 		Events.Dispatcher.OnTargetWordSyllablesSet += (List<Match> syllables) => {
 			this.targetWordSyllables = syllables;
-			Debug.Log($"target word syllables {syllables.Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+
 		};
 	
 	}
