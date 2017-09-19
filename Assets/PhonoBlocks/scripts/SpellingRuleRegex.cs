@@ -54,7 +54,7 @@ public static class SpellingRuleRegex  {
 	//Consonant Blend Regex
 	//can only appear at the end of a syllable
 	static string[] consonantBlendsFinal = new string[]{
-		"ft", "nd", "mp", "nt","thr", "nz","str"
+		"ft","rn", "nd", "mp", "nt","thr", "nz","str"
 	};
 
 
@@ -79,6 +79,14 @@ public static class SpellingRuleRegex  {
 
 	}
 
+	static string[] acceptableInitialConsonantUnits=consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray();
+	static string[] acceptableFinalConsonantUnits =consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray();
+
+	static string anyInitialConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray());
+	static Regex anyInitialUnitRegex = Make($"{anyInitialConsonantUnit}|{vowelDigraph}");
+	static string anyFinalConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray());
+	static Regex anyFinalUnitRegex = Make($"{anyFinalConsonantUnit}|{vowelDigraph}");
+
 
 	static string[] vowelDigraphs = new string[] {
 		"ea", "ai", "ae", "aa", "ee", "ie", "oe", "ue", "ou", "ay", "oa"
@@ -92,18 +100,8 @@ public static class SpellingRuleRegex  {
 
 	}
 
-	static string[] rControlledVowels = new string[]{
-		"er", "ur", "or","ir","ar"
-	};
-	static string rControlledVowel = MatchAnyOf (rControlledVowels);
-	static Regex rControlledVowelRegex = Make(rControlledVowel);
-	public static Regex RControlledVowel{
-		get{
-			return rControlledVowelRegex;
-		}
+	static string[] anyRFinalBlendOrDigraph = acceptableFinalConsonantUnits.Where(blend=>blend[0]=='r').ToArray();
 
-	}
-		
 
 	static string anyConsonant = MatchAnyOf(new string[]{consonantDigraph, consonantBlend, consonant});
 	static Regex anyConsonantRegex = Make (anyConsonant);
@@ -113,16 +111,13 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
-	static string anyInitialConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray());
-	static Regex anyInitialUnitRegex = Make($"{anyInitialConsonantUnit}|{vowelDigraph}");
-	static string anyFinalConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray());
-	static Regex anyFinalUnitRegex = Make($"{anyFinalConsonantUnit}|{vowelDigraph}");
 
 	//order matters here. 
 	//syllable division- need to keep consonant blends/digraphs together (i.e. jacket -< jack and et not jac and ket).
 	//as such, be sure to put digraphs and blends ahead of single consonants so that it matches the larger units first.
 	public static string acceptableInitialConsonant = $"({anyInitialConsonantUnit}|({consonant}))";
 	public static string acceptableFinalConsonant = $"({anyFinalConsonantUnit}|({consonant}))";
+
 
 	static string anyVowel = MatchAnyOf (new string[]{vowelDigraph, vowel });
 	static Regex anyVowelRegex = Make (anyVowel);
@@ -132,6 +127,16 @@ public static class SpellingRuleRegex  {
 		}
 
 	}
+
+	static string rControlledVowel = $"({anyVowel})({MatchAnyOf (anyRFinalBlendOrDigraph)}|r)";
+	static Regex rControlledVowelRegex = Make(rControlledVowel);
+	public static Regex RControlledVowel{
+		get{
+			return rControlledVowelRegex;
+		}
+
+	}
+
 
 	//Magic-E rule regex
 	static Regex magicERule = Make($"({acceptableInitialConsonant})?({vowel})(?!r)({acceptableFinalConsonant})e(?!\\w)");
@@ -159,13 +164,13 @@ public static class SpellingRuleRegex  {
 			return closedSyllableRegex;
 		}
 	}
-
+		
 	static string consonantLeSyllable = $"({anyConsonant})le";
-	static string rControlledVowelSyllable=$"({acceptableInitialConsonant})({anyVowel})r";
+	static string rControlledVowelSyllable=$"({acceptableInitialConsonant})?({anyVowel})r";
 	static string vowelYSyllable=$"({acceptableInitialConsonant})y";
 	static string[] stableSyllables = new string[]{
-		consonantLeSyllable, rControlledVowelSyllable, vowelYSyllable
-	};
+		consonantLeSyllable, rControlledVowelSyllable, vowelYSyllable};
+
 	static string stableSyllable = MatchAnyOf(stableSyllables);
 	static Regex stableSyllableRegex = Make(stableSyllable);
 
@@ -259,13 +264,12 @@ public static class SpellingRuleRegex  {
 		
 
 	public static void Test(){
-		TestSyllabify();
 
 	}
 
 
 	static void TestSyllabify(){
-		/*Debug.Log($"expect wa ter {Syllabify("water").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect wa ter {Syllabify("water").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect in put {Syllabify("input").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect rel ish {Syllabify("relish").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect po lite {Syllabify("polite").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
@@ -277,12 +281,42 @@ public static class SpellingRuleRegex  {
 		Debug.Log($"expect banz ban an {Syllabify("banzwbanan").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ma ple {Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ter ror {Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
-*/
+
 		Debug.Log($"expect cree py {Syllabify("creepy").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
-		/*Debug.Log($"expect ca ble {Syllabify("cable").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect ca ble {Syllabify("cable").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect o ver {Syllabify("over").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ang er {Syllabify("anger").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
-		Debug.Log($"expect ri der {Syllabify("rider").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");*/
+		Debug.Log($"expect ri der {Syllabify("rider").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+	}
+
+
+	static void TestRControlledVowel(){
+		Debug.Log("--------TEST R CONTROLLED VOWEL------");
+		Debug.Log($"Matches ar: {rControlledVowelRegex.Match("ar").Value}");
+		Debug.Log($"Matches arr: {rControlledVowelRegex.Match("arr").Value}");
+		Debug.Log($"Matches ark: {rControlledVowelRegex.Match("ark").Value}");
+		Debug.Log($"Matches arka: {rControlledVowelRegex.Match("arka").Value}");
+		Debug.Log($"Matches ara: {rControlledVowelRegex.Match("ara").Value}");
+		Debug.Log($"Matches bar: {rControlledVowelRegex.Match("bar").Value}");
+		Debug.Log($"Matches bara: {rControlledVowelRegex.Match("bara").Value}");
+		Debug.Log($"Matches ar  : {rControlledVowelRegex.Match("ar  ").Value}");
+		Debug.Log($"Matches   ar: {rControlledVowelRegex.Match("  ar").Value}");
+		Debug.Log($"Matches are: {rControlledVowelRegex.Match("are").Value}");
+		Debug.Log($"Does not match r (without vowel): {!rControlledVowelRegex.IsMatch("r")}");
+
+		Debug.Log($"Matches car: {rControlledVowelRegex.Match("car")}");
+		Debug.Log($"Matches jar: {rControlledVowelRegex.Match("jar")}");
+		Debug.Log($"Matches fir: {rControlledVowelRegex.Match("fir")}");
+
+		Debug.Log($"Matches hurt; captures final cons. blend: {rControlledVowelRegex.Match("hurt").Value}");
+		Debug.Log($"Matches horn; captures final cons. blend: {rControlledVowelRegex.Match("horn").Value}");
+		Debug.Log($"Matches part; captures final cons. blend: {rControlledVowelRegex.Match("part").Value}");
+		Debug.Log($"Matches intern; captures final cons. blend: {rControlledVowelRegex.Match("intern").Value}");
+	
+
+		Debug.Log($"Does not match ra: {!rControlledVowelRegex.IsMatch("ra")}");
+		Debug.Log($"Does not match rad: {!rControlledVowelRegex.IsMatch("rad")}");
+		Debug.Log($"Does not match r a: {!rControlledVowelRegex.IsMatch("r a")}");
 	}
 
 
@@ -315,7 +349,7 @@ public static class SpellingRuleRegex  {
 
 
 
-	/*
+
 	static void TestMatchMagicERule(){
 		Debug.Log("--------TEST MAGIC E RULE------");
 		Debug.Log ($"Matches game: {magicERule.IsMatch("game")}"); 
@@ -343,64 +377,49 @@ public static class SpellingRuleRegex  {
 
 	static void TestClosedSyllable(){
 		Debug.Log("--------TEST CLOSED SYLLABLE------");
-		Debug.Log($"Matches cat: {closedSyllable.IsMatch("cat")}");
-		Debug.Log($"Matches cat  : {closedSyllable.IsMatch("cat  ")}");
-		Debug.Log($"Matches cat  : {closedSyllable.IsMatch("  cat")}");
-		Debug.Log($"Matches acat  : {closedSyllable.IsMatch("acat")}");
-		Debug.Log($"Matches acata: {closedSyllable.IsMatch("acata")}");
-		Debug.Log($"Matches acatat: {closedSyllable.IsMatch("acatat")}");
-		Debug.Log($"Matches catcat: {closedSyllable.IsMatch("catcat")}");
-		Debug.Log($"Matches chat: {closedSyllable.IsMatch("chat")}");
-		Debug.Log($"Matches cash: {closedSyllable.IsMatch("cash")}");
-		Debug.Log($"Matches ash: {closedSyllable.IsMatch("ash")}");
-		Debug.Log($"Does not match ca: {!closedSyllable.IsMatch("ca")}");
-		Debug.Log($"Does not match car: {!closedSyllable.IsMatch("car")}");
-		Debug.Log($"Does not match a: {!closedSyllable.IsMatch("a")}");
-		Debug.Log($"Does not match c: {!closedSyllable.IsMatch("c")}");
-		Debug.Log($"Does not match ch: {!closedSyllable.IsMatch("ch")}");
-		Debug.Log($"Does not match game: {!closedSyllable.IsMatch("game")}");
+		Debug.Log($"Matches cat: {ClosedSyllable.IsMatch("cat")}");
+		Debug.Log($"Matches cat  : {ClosedSyllable.IsMatch("cat  ")}");
+		Debug.Log($"Matches cat  : {ClosedSyllable.IsMatch("  cat")}");
+		Debug.Log($"Matches acat  : {ClosedSyllable.IsMatch("acat")}");
+		Debug.Log($"Matches acata: {ClosedSyllable.IsMatch("acata")}");
+		Debug.Log($"Matches acatat: {ClosedSyllable.IsMatch("acatat")}");
+		Debug.Log($"Matches catcat: {ClosedSyllable.IsMatch("catcat")}");
+		Debug.Log($"Matches chat: {ClosedSyllable.IsMatch("chat")}");
+		Debug.Log($"Matches cash: {ClosedSyllable.IsMatch("cash")}");
+		Debug.Log($"Matches ash: {ClosedSyllable.IsMatch("ash")}");
+		Debug.Log($"Does not match ca: {!ClosedSyllable.IsMatch("ca")}");
+		Debug.Log($"Does not match car: {!ClosedSyllable.IsMatch("car")}");
+		Debug.Log($"Does not match a: {!ClosedSyllable.IsMatch("a")}");
+		Debug.Log($"Does not match c: {!ClosedSyllable.IsMatch("c")}");
+		Debug.Log($"Does not match ch: {!ClosedSyllable.IsMatch("ch")}");
+		Debug.Log($"Does not match game: {!ClosedSyllable.IsMatch("game")}");
+		Debug.Log($"Does not match c: {!ClosedSyllable.IsMatch("c")}");
+		Debug.Log($"Does not match ct: {!ClosedSyllable.IsMatch("ct")}");
 		//don't count r controlled vowels; different syllable.
-		Debug.Log($"Does not match car: {!closedSyllable.IsMatch("car")}");
-		Debug.Log($"Does not match c a t: {!closedSyllable.IsMatch("c a t")}");
+		Debug.Log($"Does not match car: {!ClosedSyllable.IsMatch("car")}");
+		Debug.Log($"Does not match c a t: {!ClosedSyllable.IsMatch("c a t")}");
 	}
 
 
 	static void TestOpenSyllable(){
 		Debug.Log("--------TEST OPEN SYLLABLE------");
-		Debug.Log($"Matches a: {openSyllable.IsMatch("a")}");
-		Debug.Log($"Matches aa: {openSyllable.IsMatch("aa")}");
-		Debug.Log($"Matches ae: {openSyllable.IsMatch("ae")}");
-		Debug.Log($"Matches ca: {openSyllable.IsMatch("ca")}");
-		Debug.Log($"Matches caa: {openSyllable.IsMatch("caa")}");
-		Debug.Log($"Matches    a: {openSyllable.IsMatch("   a")}");
-		Debug.Log($"Matches a  : {openSyllable.IsMatch("a   ")}");
-		Debug.Log($"Matches a a a: {openSyllable.IsMatch("a a a")}");
-		Debug.Log($"Matches caca (second a): {openSyllable.IsMatch("caca")}");
+		Debug.Log($"Matches a: {OpenSyllable.IsMatch("a")}");
+		Debug.Log($"Matches aa: {OpenSyllable.IsMatch("aa")}");
+		Debug.Log($"Matches ae: {OpenSyllable.IsMatch("ae")}");
+		Debug.Log($"Matches ca: {OpenSyllable.IsMatch("ca")}");
+		Debug.Log($"Matches caa: {OpenSyllable.IsMatch("caa")}");
+		Debug.Log($"Matches    a: {OpenSyllable.IsMatch("   a")}");
+		Debug.Log($"Matches a  : {OpenSyllable.IsMatch("a   ")}");
+		Debug.Log($"Matches a a a: {OpenSyllable.IsMatch("a a a")}");
+		Debug.Log($"Matches caca (second a): {OpenSyllable.IsMatch("caca")}");
 
-		Debug.Log($"Does not match c: {!openSyllable.IsMatch("c")}");
-		Debug.Log($"Does not match ad: {!openSyllable.IsMatch("ad")}");
-		Debug.Log($"Does not match ack: {!openSyllable.IsMatch("ack")}");
-		Debug.Log($"Does not match ace: {!openSyllable.IsMatch("ace")}"); //todo... this one fails
-		Debug.Log($"Does not match ar: {!openSyllable.IsMatch("ar")}");
+		Debug.Log($"Does not match c: {!OpenSyllable.IsMatch("c")}");
+		Debug.Log($"Does not match ad: {!OpenSyllable.IsMatch("ad")}");
+		Debug.Log($"Does not match ack: {!OpenSyllable.IsMatch("ack")}");
+		Debug.Log($"Does not match ace: {!OpenSyllable.IsMatch("ace")}"); //todo... this one fails
+		Debug.Log($"Does not match ar: {!OpenSyllable.IsMatch("ar")}");
 
 	}
-
-	static void TestRControlledVowel(){
-		Debug.Log("--------TEST R CONTROLLED VOWEL------");
-		Debug.Log($"Matches ar: {rControlledVowelRegex.IsMatch("ar")}");
-		Debug.Log($"Matches arr: {rControlledVowelRegex.IsMatch("arr")}");
-		Debug.Log($"Matches ark: {rControlledVowelRegex.IsMatch("ark")}");
-		Debug.Log($"Matches arka: {rControlledVowelRegex.IsMatch("arka")}");
-		Debug.Log($"Matches ara: {rControlledVowelRegex.IsMatch("ara")}");
-		Debug.Log($"Matches bar: {rControlledVowelRegex.IsMatch("bar")}");
-		Debug.Log($"Matches bara: {rControlledVowelRegex.IsMatch("bara")}");
-		Debug.Log($"Matches ar  : {rControlledVowelRegex.IsMatch("ar  ")}");
-		Debug.Log($"Matches   ar: {rControlledVowelRegex.IsMatch("  ar")}");
-		Debug.Log($"Matches are: {rControlledVowelRegex.IsMatch("are")}");
-
-		Debug.Log($"Does not match ra: {!rControlledVowelRegex.IsMatch("ra")}");
-		Debug.Log($"Does not match rad: {!rControlledVowelRegex.IsMatch("rad")}");
-		Debug.Log($"Does not match r a: {!rControlledVowelRegex.IsMatch("r a")}");
-	}*/
+		
 
 }
