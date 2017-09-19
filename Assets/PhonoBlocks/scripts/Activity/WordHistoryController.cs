@@ -47,20 +47,21 @@ public class WordHistoryController : MonoBehaviour
 
 
 		public void AddCurrentWordToHistory ()
-		{
-				Word newWord = CreateNewWordAndAddToList (AddLettersOfNewWordToHistory ());
+		{           
+				AddLettersOfNewWordToHistory ();
+		        //cache an audio clip and string for each word that gets saved to the History
+				Word newWord = CreateNewWordAndAddToList (State.Current.UserInputLetters.Trim());
 				AudioSourceController.PushClip (newWord.Sound);
 			
 		}
 
-		string AddLettersOfNewWordToHistory ()
+		void AddLettersOfNewWordToHistory ()
 		{ 
-				StringBuilder currentWordAsString = new StringBuilder ();
+				
 				int position = words.Count * Parameters.UI.ONSCREEN_LETTER_SPACES;
 				foreach (InteractiveLetter l in State.Current.UILetters) {
 					
 			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (
-						l.LetterFromUserInput, 
 							l.CurrentDisplayImage (), 
 							(position++) + "", l.ColorFromInput
 						);
@@ -68,12 +69,9 @@ public class WordHistoryController : MonoBehaviour
 						letterInWord.GetComponent<InteractiveLetter>().LetterPressed+=PlayWordOfPressedLetter;
 						letterInWord.AddComponent<BoxCollider> ();
 						letterInWord.AddComponent<UIDragPanelContents> ();
-
-						currentWordAsString.Append (l.LetterFromUserInput);
-						
+		
 				}
 				wordHistoryGrid.GetComponent<UIGrid> ().Reposition ();
-				return currentWordAsString.ToString ().Trim ().ToLower ();
 
 
 		}
@@ -82,9 +80,9 @@ public class WordHistoryController : MonoBehaviour
 		{
 				words.Clear ();
 				//set the letter and display color of each word in history to blank
-				List<InteractiveLetter> letters = lettersOfWordInHistory.GetLetters (false);
+				List<InteractiveLetter> letters = lettersOfWordInHistory.GetLetters ();
 				foreach (InteractiveLetter letter in letters) {
-					letter.UpdateInputLetterAndInputDerivedColor (" ", 
+					letter.UpdateLetterImageAndInputDerivedColor ( 
 				    lettersOfWordInHistory.GetAppropriatelyScaledImageForLetter(" "), Color.white);
 				}
 		}
@@ -102,8 +100,6 @@ public class WordHistoryController : MonoBehaviour
 		public void PlayWordOfPressedLetter (GameObject pressedLetterCell)
 		{
 				InteractiveLetter l = pressedLetterCell.GetComponent<InteractiveLetter> ();
-				if (l.IsBlank ()) 
-						return;
 				Word wordThatLettersBelongTo = RetrieveWordGivenLetterAndIndex (l, IndexOfWordThatLetterBelongsTo (pressedLetterCell));
 				AudioSourceController.PushClip (wordThatLettersBelongTo.Sound);
 			

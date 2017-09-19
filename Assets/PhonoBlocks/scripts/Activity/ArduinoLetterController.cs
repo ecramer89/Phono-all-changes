@@ -40,7 +40,7 @@ public class ArduinoLetterController : MonoBehaviour{
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 							AssignInteractiveLettersToTangibleCounterParts ();
 
-							Events.Dispatcher.UILettersCreated (letterGrid.GetLetters (false));
+							Events.Dispatcher.UILettersCreated (letterGrid.GetLetters ());
 						}
 
 				};
@@ -55,19 +55,7 @@ public class ArduinoLetterController : MonoBehaviour{
 
 		public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter)
 		{
-		   letterGrid.GetInteractiveLetter (atPosition).
-			UpdateInputLetterButNotInputDerivedColor (newLetter, 
-			letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
-		}
-
-
-
-		void ChangeTheImageOfASingleCell (int atPosition, Texture2D newImage)
-		{
-				InteractiveLetter i = letterGrid.GetInteractiveLetter (atPosition);
-				i.UpdateDisplayImageButNotInputLetter (newImage);
-
-
+		   letterGrid.GetInteractiveLetter (atPosition).UpdateLetterImage (letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
 		}
 
 
@@ -97,7 +85,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		
 		for (int i=0; i<word.Length; i++) {
 					if(!ignoreBlanks || word[i] != ' ')
-						ChangeTheImageOfASingleCell (i, LetterImageTable.instance.GetLetterImageFromLetter (word.Substring (i, 1) [0]));
+						ChangeTheLetterOfASingleCell (i, word[i]);
 			
 				}
 		

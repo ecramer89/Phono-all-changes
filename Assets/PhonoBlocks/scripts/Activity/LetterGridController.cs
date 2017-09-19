@@ -110,14 +110,15 @@ public class LetterGridController : MonoBehaviour
     
 				for (int i= 0; i<numCells; i++) {
 				
-						GameObject newLetter = CreateLetterBarCell (" ", blankLetter, i + "", Color.white);
-
+						GameObject newLetter = CreateLetterBarCell (blankLetter, i + "", Color.white);
+						InteractiveLetter iLetter = newLetter.GetComponent<InteractiveLetter>();
+						iLetter.Position = i;
 						//the word history controller also involves a letter grid... but doesn't highlight selected letters or show the lines.
 						//consider changing this so that the arduino letter controller is what creates the underlines and highlights...
 						//seems weird that this class would be making decisions about that
 						if (letterHighlightsGrid) {
 								UITexture letterHighlight = CreateLetterHighlightCell ();
-								newLetter.GetComponent<InteractiveLetter> ().SelectHighlight = letterHighlight;
+								iLetter.SelectHighlight = letterHighlight;
 						}
 						if (letterUnderlinesGrid) {
 								CreateLetterUnderlineCell (i);
@@ -191,7 +192,7 @@ public class LetterGridController : MonoBehaviour
 				}
 		}
 
-		public GameObject CreateLetterBarCell (String letter, Texture2D tex2D, string position, Color c)
+		public GameObject CreateLetterBarCell (Texture2D tex2D, string position, Color c)
 		{      
 				Texture2D tex2dCopy = CopyAndScaleTexture (letterImageWidth, letterImageHeight, tex2D);
 				UITexture ut = NGUITools.AddChild<UITexture> (letterGrid);
@@ -207,7 +208,7 @@ public class LetterGridController : MonoBehaviour
 
 				InteractiveLetter l = ut.gameObject.AddComponent<InteractiveLetter> ();
 				l.Trigger = b;
-				l.UpdateInputLetterAndInputDerivedColor (letter, tex2dCopy, c);
+				l.UpdateLetterImageAndInputDerivedColor (tex2dCopy, c);
 	
 				ut.gameObject.name = position;
 				ut.MakePixelPerfect ();
@@ -231,16 +232,12 @@ public class LetterGridController : MonoBehaviour
 				return tex2dCopy;
 		}
 
-		public List<InteractiveLetter> GetLetters (bool skipBlanks)
-		{
+		public List<InteractiveLetter> GetLetters ()
+	{       
 				List<InteractiveLetter> list = new List<InteractiveLetter> ();
 				foreach (Transform child in letterGrid.transform) {
 						InteractiveLetter letter = child.GetComponent<InteractiveLetter> ();
-						if (!skipBlanks || !letter.IsBlank ()) {
-						
 								list.Add (letter);
-						}
-
 
 				}
 				return list;

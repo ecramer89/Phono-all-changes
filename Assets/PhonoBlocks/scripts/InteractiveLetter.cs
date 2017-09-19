@@ -4,13 +4,19 @@ using System;
 
 
 public class InteractiveLetter : MonoBehaviour{
-
-		String letterFromUserInput; //letter the user has physically placed at the position of this interactive letter.
-		public String LetterFromUserInput
-		{ 		get{
-				return letterFromUserInput;
+	    
+		int position; //position of this letter in the on screen word.
+		public int Position{
+			get {
+				return Position;
 			}
+			set {
+				position = value;
+			}
+
 		}
+	    
+
 		Color colorFromInput;  //color derived from the letterFromUserInput
 		public Color ColorFromInput {
 				get {
@@ -133,10 +139,6 @@ public class InteractiveLetter : MonoBehaviour{
 				return gameObject.GetComponent<UITexture> ().color;
 		}
 
-		public bool IsBlank ()
-		{
-			return letterFromUserInput == null || letterFromUserInput.Length ==0 || letterFromUserInput == " ";
-		}
 
 		public void StartFlash(){
 			if (numFlashCycles == 0)
@@ -195,49 +197,32 @@ public class InteractiveLetter : MonoBehaviour{
 			UpdateDisplayColour (c);
 		}
 
-
+	//todo, this should be responsibility of the colorer, not of the i letters sine i letters used to grids also
 		public void ChangeColourOfTangibleCounterpartIfThereIsOne (Color c)
 		{
  
         //on the screen, blank letters are just clear.
-        //but we issue the black (0,0,0) colour to the arduino.
-		if (IsBlank())
-						c = Color.black;
-		if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER &&
+        //but we issue the black (0,0,0) colour to the arduino
+		/*if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER &&
 		      State.Current.InputType == InputType.TUI) {
 			ArduinoUnityInterface.Instance.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c);
-		}
+		}*/
 
 
 		}
-		public void UpdateInputLetterAndInputDerivedColor (String letter, Texture2D img, Color c)
+		public void UpdateLetterImageAndInputDerivedColor (Texture2D img, Color c)
 	{   	
-			UpdateInputLetterButNotInputDerivedColor (letter, img);
+			UpdateLetterImage (img);
 			UpdateInputDerivedAndDisplayColor (c);
 		}
 
 
 		
-		public void UpdateDisplayImageButNotInputLetter (Texture2D img)
+		public void UpdateLetterImage (Texture2D img)
 		{
 				gameObject.GetComponent<UITexture> ().mainTexture = img;
 		}
 		
-
-		public void UpdateInputLetterButNotInputDerivedColor (String letter, Texture2D img)
-		{
-			
-				letter = letter;
-
-				//de-select this cell if it was selected
-				if (isSelected)
-						DeSelect ();
-			
-			
-				gameObject.GetComponent<UITexture> ().mainTexture = img;
-			
-
-		}
 
 
 
@@ -247,36 +232,35 @@ public class InteractiveLetter : MonoBehaviour{
 
 		}
 		
-		void Update ()
-		{
-	
-				if (!IsBlank ()) { //don't select blank letters
-						
+		public void Update ()
+	{
+
 						if (MouseIsOverSelectable ()) {
 					
 								if (SwipeDetector.swipeDirection == SwipeDetector.Swipe.RIGHT) {
-												
+										Debug.Log("SWIPE RIGHT");		
 										Select ();
 								}
 								if (SwipeDetector.swipeDirection == SwipeDetector.Swipe.LEFT) {
+										Debug.Log("SWIPE LEFT");
 										DeSelect ();				
 								}
 					
 						}
 			
-				}
+				
 		}
 	
 		bool MouseIsOverSelectable ()
-		{
+		{        
 				Vector3 mouse = SwipeDetector.GetTransformedMouseCoordinates ();
-		
+		        
 				return (Vector3.Distance (mouse, gameObject.transform.position) < .3);	
 		}
 
 		public void Select (bool notifyObservers=true)
 		{
-				if (!isSelected && !IsBlank ()) {
+				if (!isSelected) {
 
 						isSelected = true;
 						if (selectColor == Color.clear)

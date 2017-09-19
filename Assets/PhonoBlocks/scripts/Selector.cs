@@ -59,7 +59,7 @@ public class Selector : MonoBehaviour {
 			return targetWordWithBlanksOnEnd;
 		}
 	}
-
+		
 
 	private bool currentStateOfUserInputMatchesTarget;
 	public bool CurrentStateOfInputMatchesTarget{
