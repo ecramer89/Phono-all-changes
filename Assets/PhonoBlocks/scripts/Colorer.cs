@@ -808,6 +808,7 @@ public class Colorer : MonoBehaviour   {
 			for(int i=0;i<syllables.Count;i++){
 				Match syllable = syllables[i];
 				List<InteractiveLetter> letters = State.Current.UILetters.GetRange(syllable.Index, syllable.Length);
+			
 				foreach(InteractiveLetter letter in letters){
 					letter.UpdateInputDerivedAndDisplayColor(
 						State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
@@ -836,6 +837,7 @@ public class Colorer : MonoBehaviour   {
 			bool divided=State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
 			if(divided && targetWord == updatedUserInputLetters.Trim()){
 				colorSyllables(updatedUserInputLetters);
+				return;
 			}
 
 			//otherwise we just color the letters pink, provided they are correctly placed.

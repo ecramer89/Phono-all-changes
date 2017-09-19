@@ -10,7 +10,8 @@ public class ToggleSyllableDivisionShowButton : MonoBehaviour {
 		messenger.target = gameObject;
 		messenger.functionName = "ToggleSyllableDivisionShow";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
-
+	
+	
 		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
 		  gameObject.SetActive(activity == Activity.SYLLABLE_DIVISION);
 		};

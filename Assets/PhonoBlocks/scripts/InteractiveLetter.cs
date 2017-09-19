@@ -211,7 +211,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 		}
 		public void UpdateInputLetterAndInputDerivedColor (String letter, Texture2D img, Color c)
-		{
+	{   	
 			UpdateInputLetterButNotInputDerivedColor (letter, img);
 			UpdateInputDerivedAndDisplayColor (c);
 		}

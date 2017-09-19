@@ -103,9 +103,7 @@ public static class SpellingRuleRegex  {
 		}
 
 	}
-
-
-
+		
 
 	static string anyConsonant = MatchAnyOf(new string[]{consonantDigraph, consonantBlend, consonant});
 	static Regex anyConsonantRegex = Make (anyConsonant);
@@ -121,7 +119,7 @@ public static class SpellingRuleRegex  {
 	public static string acceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
 	public static string acceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
 
-	static string anyVowel = MatchAnyOf (new string[]{ vowelDigraph, vowel });
+	static string anyVowel = MatchAnyOf (new string[]{vowelDigraph, vowel });
 	static Regex anyVowelRegex = Make (anyVowel);
 	public static Regex AnyVowel{
 		get {
@@ -149,7 +147,7 @@ public static class SpellingRuleRegex  {
 	}
 
 	//Closed syllable regex
-	static string closedSyllable = $"({acceptableInitialConsonant})?({vowel})(?!r)({acceptableFinalConsonant})";
+	static string closedSyllable = $"({acceptableInitialConsonant})?({anyVowel})(?!r)({acceptableFinalConsonant})";
 	static Regex closedSyllableRegex = Make($"{closedSyllable}");
 	public static Regex ClosedSyllable{
 		get {
@@ -157,18 +155,32 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
-	static Regex any = new Regex(".*");
+
 	static string[] stableSyllables = new string[]{
-		$"({anyConsonant})le", $"({acceptableInitialConsonant})({anyVowel})r"
+		$"({anyConsonant})le", $"({acceptableInitialConsonant})({anyVowel})r", $"({acceptableInitialConsonant})y"
 	};
 	static string stableSyllable = MatchAnyOf(stableSyllables);
 	static Regex stableSyllableRegex = Make(stableSyllable);
-		
-	static Regex OneConsonantDivision = Make($"({anyVowel})({anyConsonant})({anyVowel})");
-	static Func<int, string> Quantify = (int number) => "{"+number+"}";
-	static Regex TwoConsonantDivision = Make($"({anyVowel})({anyConsonant}){Quantify(2)}({anyVowel})");
 
-    /*
+	static Regex[] closedAndOpenSyllables = new Regex[]{ClosedSyllable,OpenSyllable};
+	static string anyInitialConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray());
+	static Regex anyInitialUnitRegex = Make($"{anyInitialConsonantUnit}|{vowelDigraph}");
+	static string anyFinalConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray());
+	static Regex anyFinalUnitRegex = Make($"{anyFinalConsonantUnit}|{vowelDigraph}");
+
+	static Func<int,Match,bool> IsPartOfValidUnit = (int index, Match inMatch) => {
+		Match validUnit = index <= inMatch.Index ? anyInitialUnitRegex.Match(inMatch.Value) : anyFinalUnitRegex.Match(inMatch.Value);
+		return (Range.Includes(validUnit.Index, validUnit.Index+validUnit.Length, index-inMatch.Index));
+	};		
+	static Func<Match, Match, int, bool> unitsKeepTogetherLongerBeatShorter = (Match contender, Match currentWinner, int overlapAt) => {
+		//if they're arguing over an index where
+		//for one of the contenders, it's part of a valid multi letter unit,
+		//then that contender wins.
+		//otherwise, pick the longer one.
+		return IsPartOfValidUnit(overlapAt, contender) ? true :  IsPartOfValidUnit(overlapAt, currentWinner) ? false : contender.Length > currentWinner.Length;
+	};
+
+	/*
      * order is important. needs to find stable syllables first, then magic e, then closed, then open.
      * any letters that aren't included in syllables (e.g. randomly interjected consonants) won't be included
      * in anything in the returned list of matches.
@@ -180,8 +192,7 @@ public static class SpellingRuleRegex  {
 		List<Match> syllables = new List<Match>();
 		word = ExtractAll(stableSyllableRegex,word,syllables); 
 		word = ExtractAll(MagicERegex, word, syllables);
-		word = ExtractAll(ClosedSyllable, word, syllables);
-		word = ExtractAll(OpenSyllable, word, syllables);
+		word = ExtractAll(closedAndOpenSyllables, word, syllables, unitsKeepTogetherLongerBeatShorter);
 		syllables.Sort((Match x, Match y) => x.Index - y.Index);
 		return syllables;
 	}
@@ -202,6 +213,37 @@ public static class SpellingRuleRegex  {
 	}
 
 
+	/*
+	 * decider: should return true if the left hand match would be chosen over the right hand match and false
+	 * if the right hand match would return true over the left hand match. Cannot choose both. 
+	 * 
+	 * */
+
+	static string ExtractAll(Regex[] rules, String word, List<Match> results, Func<Match,Match,int,bool> leftWins){
+		while(true){
+			var matches = rules.Select((Regex rule)=>rule.Match(word)).Where(match=>match.Success);
+			if(matches.Count()==0) return word;
+			for(int i=0;i<word.Length;i++){
+				if(matches.Count() == 0) return word;
+				if(word[i]==' ') continue;
+				var contenders = matches.Where(match=>Range.Includes(match.Index, match.Index+match.Length, i));
+				if(contenders.Count() == 0) continue;
+					Match winner=null;
+					foreach(Match contender in contenders){
+					if(winner == null || 
+						leftWins(contender, winner, 
+							Range.IndexOfOverlap(contender.Index, contender.Index + contender.Length, winner.Index, winner.Index+winner.Length))) 
+						winner = contender;
+					}
+					results.Add(winner);
+					word=word.ReplaceRangeWith(' ',winner.Index, winner.Length);
+					matches=matches.Except(contenders);
+			}
+		}
+		return word;
+	}
+
+
 	static string MatchAnyOf(string[] patterns){
 		return patterns.Aggregate((acc, nxt)=>$"{acc}|{nxt}");
 	}
@@ -216,33 +258,10 @@ public static class SpellingRuleRegex  {
 		TestSyllabify();
 
 	}
-	static Action<Regex, bool, string> testConsDiv= (Regex reg, bool expect, string input) => {
-		Match m = reg.Match(input);
-		Debug.Log($"Expect {m.Success} to be {expect}: given {input} matched {m.Value}");
-	};
 
-	static void TestOneConsonantDivision(){
-		testConsDiv(OneConsonantDivision, false, "cat");
-		testConsDiv(OneConsonantDivision, true, "water");
-		testConsDiv(OneConsonantDivision, true, "wanky");
-		testConsDiv(OneConsonantDivision, true, "anky");
-		testConsDiv(OneConsonantDivision, true, "maple");
-		testConsDiv(TwoConsonantDivision, false, "catnip");
-
-	}
-
-	static void TestTwoConsonantDivision(){
-		testConsDiv(TwoConsonantDivision, false, "cat");
-		testConsDiv(TwoConsonantDivision, false, "water");
-		testConsDiv(TwoConsonantDivision, true, "wanky");
-		testConsDiv(TwoConsonantDivision, true, "anky");
-		testConsDiv(TwoConsonantDivision, true, "maple");
-		testConsDiv(TwoConsonantDivision, true, "catnip");
-
-	}
 
 	static void TestSyllabify(){
-		Debug.Log($"expect wa ter {Syllabify("water").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		/*Debug.Log($"expect wa ter {Syllabify("water").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect in put {Syllabify("input").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect rel ish {Syllabify("relish").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect po lite {Syllabify("polite").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
@@ -254,6 +273,12 @@ public static class SpellingRuleRegex  {
 		Debug.Log($"expect banz ban an {Syllabify("banzwbanan").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ma ple {Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ter ror {Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+*/
+		Debug.Log($"expect cree py {Syllabify("creepy").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		/*Debug.Log($"expect ca ble {Syllabify("cable").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect o ver {Syllabify("over").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect ang er {Syllabify("anger").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect ri der {Syllabify("rider").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");*/
 	}
 
 

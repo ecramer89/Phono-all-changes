@@ -21,6 +21,7 @@ public class State: MonoBehaviour  {
 
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
 			if(scene.name == "Activity"){
+				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			}
 		};

@@ -21,6 +21,29 @@ public static class _String{
 		return res.ToString();
 	}
 }
+		
+
+	public static class Range{
+
+	
+		public static bool Overlap(int aStart, int aEnd, int bStart, int bEnd){
+			if(aEnd <= aStart || bEnd<bStart) throw new Exception("Invalid range");
+			int halfwaythroughA = (aEnd-aStart)/2;
+			int halfwaythroughB = (bEnd-bStart)/2;
+			return Math.Abs(halfwaythroughA - halfwaythroughB) < halfwaythroughA + halfwaythroughB;
+		}
+
+		public static bool Includes(int rangeStart, int rangeEnd, int value){
+			if(rangeEnd <= rangeStart) throw new Exception("Invalid range");
+			return value <= rangeEnd && value >= rangeStart;
+		}
+
+		public static int IndexOfOverlap(int aStart, int aEnd, int bStart, int bEnd){
+			if(!Overlap(aStart, aEnd, bStart, bEnd)) throw new Exception("Ranges do not overlap.");
+			return Math.Abs(aStart-bStart)+(aStart < bStart ? aStart : bStart);
+		}
+
+	}
 
 
 	public static class PhonoBlocksExtensions {
@@ -93,7 +116,7 @@ public static class _String{
 		 * given input letters (e.g., "pk" when target is "peak"; full placeholder string must be "p  k").
 		 * */
 		public static String Align(this String str, string other){
-			if(other == null) return _String.Fill(" ", str.Length);
+			if(other == null || other.Length == 0) return _String.Fill(" ", str.Length);
 			if(other.Length == str.Length) {
 				if(other != str) throw new Exception(
 					$"Align argument exception: {str} and {other} have equal length but have uncommon characters." +

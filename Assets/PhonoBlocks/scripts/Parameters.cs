@@ -21,6 +21,8 @@ public class Parameters : MonoBehaviour {
 			Application.LoadLevel ("Activity");
 		};
 
+		SpellingRuleRegex.Test();
+
 			
 	}
 		
@@ -208,9 +210,16 @@ public class Parameters : MonoBehaviour {
 			),
 			new SessionData(
 			12, 
+				Activity.SYLLABLE_DIVISION,
+				new string[]{"over", "water", "creepy"},
+				new string[]{"","",""}
 			),
 			new SessionData(
-			13,)
+			13,
+				Activity.SYLLABLE_DIVISION,
+				new string[]{"anger", "rider", "cable"},
+				new string[]{"","",""}
+			)
 		};
 
 		public static int NUM_SESSIONS = PROBLEM_SETS.Count;
