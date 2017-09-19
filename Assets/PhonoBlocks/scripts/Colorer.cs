@@ -56,22 +56,7 @@ public class Colorer : MonoBehaviour   {
 		};
 			
 
-		Events.Dispatcher.OnSyllableDivisionShowStateToggled += ()=>{
-			ReColor(); //want the colors to update immediately.
-
-			if(State.Current.Mode == Mode.TEACHER) return;
-			//in student mode; update the target colors to reflect the change in desired color scheme
-			//todo, would be a good idea to cache the variants.
-			Events.Dispatcher.SetTargetColors(
-				ruleBasedColorer.GetColorsOf(
-					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
-					//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite
-					//indieces that correspond to those of target word.
-					State.Current.TargetWord
-				));
-		};
-
-
+		Events.Dispatcher.OnSyllableDivisionShowStateToggled += ReColor;
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
@@ -851,13 +836,15 @@ public class Colorer : MonoBehaviour   {
 			}
 		}
 
+		//the target word colors (which are basically used only in hints anyway)
+		//for syllable division mode are the divided colors, not the whole word, since the divided colors
+		//serve as hints to some extent.
 		public Color[] GetColorsOf (Color[] colors, string word){
-			bool wholeWord = State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD;
 			List<Match> syllables = SpellingRuleRegex.Syllabify(word);
 			for(int syllableIndex=0;syllableIndex<syllables.Count;syllableIndex++){
 				Match syllable = syllables[syllableIndex];
 				for(int letterIndex=syllable.Index;letterIndex<syllable.Index+syllable.Length;letterIndex++){
-					colors[letterIndex]=wholeWord ? wholeWordColor : AlternateBy(syllableIndex);
+					colors[letterIndex]=AlternateBy(syllableIndex);
 				}
 			}
 			return colors;
