@@ -170,6 +170,13 @@ public class State: MonoBehaviour  {
 		}
 
 	}
+	private string selectedUserInputLetters;
+	public string SelectedUserInputLetters{
+		get {
+			return selectedUserInputLetters;
+		}
+
+	}
 
 	private string targetWord;
 	public string TargetWord{

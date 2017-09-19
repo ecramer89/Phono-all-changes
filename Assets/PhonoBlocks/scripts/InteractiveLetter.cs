@@ -8,7 +8,7 @@ public class InteractiveLetter : MonoBehaviour{
 		int position; //position of this letter in the on screen word.
 		public int Position{
 			get {
-				return Position;
+			 	return position;
 			}
 			set {
 				position = value;
@@ -33,9 +33,22 @@ public class InteractiveLetter : MonoBehaviour{
 				}
 		}
 
-		public delegate void SelectAction (bool wasSelected,GameObject o);
+	   /*
+	    * pattern for handling interactive letter UI events differs a little from others.
+	    * basically, I don't want to even recognize swipes (selections) on the interactive letters in the word history panel
+	    * conversely, I don't want to recognize press events on the interactive letters on the main letter grid.
+	    * as such, I impose an additional layer between the interactive letter events and the main Event Dispatcher that
+	    * runs all the rest of the application.
+	    * the two classes (Arduino letter controller and word history controller) each subscribe directly to just the UI events they care about
+	    * and only subscribe to the instances of InteractiveLetter that they manage. 
+	    * these two controller classes are then responsible for dispatching the event (InteractiveLetterSelected/Deselected or just playing the word sound in case of W.H.controller)
+	    * to the main event dispatcher. The ALC can also decide whether to dispatch this event according to the current state of the letter, i.e., whether it's blank.
+	    * and of the app (i.e., ignore if all UI inputs blocked).
+	    * the ALC is also responsible for deciding whether to respond to the swipe/select action by changing the letter's highlights.
+	    * */
 
-		public event SelectAction LetterSelectedDeSelected;
+	    public event Action<bool, InteractiveLetter> OnInteractiveLetterSelectToggled = (bool selected, InteractiveLetter letter)=>{};
+
 		public delegate void PressAction (GameObject o);
 
 		public event PressAction LetterPressed;
@@ -238,12 +251,11 @@ public class InteractiveLetter : MonoBehaviour{
 						if (MouseIsOverSelectable ()) {
 					
 								if (SwipeDetector.swipeDirection == SwipeDetector.Swipe.RIGHT) {
-										Debug.Log("SWIPE RIGHT");		
-										Select ();
+										OnInteractiveLetterSelectToggled(true,this);
 								}
 								if (SwipeDetector.swipeDirection == SwipeDetector.Swipe.LEFT) {
-										Debug.Log("SWIPE LEFT");
-										DeSelect ();				
+
+									OnInteractiveLetterSelectToggled(false, this);				
 								}
 					
 						}
@@ -258,34 +270,12 @@ public class InteractiveLetter : MonoBehaviour{
 				return (Vector3.Distance (mouse, gameObject.transform.position) < .3);	
 		}
 
-		public void Select (bool notifyObservers=true)
+		public void ToggleSelectHighlight (bool activate)
 		{
-				if (!isSelected) {
-
-						isSelected = true;
-						if (selectColor == Color.clear)
-								selectHighlight.enabled = true;
-						else
-								UpdateDisplayColour (selectColor);
-						if (notifyObservers && LetterSelectedDeSelected != null)
-								LetterSelectedDeSelected (true, gameObject);
-				}
+				selectHighlight.enabled = activate;
 		
 		}
-
-		public void DeSelect (bool notifyObservers=true)
-		{
-				if (isSelected) {
-						isSelected = false;
-						if (selectColor == Color.clear) {
-								if (selectHighlight)
-										selectHighlight.enabled = false;
-						} else
-								UpdateDisplayColour (colorFromInput);
-						if (notifyObservers && LetterSelectedDeSelected != null)
-								LetterSelectedDeSelected (false, gameObject);
-				}
-		}
+		
 
 		public void OnPress (bool pressed)
 		{

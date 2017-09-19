@@ -38,9 +38,9 @@ public class ArduinoLetterController : MonoBehaviour{
 						if (scene.name == "Activity") {
 							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
-							AssignInteractiveLettersToTangibleCounterParts ();
-
-							Events.Dispatcher.UILettersCreated (letterGrid.GetLetters ());
+							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
+							SubscribeToInteractiveLetterEvents (UILetters);
+							Events.Dispatcher.UILettersCreated (UILetters);
 						}
 
 				};
@@ -54,8 +54,9 @@ public class ArduinoLetterController : MonoBehaviour{
 		}
 
 		public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter)
-		{
-		   letterGrid.GetInteractiveLetter (atPosition).UpdateLetterImage (letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
+		{   		InteractiveLetter letter = GetInteractiveLetterAt(atPosition);
+		            letter.UpdateLetterImage (letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
+					if(newLetter==" ") letter.ToggleSelectHighlight(false); //deselect letters if they are 'removed'
 		}
 
 
@@ -101,15 +102,35 @@ public class ArduinoLetterController : MonoBehaviour{
 		
 
 
-		void AssignInteractiveLettersToTangibleCounterParts ()
+		void SubscribeToInteractiveLetterEvents (List<InteractiveLetter> UILetters)
 		{
-				int indexOfLetterBarCell = 0;
+				foreach(InteractiveLetter letter in UILetters){
+					letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
+		
+				       if(State.Current.UserInputLetters[l.Position] != ' '){
+							l.ToggleSelectHighlight(wasSelected);
+							if(wasSelected){
+								Events.Dispatcher.RecordInteractiveLetterSelected(l);
+							}else{
+								Events.Dispatcher.RecordInteractiveLetterDeSelected(l);
+							}
+
+					 	}
+					};
+
+				}
+	}
+
+		         //todo colorer or the arduino l controller will do this, on new event colors of letters updated.
+		//to be dispatched by the coloroer.
+
+				/*int indexOfLetterBarCell = 0;
 				for (; indexOfLetterBarCell<Parameters.UI.ONSCREEN_LETTER_SPACES; indexOfLetterBarCell++) {
 						GameObject letterCell = letterGrid.GetLetterCell (indexOfLetterBarCell);
      
 						letterCell.GetComponent<InteractiveLetter> ().IdxAsArduinoControlledLetter = ConvertScreenToArduinoIndex (indexOfLetterBarCell);//plus 1 because the indexes are shifted.
 				}
-		}
+		}*/
 
 		int ConvertScreenToArduinoIndex (int screenIndex)
 		{       //arduino starts counting at 1

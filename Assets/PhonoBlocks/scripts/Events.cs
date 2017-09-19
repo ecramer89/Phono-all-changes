@@ -158,6 +158,16 @@ public class Events: MonoBehaviour  {
 		OnSyllableDivisionShowStateToggled ();
 	}
 
+	public event Action<InteractiveLetter> OnInteractiveLetterSelected = (InteractiveLetter letter) => {};
+	public void RecordInteractiveLetterSelected(InteractiveLetter letter){
+		OnInteractiveLetterSelected(letter);
+	}
+	public event Action<InteractiveLetter> OnInteractiveLetterDeSelected = (InteractiveLetter letter) => {};
+	public void RecordInteractiveLetterDeSelected(InteractiveLetter letter){
+		OnInteractiveLetterDeSelected(letter);
+	}
+
+
 	void Awake(){
 		events = this;
 		//gaurantees that state is first subscriber whose methods are invoked when new events occur.
