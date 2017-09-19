@@ -113,11 +113,16 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
+	static string anyInitialConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray());
+	static Regex anyInitialUnitRegex = Make($"{anyInitialConsonantUnit}|{vowelDigraph}");
+	static string anyFinalConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray());
+	static Regex anyFinalUnitRegex = Make($"{anyFinalConsonantUnit}|{vowelDigraph}");
+
 	//order matters here. 
 	//syllable division- need to keep consonant blends/digraphs together (i.e. jacket -< jack and et not jac and ket).
 	//as such, be sure to put digraphs and blends ahead of single consonants so that it matches the larger units first.
-	public static string acceptableInitialConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray())}|({consonant}))";
-	public static string acceptableFinalConsonant = $"({MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray())}|({consonant}))";
+	public static string acceptableInitialConsonant = $"({anyInitialConsonantUnit}|({consonant}))";
+	public static string acceptableFinalConsonant = $"({anyFinalConsonantUnit}|({consonant}))";
 
 	static string anyVowel = MatchAnyOf (new string[]{vowelDigraph, vowel });
 	static Regex anyVowelRegex = Make (anyVowel);
@@ -155,18 +160,17 @@ public static class SpellingRuleRegex  {
 		}
 	}
 
-
+	static string consonantLeSyllable = $"({anyConsonant})le";
+	static string rControlledVowelSyllable=$"({acceptableInitialConsonant})({anyVowel})r";
+	static string vowelYSyllable=$"({acceptableInitialConsonant})y";
 	static string[] stableSyllables = new string[]{
-		$"({anyConsonant})le", $"({acceptableInitialConsonant})({anyVowel})r", $"({acceptableInitialConsonant})y"
+		consonantLeSyllable, rControlledVowelSyllable, vowelYSyllable
 	};
 	static string stableSyllable = MatchAnyOf(stableSyllables);
 	static Regex stableSyllableRegex = Make(stableSyllable);
 
 	static Regex[] closedAndOpenSyllables = new Regex[]{ClosedSyllable,OpenSyllable};
-	static string anyInitialConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsInitial).Concat(consonantDigraphsEither).Concat(consonantDigraphsInitial).ToArray());
-	static Regex anyInitialUnitRegex = Make($"{anyInitialConsonantUnit}|{vowelDigraph}");
-	static string anyFinalConsonantUnit = MatchAnyOf(consonantBlendsEither.Concat(consonantBlendsFinal).Concat(consonantDigraphsEither).Concat(consonantDigraphsFinal).ToArray());
-	static Regex anyFinalUnitRegex = Make($"{anyFinalConsonantUnit}|{vowelDigraph}");
+
 
 	static Func<int,Match,bool> IsPartOfValidUnit = (int index, Match inMatch) => {
 		Match validUnit = index <= inMatch.Index ? anyInitialUnitRegex.Match(inMatch.Value) : anyFinalUnitRegex.Match(inMatch.Value);
