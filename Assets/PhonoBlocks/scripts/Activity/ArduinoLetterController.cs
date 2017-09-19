@@ -28,7 +28,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 				
 
-		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+			Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
 					ReplaceEachLetterWithBlank ();
 					PlaceWordInLetterGrid (problem.initialWord);
 					activateLinesBeneathLettersOfWord(problem.targetWord);
@@ -88,6 +88,11 @@ public class ArduinoLetterController : MonoBehaviour{
 		{
 			ChangeTheLetterOfASingleCell (atPosition, newLetter + "");
 
+		}
+
+		public void ChangeTheImageOfASingleCell(int atPosition, Texture2D image){
+			InteractiveLetter letter = GetInteractiveLetterAt(atPosition);
+			letter.UpdateLetterImage(letterGrid.ConfigureTextureForLetterGrid(image));
 		}
 
 		public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter)

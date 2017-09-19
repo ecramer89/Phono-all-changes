@@ -16,6 +16,7 @@ public class LetterImageTable : MonoBehaviour
 		public static Texture2D LetterUnderlineImage;
 		public static Texture2D SelectLetterImage;
 		public Texture2D[] LETTER_IMAGES = new Texture2D[27];
+		public Texture2D[] LETTER_OUTLINES = new Texture2D[26]; 
 		public const int BLANK_IDX = 26;
 		public const int a_AS_INT = (int)'a';
 		public const int z_AS_INT = (int)'z';
@@ -50,20 +51,28 @@ public class LetterImageTable : MonoBehaviour
 		}
 
 		public Texture2D GetLetterImageFromLetter (char letter)
-		{       
-				int asInt = (int)letter;
-				if (IsALetter (asInt)) {
-					
-						return LETTER_IMAGES [asInt - a_AS_INT];
-
-				}
-
-				if (letter == '_')
-						return without_line_blank;
-				return getBlankLetterImage ();
-
-			
+	  {       
+			return ImageFromLetter(LETTER_IMAGES, letter);
 		}
+
+		public Texture2D GetLetterOutlineImageFromLetter(char letter){
+				return ImageFromLetter(LETTER_OUTLINES, letter);
+
+		}
+
+	Texture2D ImageFromLetter(Texture2D[] imageSource, char letter){
+		int asInt = (int)letter;
+		if (IsALetter (asInt)) {
+
+			return imageSource [asInt - a_AS_INT];
+
+		}
+
+		if (letter == '_')
+			return without_line_blank;
+		return getBlankLetterImage ();
+
+	}
 
 		public Texture2D getBlankLetterImage ()
 		{

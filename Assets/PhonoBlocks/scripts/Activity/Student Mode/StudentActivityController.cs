@@ -56,6 +56,13 @@ public class StudentActivityController : MonoBehaviour
 						}
 					};
 
+		           //when a new letter is placed, if the letter is blank and the position is one of the placeholder letters
+				  Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+						for(int i=0;i<problem.initialWord.Length;i++){
+							ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
+						}
+				   };
+
 		}
 
 

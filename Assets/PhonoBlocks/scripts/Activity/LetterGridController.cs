@@ -10,8 +10,6 @@ public class LetterGridController : MonoBehaviour
 		public GameObject letterUnderlinesGrid;
 		public int letterImageWidth;
 		public int letterImageHeight;
-		float selectH;
-		float selectW;
 
 		public int LetterImageHeight {
 				get {
@@ -51,9 +49,6 @@ public class LetterGridController : MonoBehaviour
 						high.cellHeight = letters.cellHeight;
 						letterHighlightsGrid.transform.position = letterGrid.transform.position;
 
-
-						selectH = letterImageHeight;
-						selectW = letterImageWidth;
 
 				}
 
@@ -139,7 +134,7 @@ public class LetterGridController : MonoBehaviour
 		
 
 		public Texture2D GetAppropriatelyScaledImageForLetter(String letter){
-			return letter == " " ? blankLetter : CopyAndScaleTexture (letterImageWidth, letterImageHeight, letterImageTable.GetLetterImageFromLetter (letter));
+			return letter == " " ? blankLetter : ConfigureTextureForLetterGrid (letterImageTable.GetLetterImageFromLetter (letter));
 
 		}
 
@@ -147,9 +142,9 @@ public class LetterGridController : MonoBehaviour
 		public UITexture CreateLetterHighlightCell ()
 		{
 				UITexture selectHighlight = NGUITools.AddChild<UITexture> (letterHighlightsGrid);
-				selectHighlight.transform.localScale = new Vector2 (selectW, selectH);
+				selectHighlight.transform.localScale = new Vector2 (letterImageWidth, letterImageHeight);
 				selectHighlight = SetShaders (selectHighlight);
-				selectHighlight.mainTexture = CopyAndScaleTexture (selectW, selectH, LetterImageTable.SelectLetterImage);
+				selectHighlight.mainTexture = ConfigureTextureForLetterGrid (LetterImageTable.SelectLetterImage);
 				selectHighlight.enabled = false;
 			
 				return selectHighlight;
@@ -160,9 +155,9 @@ public class LetterGridController : MonoBehaviour
 		{
 	
 				UITexture underline = NGUITools.AddChild<UITexture> (letterUnderlinesGrid);
-				underline.transform.localScale = new Vector2 (selectW, selectH);
+				underline.transform.localScale = new Vector2 (letterImageWidth, letterImageHeight);
 				underline = SetShaders (underline);
-				underline.mainTexture = CopyAndScaleTexture (selectW, selectH, LetterImageTable.LetterUnderlineImage);
+				underline.mainTexture = ConfigureTextureForLetterGrid (LetterImageTable.LetterUnderlineImage);
 		        underline.gameObject.name = "" + index;
 				
 		}
@@ -194,7 +189,7 @@ public class LetterGridController : MonoBehaviour
 
 		public GameObject CreateLetterBarCell (Texture2D tex2D, string position, Color c)
 		{      
-				Texture2D tex2dCopy = CopyAndScaleTexture (letterImageWidth, letterImageHeight, tex2D);
+				Texture2D tex2dCopy = ConfigureTextureForLetterGrid (tex2D);
 				UITexture ut = NGUITools.AddChild<UITexture> (letterGrid);
 				ut.material = new Material (Shader.Find ("Unlit/Transparent Colored"));
 				ut.shader = Shader.Find ("Unlit/Transparent Colored");
@@ -225,10 +220,10 @@ public class LetterGridController : MonoBehaviour
 				return ut;
 		}
 	
-		Texture2D CopyAndScaleTexture (float w, float h, Texture tex2D)
+		public Texture2D ConfigureTextureForLetterGrid (Texture tex2D)
 		{
 				Texture2D tex2dCopy = Instantiate (tex2D) as Texture2D;
-				TextureScale.Bilinear (tex2dCopy, (int)w, (int)h);
+				TextureScale.Bilinear (tex2dCopy, (int)letterImageWidth, (int)letterImageHeight);
 				return tex2dCopy;
 		}
 
