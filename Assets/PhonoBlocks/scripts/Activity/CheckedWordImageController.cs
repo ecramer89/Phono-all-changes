@@ -17,13 +17,13 @@ public class CheckedWordImageController : MonoBehaviour
 			void Start (){
 
 				//remove the old image, if it's still there
-				Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+				Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 					EndDisplay ();
 				};
 				//display the target word image
-				Events.Dispatcher.OnCurrentProblemCompleted += DisplayTargetWord;
+				Dispatcher.Instance.OnCurrentProblemCompleted += DisplayTargetWord;
 				//level three hint; show the image of the target word.
-				Events.Dispatcher.OnHintRequested += () => {
+				Dispatcher.Instance.OnHintRequested += () => {
 				if(State.Current.CurrentHintNumber == Parameters.Hints.Descriptions.
 					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
 						DisplayTargetWord();
@@ -31,7 +31,7 @@ public class CheckedWordImageController : MonoBehaviour
 				};
 		        //if the current state of user input letters corresponds to a saved image, then
 				//display it.
-				Events.Dispatcher.OnUserAddedWordToHistory += DisplayCurrentInputWord;
+				Dispatcher.Instance.OnUserAddedWordToHistory += DisplayCurrentInputWord;
 
 				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 					if(scene.name == "Activity"){

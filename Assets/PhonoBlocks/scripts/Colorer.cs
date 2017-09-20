@@ -32,21 +32,21 @@ public class Colorer : MonoBehaviour   {
 	public void Start(){
 		instance = this;
 
-		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
+		Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
 			InitializeRuleBasedColorer();
 		};
 
 
-		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
+		Dispatcher.Instance.OnUILettersCreated += (List<InteractiveLetter> letters) => {
 			RegisterLettersToColorer(letters);
 		};
 
 
-		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 
 			TurnAllLettersOff();
 
-			Events.Dispatcher.SetTargetColors(
+			Dispatcher.Instance.SetTargetColors(
 				ruleBasedColorer.GetColorsOf(
 					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
 					//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite
@@ -56,7 +56,7 @@ public class Colorer : MonoBehaviour   {
 		};
 			
 
-		Events.Dispatcher.OnSyllableDivisionShowStateToggled += ReColor;
+		Dispatcher.Instance.OnSyllableDivisionShowStateToggled += ReColor;
 	}
 
 	static Action InitializeRuleBasedColorer = () => {

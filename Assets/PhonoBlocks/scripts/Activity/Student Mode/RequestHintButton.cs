@@ -13,24 +13,24 @@ public class RequestHintButton : MonoBehaviour {
 				messenger.target = gameObject;
 				messenger.functionName = "RequestHint";
 				messenger.trigger = UIButtonMessage.Trigger.OnClick;
-				Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+				Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 					gameObject.SetActive (false);
 				};
-				Events.Dispatcher.OnUIInputLocked += () => {
+				Dispatcher.Instance.OnUIInputLocked += () => {
 					gameObject.SetActive (false);
 				};
 				//hint button should only be active if a hint is available, a
 				//state that is toggled by events user submits incorrect answer (hint is available)
 				//and hint is provided (hint no longer available).
 				//as such, shouldn't set the hint button to active again unless the hint is currently available.
-				Events.Dispatcher.OnUIInputUnLocked += () => {
+				Dispatcher.Instance.OnUIInputUnLocked += () => {
 					gameObject.SetActive(State.Current.HintAvailable);
 				};
-				Events.Dispatcher.OnHintProvided += () => {
+				Dispatcher.Instance.OnHintProvided += () => {
 					
 					gameObject.SetActive (false);
 				};
-				Events.Dispatcher.OnUserSubmittedIncorrectAnswer += () => {
+				Dispatcher.Instance.OnUserSubmittedIncorrectAnswer += () => {
 					gameObject.SetActive(State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
 				};
 		}
@@ -42,7 +42,7 @@ public class RequestHintButton : MonoBehaviour {
 		if (State.Current.UIInputLocked || State.Current.Mode == Mode.TEACHER)
 			return;
 
-		Events.Dispatcher.RecordUserRequestedHint ();
+		Dispatcher.Instance.RecordUserRequestedHint ();
 		
 
 	}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Extensions;
+using System;
 public class Selector : MonoBehaviour {
 
 	private static Selector instance;
@@ -14,11 +15,18 @@ public class Selector : MonoBehaviour {
 
 	public void Start(){
 		instance = this;
+		Dispatcher.Instance.TestEventA.SubscribeWith((string s)=>{
+			Debug.Log($"event a handled in selector {s}");
+	
+		});
+		Dispatcher.Instance.TestEventB.SubscribeWith((string s)=>{
+			Debug.Log($"event b handled in selector {s}");
+		});
 	}
 
 	public void SubscribeToEvents(){
 		
-			Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+			Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
 			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
@@ -36,7 +44,7 @@ public class Selector : MonoBehaviour {
 		};
 			
 			
-		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 			if(State.Current.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
 			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
@@ -48,15 +56,15 @@ public class Selector : MonoBehaviour {
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
 		};
 
-		Events.Dispatcher.OnCurrentProblemCompleted += () => {
+		Dispatcher.Instance.OnCurrentProblemCompleted += () => {
 			solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
 		};
 
-		Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
 			allLettersSelected = State.Current.SelectedUserInputLetters == State.Current.UserInputLetters;
 			allLettersDeSelected = false;
 		};
-		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
 			allLettersSelected = false;
 			allLettersDeSelected = State.Current.SelectedUserInputLetters.Trim().Length == 0;
 		};

@@ -29,7 +29,7 @@ public class StudentsDataHandler: MonoBehaviour
 
 		public void Start(){
 			assessmentStartTime = DateTime.Now;
-			Events.Dispatcher.OnStudentNameEntered += (string name) => {
+			Dispatcher.Instance.OnStudentNameEntered += (string name) => {
 				string nameEntered = name.Trim ().ToLower ();
 				if (nameEntered.Length > 0) {
 				        
@@ -38,7 +38,7 @@ public class StudentsDataHandler: MonoBehaviour
 					bool wasStoredDataForName = LoadStudentData (nameEntered);
 
 					if (wasStoredDataForName) {
-						Events.Dispatcher.RecordStudentDataRetrieved ();
+						Dispatcher.Instance.RecordStudentDataRetrieved ();
 
 					} else {
 						Debug.Log ("No data recorded for this student");
@@ -47,22 +47,22 @@ public class StudentsDataHandler: MonoBehaviour
 				}
 			};
 
-			Events.Dispatcher.OnSessionSelected += (int session) => {
+			Dispatcher.Instance.OnSessionSelected += (int session) => {
 				UpdateUsersSession (session);
 			};
-			Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+			Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 				LogEvent ("change_letter", newLetter + "", atPosition + "");
 			};
-			Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+			Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 				RecordActivityTargetWord (problem.targetWord);
 			};
-			Events.Dispatcher.OnHintProvided += () => {
+			Dispatcher.Instance.OnHintProvided += () => {
 				LogEvent ("requested_hint", $"{State.Current.CurrentHintNumber}", "NA");
 			};
-			Events.Dispatcher.OnUserSubmittedTheirLetters += () => {
+			Dispatcher.Instance.OnUserSubmittedTheirLetters += () => {
 				LogEvent ("submitted_answer", State.Current.UserInputLetters, State.Current.TargetWord);
 			};
-			Events.Dispatcher.OnCurrentProblemCompleted += () => {
+			Dispatcher.Instance.OnCurrentProblemCompleted += () => {
 
 				RecordActivitySolved (
 				Selector.Instance.CurrentStateOfInputMatchesTarget, 
@@ -74,7 +74,7 @@ public class StudentsDataHandler: MonoBehaviour
 			};
 			
 
-			Events.Dispatcher.OnSessionCompleted += UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs;
+			Dispatcher.Instance.OnSessionCompleted += UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs;
 
 		}
 

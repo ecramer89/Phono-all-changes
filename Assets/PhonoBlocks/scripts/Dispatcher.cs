@@ -7,15 +7,46 @@ using System.Text.RegularExpressions;
 
 [RequireComponent(typeof(State))]
 [RequireComponent(typeof(Selector))]
-public class Events: MonoBehaviour  {
+public class Dispatcher: MonoBehaviour  {
 
-	private static Events events;
-	public static Events Dispatcher{
+	private IEnumerator<Action> dispatch;
+	private Queue<PhonoBlocksEvent> events=new Queue<PhonoBlocksEvent>();
+
+	private static Dispatcher instance;
+	public static Dispatcher Instance{
 		get {
-			return events;
+			return instance;
 
 		}
 	}
+		
+
+	public UnaryTypedEvent<string> TestEventA = new UnaryTypedEvent<string>();
+	public UnaryTypedEvent<string> TestEventB = new UnaryTypedEvent<string>();
+
+
+
+	public void EnqueueEvent(PhonoBlocksEvent evt){
+		events.Enqueue(evt);
+
+	}
+
+
+	public void Update(){
+
+		if(dispatch != null && dispatch.MoveNext()){
+			dispatch.Current();
+			return;
+		}
+
+		if(events.Count > 0){
+			List<Action> subs = events.Dequeue().Subscribers();
+			dispatch = subs.GetEnumerator();
+
+		}
+
+	}
+
 
 	public event Action<InputType> OnInputTypeSelected = (InputType mode) => {};
 	public void RecordInputTypeSelected(InputType mode){
@@ -174,7 +205,7 @@ public class Events: MonoBehaviour  {
 
 
 	void Awake(){
-		events = this;
+		instance = this;
 		//gaurantees that state is first subscriber whose methods are invoked when new events occur.
 		//saves other classes that need to frequently refer to these data from having to cache additional
 		//references/copies to/of data
@@ -191,14 +222,12 @@ public class Events: MonoBehaviour  {
 	}
 
 
-
-
-
-
-
+		
 
 
 }
+
+
 
 
 

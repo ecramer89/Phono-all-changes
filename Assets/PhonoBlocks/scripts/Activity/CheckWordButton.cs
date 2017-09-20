@@ -11,17 +11,17 @@ public class CheckWordButton : MonoBehaviour {
 		messenger.functionName = "CheckWord";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
-		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 			gameObject.SetActive(true);
 		};
 		//transition automatically from all letters removed to beginning of next problem; no need to press submit button again.
-		Events.Dispatcher.OnEnterForceRemoveAllLetters += () =>{
+		Dispatcher.Instance.OnEnterForceRemoveAllLetters += () =>{
 			gameObject.SetActive(false);
 		};
-		Events.Dispatcher.OnUIInputLocked += () => {
+		Dispatcher.Instance.OnUIInputLocked += () => {
 			gameObject.SetActive(false);
 		};
-		Events.Dispatcher.OnUIInputUnLocked += () => {
+		Dispatcher.Instance.OnUIInputUnLocked += () => {
 			gameObject.SetActive(true);
 		};
 	}
@@ -30,7 +30,7 @@ public class CheckWordButton : MonoBehaviour {
 
 		if (State.Current.UIInputLocked)
 			return;
-		Events.Dispatcher.RecordUserSubmittedTheirLetters ();
+		Dispatcher.Instance.RecordUserSubmittedTheirLetters ();
 	 
 
 	}

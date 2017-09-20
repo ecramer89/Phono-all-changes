@@ -99,7 +99,7 @@ public class KeyboardLetterInput : MonoBehaviour {
 	{
 		if (testPosition != -1 && testLetter != null) {
 			
-			Events.Dispatcher.RecordNewUserInputLetter(testLetter [0], testPosition);
+			Dispatcher.Instance.RecordNewUserInputLetter(testLetter [0], testPosition);
 			ClearTestPosition ();
 
 		}

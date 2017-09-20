@@ -5,15 +5,15 @@ using UnityEngine;
 public class TeacherModeController : MonoBehaviour {
 
 	void Start () {
-		Events.Dispatcher.OnModeSelected += (Mode mode) => {
+		Dispatcher.Instance.OnModeSelected += (Mode mode) => {
 			if(mode == Mode.TEACHER){
-				Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+				Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, newLetter);
 					Colorer.Instance.ReColor ();
 				};
 
-				Events.Dispatcher.OnUserSubmittedTheirLetters += () => {
-					Events.Dispatcher.RecordUserAddedWordToHistory ();
+				Dispatcher.Instance.OnUserSubmittedTheirLetters += () => {
+					Dispatcher.Instance.RecordUserAddedWordToHistory ();
 				};
 			}else {
 				gameObject.SetActive(false);

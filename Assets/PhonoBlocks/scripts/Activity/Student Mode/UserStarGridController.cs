@@ -24,7 +24,7 @@ public class UserStarGridController : MonoBehaviour
 
 					PlaceUserStarOutlinesInGrid (); 
 
-					Events.Dispatcher.OnCurrentProblemCompleted += () => {
+					Dispatcher.Instance.OnCurrentProblemCompleted += () => {
 						if (Selector.Instance.SolvedOnFirstTry){
 							AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
 						}

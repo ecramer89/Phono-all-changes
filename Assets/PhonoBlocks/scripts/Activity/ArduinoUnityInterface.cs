@@ -92,7 +92,7 @@ public class ArduinoUnityInterface : MonoBehaviour
 		public void Start(){
 				instance = this;
 				GameObject uniduino = GameObject.Find ("Uniduino");
-				Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
+				Dispatcher.Instance.OnInputTypeSelected += (InputType type) => {
 					if(type == InputType.KEYBOARD) {
 						gameObject.SetActive(false);
 						uniduino.SetActive(false);
@@ -187,7 +187,7 @@ public class ArduinoUnityInterface : MonoBehaviour
 
 								SearchForAndSaveChangedLetterAndPosition ();
 				if (WasAChange ())
-					Events.Dispatcher.RecordNewUserInputLetter (
+					Dispatcher.Instance.RecordNewUserInputLetter (
 						change.letter, 
 						AdjustArduinoPositionForScreen (change.position));
 									

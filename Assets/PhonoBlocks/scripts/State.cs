@@ -31,34 +31,34 @@ public class State: MonoBehaviour  {
 		
 		};
 
-		Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
+		Dispatcher.Instance.OnInputTypeSelected += (InputType type) => {
 			inputType = type;
 		};
 
-		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
+		Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
 			this.activity = activity;
 			if(activity == Activity.SYLLABLE_DIVISION){
 				syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
 			}
 		};
 
-		Events.Dispatcher.OnModeSelected += (Mode mode) => {
+		Dispatcher.Instance.OnModeSelected += (Mode mode) => {
 			this.mode = mode;
 		};
 
-		Events.Dispatcher.OnSessionSelected += (int session) => {
+		Dispatcher.Instance.OnSessionSelected += (int session) => {
 			this.session = session;
 		};
 
-		Events.Dispatcher.OnUILettersCreated += (List<InteractiveLetter> letters) => {
+		Dispatcher.Instance.OnUILettersCreated += (List<InteractiveLetter> letters) => {
 			this.uILetters = letters;
 		};
 			
-		Events.Dispatcher.OnTargetColorsSet += (Color[] targetWordColors) => {
+		Dispatcher.Instance.OnTargetColorsSet += (Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
 		};
 
-		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 			placeHolderLetters = problem.initialWord;
 			this.targetWord = problem.targetWord;
 			currentProblemInstrutions = problem.instructions;
@@ -72,53 +72,53 @@ public class State: MonoBehaviour  {
 
 		};
 	
-		Events.Dispatcher.OnTimesAttemptedCurrentProblemIncremented += () => {
+		Dispatcher.Instance.OnTimesAttemptedCurrentProblemIncremented += () => {
 			timesAttemptedCurrentProblem++;
 		};
 			
 	 
-		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 			previousUserInputLetters = userInputLetters;
 			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
 				
 		};
 	
-		Events.Dispatcher.OnEnterStudentModeMainActivity += () => {
+		Dispatcher.Instance.OnEnterStudentModeMainActivity += () => {
 			studentModeState = StudentModeStates.MAIN_ACTIVITY;
 		};
-		Events.Dispatcher.OnEnterForceCorrectLetterPlacement += () => {
+		Dispatcher.Instance.OnEnterForceCorrectLetterPlacement += () => {
 			studentModeState = StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT;
 		};
-		Events.Dispatcher.OnEnterForceRemoveAllLetters += () => {
+		Dispatcher.Instance.OnEnterForceRemoveAllLetters += () => {
 			studentModeState = StudentModeStates.REMOVE_ALL_LETTERS;
 		};
 
-		Events.Dispatcher.OnUIInputUnLocked += () => {
+		Dispatcher.Instance.OnUIInputUnLocked += () => {
 			uIInputLocked = false;
 		};
-		Events.Dispatcher.OnUIInputLocked += () => {
+		Dispatcher.Instance.OnUIInputLocked += () => {
 			uIInputLocked = true;
 		};
-		Events.Dispatcher.OnUserSubmittedIncorrectAnswer += () => {
+		Dispatcher.Instance.OnUserSubmittedIncorrectAnswer += () => {
 			this.hintAvailable=this.currentHintNumber < Parameters.Hints.NUM_HINTS;
 		};
-		Events.Dispatcher.OnHintProvided += () => {
+		Dispatcher.Instance.OnHintProvided += () => {
 			this.hintAvailable = false;
 			this.currentHintNumber++;
 		};
-		Events.Dispatcher.OnSyllableDivisionShowStateToggled += () => {
+		Dispatcher.Instance.OnSyllableDivisionShowStateToggled += () => {
 			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
 				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
 		};
-		Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				userInputLetters[letter.Position]);
 		};
-		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				' ');
 		};
-		Events.Dispatcher.OnTargetWordSyllablesSet += (List<Match> syllables) => {
+		Dispatcher.Instance.OnTargetWordSyllablesSet += (List<Match> syllables) => {
 			this.targetWordSyllables = syllables;
 
 		};

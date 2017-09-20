@@ -12,14 +12,14 @@ public class ToggleSyllableDivisionShowButton : MonoBehaviour {
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 	
 	
-		Events.Dispatcher.OnActivitySelected += (Activity activity) => {
+		Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
 		  gameObject.SetActive(activity == Activity.SYLLABLE_DIVISION);
 		};
 
-		Events.Dispatcher.OnUIInputLocked += () => {
+		Dispatcher.Instance.OnUIInputLocked += () => {
 			gameObject.SetActive(false);
 		};
-		Events.Dispatcher.OnUIInputUnLocked += () => {
+		Dispatcher.Instance.OnUIInputUnLocked += () => {
 			gameObject.SetActive(true);
 		};
 	}
@@ -28,7 +28,7 @@ public class ToggleSyllableDivisionShowButton : MonoBehaviour {
 
 		if (State.Current.UIInputLocked)
 			return;
-		Events.Dispatcher.RecordSyllableDivisionShowStateToggled ();
+		Dispatcher.Instance.RecordSyllableDivisionShowStateToggled ();
 
 
 	}

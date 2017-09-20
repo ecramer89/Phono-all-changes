@@ -16,12 +16,18 @@ public class Parameters : MonoBehaviour {
 		//expedites retrieval of session data from session index.
 		StudentMode.PROBLEM_SETS.Sort((SessionData x, SessionData y) => x.number - y.number);
 	
-		Events.Dispatcher.RecordInputTypeSelected (inputType);
-		Events.Dispatcher.OnActivitySelected += (Activity obj) => {
+		Dispatcher.Instance.RecordInputTypeSelected (inputType);
+		Dispatcher.Instance.OnActivitySelected += (Activity obj) => {
 			Application.LoadLevel ("Activity");
 		};
 
-
+		Dispatcher.Instance.TestEventA.SubscribeWith((string s)=>{
+			Debug.Log($"event a handled in parameters {s}");
+			Dispatcher.Instance.TestEventB.Dispatch("bar");
+		});
+		Dispatcher.Instance.TestEventB.SubscribeWith((string s)=>{
+			Debug.Log($"event b handled in parameters {s}");
+		});
 
 			
 	}

@@ -247,10 +247,10 @@ public class InteractiveLetter : MonoBehaviour{
 
 
 	public void Start(){
-		Events.Dispatcher.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
 			if(this == letter) ToggleSelectHighlight(false);
 		};
-		Events.Dispatcher.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
 			if(this == letter) ToggleSelectHighlight(true);
 		};
 	}

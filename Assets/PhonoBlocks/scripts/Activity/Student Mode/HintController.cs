@@ -9,7 +9,7 @@ public class HintController : MonoBehaviour
 
 		public void Start ()
 		{
-				Events.Dispatcher.OnHintRequested += ProvideHint;
+				Dispatcher.Instance.OnHintRequested += ProvideHint;
 		}
 
 
@@ -21,7 +21,7 @@ public class HintController : MonoBehaviour
 			switch (State.Current.CurrentHintNumber) {
 				case Parameters.Hints.Descriptions.
 					PRESENT_EACH_TARGET_LETTER_IN_SEQUENCE: 
-						Events.Dispatcher.LockUIInput();
+						Dispatcher.Instance.LockUIInput();
 						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
 						StartCoroutine (
 							State.Current.Activity == Activity.SYLLABLE_DIVISION ? 
@@ -40,7 +40,7 @@ public class HintController : MonoBehaviour
 								Selector.Instance.TargetWordWithBlanksForUnusedPositions [letterIndex]);
 							Colorer.ChangeDisplayColourOfASingleLetter (letterIndex, State.Current.TargetWordColors [letterIndex]);
 						}
-						Events.Dispatcher.ForceCorrectLetterPlacement ();
+						Dispatcher.Instance.ForceCorrectLetterPlacement ();
 					break;
 
 					default: //level 1 hint, and whatever would happen should number of hints exceed 3.
@@ -50,7 +50,7 @@ public class HintController : MonoBehaviour
 				}
 
 			
-				Events.Dispatcher.RecordHintProvided ();
+				Dispatcher.Instance.RecordHintProvided ();
 
 		}
 
@@ -78,7 +78,7 @@ public class HintController : MonoBehaviour
 				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 			}
 		}
-		Events.Dispatcher.UnLockUIInput ();
+		Dispatcher.Instance.UnLockUIInput ();
 		ArduinoLetterController.instance.PlaceWordInLetterGrid (
 			State.Current.UserInputLetters.Union(State.Current.PlaceHolderLetters)
 		);
@@ -105,7 +105,7 @@ public class HintController : MonoBehaviour
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
-				Events.Dispatcher.UnLockUIInput ();
+				Dispatcher.Instance.UnLockUIInput ();
 				ArduinoLetterController.instance.PlaceWordInLetterGrid (
 						State.Current.UserInputLetters.Union(State.Current.PlaceHolderLetters)
 				);

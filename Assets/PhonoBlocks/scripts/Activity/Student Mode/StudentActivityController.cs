@@ -29,11 +29,11 @@ public class StudentActivityController : MonoBehaviour
 		void Start ()
 	{       		instance = this;
 		
-					Events.Dispatcher.OnModeSelected += (Mode mode) => {
+					Dispatcher.Instance.OnModeSelected += (Mode mode) => {
 					
 						if (mode == Mode.STUDENT) {
-							Events.Dispatcher.OnUserEnteredNewLetter += HandleNewArduinoLetter;
-							Events.Dispatcher.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
+							Dispatcher.Instance.OnUserEnteredNewLetter += HandleNewArduinoLetter;
+							Dispatcher.Instance.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
 							CacheAudioClips ();
 							SubscribeToEvents();
 						} else {
@@ -46,7 +46,7 @@ public class StudentActivityController : MonoBehaviour
 
 
 	void SubscribeToEvents(){
-		Events.Dispatcher.OnSessionSelected += (int session) => {
+		Dispatcher.Instance.OnSessionSelected += (int session) => {
 			ProblemsRepository.instance.Initialize (session);
 		};
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
@@ -55,23 +55,23 @@ public class StudentActivityController : MonoBehaviour
 			}
 		};
 
-		Events.Dispatcher.OnActivitySelected+=(Activity activity) => {
+		Dispatcher.Instance.OnActivitySelected+=(Activity activity) => {
 			if(activity == Activity.SYLLABLE_DIVISION){
-				Events.Dispatcher.OnNewProblemBegun+=(ProblemData problem)=>{
-					Events.Dispatcher.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
+				Dispatcher.Instance.OnNewProblemBegun+=(ProblemData problem)=>{
+					Dispatcher.Instance.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
 				};
 			}
 		};
 
 		//placeholder letters have the blank letter outline
-		Events.Dispatcher.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
 			for(int i=0;i<problem.initialWord.Length;i++){
 				ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
 			}
 		};
 		//if the user removes a letter at a position of a place holder letter,
 		//then restore the dashed letter outline for the placeholder.
-		Events.Dispatcher.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 			if(newLetter!=' ' || atPosition >= State.Current.PlaceHolderLetters.Length) return;
 			char placeholderLetter = State.Current.PlaceHolderLetters[atPosition];
 			if(placeholderLetter == ' ') return;
@@ -152,11 +152,11 @@ public class StudentActivityController : MonoBehaviour
 		
 	 void SetUpNextProblem ()
 		{  
-		        Events.Dispatcher.RecordNewProblemBegun (
+		        Dispatcher.Instance.RecordNewProblemBegun (
 					ProblemsRepository.instance.GetNextProblem ()
 				);
 			
-				Events.Dispatcher.EnterStudentModeMainActivity ();
+				Dispatcher.Instance.EnterStudentModeMainActivity ();
 				AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
 
 				
@@ -166,7 +166,7 @@ public class StudentActivityController : MonoBehaviour
 		void HandleEndOfActivity ()
 		{
 				if (ProblemsRepository.instance.AllProblemsDone ()) {
-						Events.Dispatcher.RecordSessionCompleted ();
+						Dispatcher.Instance.RecordSessionCompleted ();
 						AudioSourceController.PushClip (triumphantSoundForSessionDone);
 						
 				} else {
@@ -180,7 +180,7 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleSubmittedAnswer ()
 		{     
 		       			
-				Events.Dispatcher.IncrementTimesAttemptedCurrentProblem ();
+				Dispatcher.Instance.IncrementTimesAttemptedCurrentProblem ();
 		
 				if (Selector.Instance.CurrentStateOfInputMatchesTarget) {
 					HandleCorrectAnswer ();
@@ -203,7 +203,7 @@ public class StudentActivityController : MonoBehaviour
 
 		void HandleIncorrectAnswer ()
 		{
-				Events.Dispatcher.RecordUserSubmittedIncorrectAnswer ();
+				Dispatcher.Instance.RecordUserSubmittedIncorrectAnswer ();
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
 				if(State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
@@ -213,10 +213,10 @@ public class StudentActivityController : MonoBehaviour
 	    
 		void CurrentProblemCompleted ()
 		{
-				Events.Dispatcher.RecordCurrentProblemCompleted ();
+				Dispatcher.Instance.RecordCurrentProblemCompleted ();
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
 		        //don't want the letters still on platform from problem n being interpreted as input for problem n+1.
-				Events.Dispatcher.ForceRemoveAllLetters();
+				Dispatcher.Instance.ForceRemoveAllLetters();
 			
       
 		}
