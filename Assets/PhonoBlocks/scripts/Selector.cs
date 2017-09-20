@@ -15,11 +15,11 @@ public class Selector : MonoBehaviour {
 
 	public void Start(){
 		instance = this;
-		Dispatcher.Instance.TestEventA.SubscribeWith((string s)=>{
+		Dispatcher.Instance.TestEventA.Subscribe((string s)=>{
 			Debug.Log($"event a handled in selector {s}");
 	
 		});
-		Dispatcher.Instance.TestEventB.SubscribeWith((string s)=>{
+		Dispatcher.Instance.TestEventB.Subscribe((string s)=>{
 			Debug.Log($"event b handled in selector {s}");
 		});
 	}

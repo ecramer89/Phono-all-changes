@@ -42,6 +42,6 @@ public class ModeSelectionButton : MonoBehaviour {
 		Dispatcher.Instance.RecordModeSelected (mode);
 
 
-		Dispatcher.Instance.TestEventA.Dispatch("dispatching event A from button");
+		Dispatcher.Instance.TestEventA.Fire("dispatching event A from button");
 	}
 }

@@ -38,7 +38,7 @@ public class Dispatcher: MonoBehaviour  {
 	public ParameterlessEvent SessionCompleted = new ParameterlessEvent();
 	public ParameterlessEvent SyllableDivisionShowStateToggled = new ParameterlessEvent();
 
-
+	public UnaryParameterizedEvent<InputType> InputTypeSelected = new UnaryParameterizedEvent<InputType>();
 	public UnaryParameterizedEvent<Mode> ModeSelected = new UnaryParameterizedEvent<Mode>();
 	public UnaryParameterizedEvent<string> StudentNameEnetered = new UnaryParameterizedEvent<string>();
 	public UnaryParameterizedEvent<int> SessionSelected = new UnaryParameterizedEvent<int>();
@@ -77,10 +77,10 @@ public class Dispatcher: MonoBehaviour  {
 	}
 
 
-	public event Action<InputType> OnInputTypeSelected = (InputType mode) => {};
+	/*public event Action<InputType> OnInputTypeSelected = (InputType mode) => {};
 	public void RecordInputTypeSelected(InputType mode){
 		OnInputTypeSelected (mode);
-	}
+	}*/
 		
 
 	public event Action<Mode> OnModeSelected = (Mode mode) => {};

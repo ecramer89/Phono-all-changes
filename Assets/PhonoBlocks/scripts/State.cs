@@ -31,9 +31,11 @@ public class State: MonoBehaviour  {
 		
 		};
 
-		Dispatcher.Instance.OnInputTypeSelected += (InputType type) => {
-			inputType = type;
-		};
+		Dispatcher.Instance.InputTypeSelected.Subscribe(
+			(InputType type) => {
+				inputType = type;
+			}
+		);
 
 		Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
 			this.activity = activity;

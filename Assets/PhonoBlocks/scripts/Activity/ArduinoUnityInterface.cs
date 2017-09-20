@@ -92,7 +92,26 @@ public class ArduinoUnityInterface : MonoBehaviour
 		public void Start(){
 				instance = this;
 				GameObject uniduino = GameObject.Find ("Uniduino");
-				Dispatcher.Instance.OnInputTypeSelected += (InputType type) => {
+				Dispatcher.Instance.InputTypeSelected.Subscribe(
+					(InputType type) => {
+						if(type == InputType.KEYBOARD) {
+							gameObject.SetActive(false);
+							uniduino.SetActive(false);
+						} else {
+
+							uniduino.GetComponent<Uniduino.Arduino> ().Connect ();
+							change = new ArduinoLetterData ();
+							arduino = Arduino.global;
+							arduino.Setup (ConfigurePins);
+
+						}
+					}
+				
+				);
+
+
+
+				/*Dispatcher.Instance.OnInputTypeSelected += (InputType type) => {
 					if(type == InputType.KEYBOARD) {
 						gameObject.SetActive(false);
 						uniduino.SetActive(false);
@@ -104,7 +123,7 @@ public class ArduinoUnityInterface : MonoBehaviour
 					arduino.Setup (ConfigurePins);
 
 				}
-			};
+			};*/
 
 		}
 		

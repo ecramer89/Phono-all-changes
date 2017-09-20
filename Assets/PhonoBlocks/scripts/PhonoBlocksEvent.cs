@@ -12,12 +12,12 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 	private List<Action> subscribers;
 
 
-	public void SubscribeWith(Action subscriber){
+	public void Subscribe(Action subscriber){
 		subscribers.Add(subscriber);
 
 	}
 
-	public void Dispatch(){
+	public void Fire(){
 		Dispatcher.Instance.EnqueueEvent(this);
 	}
 
@@ -35,12 +35,12 @@ public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 		typedSubscribers = new List<Action<T>>();
 	}
 
-	public void SubscribeWith(Action<T> subscriber){
+	public void Subscribe(Action<T> subscriber){
 		typedSubscribers.Add(subscriber);
 
 	}
 
-	public void Dispatch(T arg0){
+	public void Fire(T arg0){
 		generifiedSubscribers = new List<Action>();
 		foreach(Action<T> subscriber in typedSubscribers){
 			generifiedSubscribers.Add(()=>subscriber(arg0));
@@ -62,12 +62,12 @@ public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 		typedSubscribers = new List<Action<T,V>>();
 	}
 
-	public void SubscribeWith(Action<T,V> subscriber){
+	public void Subscribe(Action<T,V> subscriber){
 		typedSubscribers.Add(subscriber);
 
 	}
 
-	public void Dispatch(T arg0, V arg1){
+	public void Fire(T arg0, V arg1){
 		generifiedSubscribers = new List<Action>();
 		foreach(Action<T,V> subscriber in typedSubscribers){
 			generifiedSubscribers.Add(()=>subscriber(arg0, arg1));
