@@ -22,6 +22,7 @@ public class CheckWordButton : MonoBehaviour {
 			gameObject.SetActive(false);
 		});
 		Transaction.Instance.UIInputUnLocked.Subscribe(() => {
+			Debug.Log("ui input unlocked handler for checked word button fired");
 			gameObject.SetActive(true);
 		});
 	}

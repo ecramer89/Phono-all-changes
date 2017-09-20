@@ -40,7 +40,7 @@ public class HintController : MonoBehaviour
 								Transaction.Selector.TargetWordWithBlanksForUnusedPositions [letterIndex]);
 							Colorer.ChangeDisplayColourOfASingleLetter (letterIndex, Transaction.State.TargetWordColors [letterIndex]);
 						}
-					Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Fire ();
+						Transaction.Instance.StudentModeForceCorrectLetterPlacementEntered.Fire ();
 					break;
 
 					default: //level 1 hint, and whatever would happen should number of hints exceed 3.
@@ -78,7 +78,7 @@ public class HintController : MonoBehaviour
 				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 			}
 		}
-		Transaction.Instance.UIInputLocked.Fire ();
+		Transaction.Instance.UIInputUnLocked.Fire ();
 		ArduinoLetterController.instance.PlaceWordInLetterGrid (
 			Transaction.State.UserInputLetters.Union(Transaction.State.PlaceHolderLetters)
 		);
@@ -105,7 +105,7 @@ public class HintController : MonoBehaviour
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
-				Transaction.Instance.UIInputLocked.Fire ();
+				Transaction.Instance.UIInputUnLocked.Fire ();
 				ArduinoLetterController.instance.PlaceWordInLetterGrid (
 						Transaction.State.UserInputLetters.Union(Transaction.State.PlaceHolderLetters)
 				);
