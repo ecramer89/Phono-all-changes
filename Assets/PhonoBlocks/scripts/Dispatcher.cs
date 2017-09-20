@@ -75,18 +75,11 @@ public class Dispatcher: MonoBehaviour  {
 		}
 
 	}
-
-
-	/*public event Action<InputType> OnInputTypeSelected = (InputType mode) => {};
-	public void RecordInputTypeSelected(InputType mode){
-		OnInputTypeSelected (mode);
-	}*/
 		
-
-	public event Action<Mode> OnModeSelected = (Mode mode) => {};
+	/*public event Action<Mode> OnModeSelected = (Mode mode) => {};
 	public void RecordModeSelected(Mode mode){
 		OnModeSelected (mode);
-	}
+	}*/
 
 	public event Action<string> OnStudentNameEntered = (string name) => {};
 	public void RecordStudentNameEntered(string name){

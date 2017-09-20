@@ -15,11 +15,11 @@ public class NameInputField : MonoBehaviour {
 	void Start(){
 		position = new Rect (300, 300, 200, 50);
 		gameObject.SetActive (false);
-		Dispatcher.Instance.OnModeSelected += (Mode mode) => {
+		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 			if(mode == Mode.STUDENT){
 				gameObject.SetActive(true);
 			}
-		};
+		});
 		Dispatcher.Instance.OnStudentDataRetrieved += () => {
 			gameObject.SetActive(false);
 		};

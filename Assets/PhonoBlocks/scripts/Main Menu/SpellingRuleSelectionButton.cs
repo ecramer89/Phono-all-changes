@@ -8,7 +8,7 @@ public class SpellingRuleSelectionButton : MonoBehaviour {
 
 	void Start(){
 		gameObject.SetActive(false);
-		Dispatcher.Instance.OnModeSelected += (Mode mode) => {
+		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 			if (mode == Mode.TEACHER) {
 				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
@@ -21,7 +21,7 @@ public class SpellingRuleSelectionButton : MonoBehaviour {
 			} else {
 				gameObject.SetActive(false);
 			}
-		};
+		});
 
 	}
 

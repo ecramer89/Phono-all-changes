@@ -27,9 +27,9 @@ public class StudentActivityController : MonoBehaviour
 
 
 		void Start ()
-	{       		instance = this;
+		{      instance = this;
 		
-					Dispatcher.Instance.OnModeSelected += (Mode mode) => {
+				Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 					
 						if (mode == Mode.STUDENT) {
 							Dispatcher.Instance.OnUserEnteredNewLetter += HandleNewArduinoLetter;
@@ -39,7 +39,7 @@ public class StudentActivityController : MonoBehaviour
 						} else {
 							gameObject.SetActive (false);
 						}
-					};				
+				});				
 
 		}
 

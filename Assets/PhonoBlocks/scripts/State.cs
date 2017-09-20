@@ -20,7 +20,6 @@ public class State: MonoBehaviour  {
 
 	public void SubscribeToEvents(){
 
-	
 
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
 			if(scene.name == "Activity"){
@@ -44,9 +43,9 @@ public class State: MonoBehaviour  {
 			}
 		};
 
-		Dispatcher.Instance.OnModeSelected += (Mode mode) => {
+		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 			this.mode = mode;
-		};
+		});
 
 		Dispatcher.Instance.OnSessionSelected += (int session) => {
 			this.session = session;
