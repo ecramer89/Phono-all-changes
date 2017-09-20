@@ -9,7 +9,7 @@ public class HintController : MonoBehaviour
 
 		public void Start ()
 		{
-				Dispatcher.Instance.OnHintRequested += ProvideHint;
+			Dispatcher.Instance.HintRequested.Subscribe(ProvideHint);
 		}
 
 
@@ -21,7 +21,7 @@ public class HintController : MonoBehaviour
 			switch (Dispatcher._State.CurrentHintNumber) {
 				case Parameters.Hints.Descriptions.
 					PRESENT_EACH_TARGET_LETTER_IN_SEQUENCE: 
-						Dispatcher.Instance.LockUIInput();
+					Dispatcher.Instance.UIInputLocked.Fire();
 						ArduinoLetterController.instance.ReplaceEachLetterWithBlank ();
 						StartCoroutine (
 							Dispatcher._State.Activity == Activity.SYLLABLE_DIVISION ? 
@@ -40,7 +40,7 @@ public class HintController : MonoBehaviour
 								Dispatcher._Selector.TargetWordWithBlanksForUnusedPositions [letterIndex]);
 							Colorer.ChangeDisplayColourOfASingleLetter (letterIndex, Dispatcher._State.TargetWordColors [letterIndex]);
 						}
-						Dispatcher.Instance.ForceCorrectLetterPlacement ();
+					Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Fire ();
 					break;
 
 					default: //level 1 hint, and whatever would happen should number of hints exceed 3.
@@ -50,7 +50,7 @@ public class HintController : MonoBehaviour
 				}
 
 			
-				Dispatcher.Instance.RecordHintProvided ();
+				Dispatcher.Instance.HintProvided.Fire ();
 
 		}
 
@@ -78,7 +78,7 @@ public class HintController : MonoBehaviour
 				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 			}
 		}
-		Dispatcher.Instance.UnLockUIInput ();
+		Dispatcher.Instance.UIInputLocked.Fire ();
 		ArduinoLetterController.instance.PlaceWordInLetterGrid (
 			Dispatcher._State.UserInputLetters.Union(Dispatcher._State.PlaceHolderLetters)
 		);
@@ -105,7 +105,7 @@ public class HintController : MonoBehaviour
 						yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 					}
 				}
-				Dispatcher.Instance.UnLockUIInput ();
+				Dispatcher.Instance.UIInputLocked.Fire ();
 				ArduinoLetterController.instance.PlaceWordInLetterGrid (
 						Dispatcher._State.UserInputLetters.Union(Dispatcher._State.PlaceHolderLetters)
 				);

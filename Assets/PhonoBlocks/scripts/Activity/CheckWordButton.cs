@@ -15,22 +15,22 @@ public class CheckWordButton : MonoBehaviour {
 			gameObject.SetActive(true);
 		});
 		//transition automatically from all letters removed to beginning of next problem; no need to press submit button again.
-		Dispatcher.Instance.OnEnterForceRemoveAllLetters += () =>{
+		Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() =>{
 			gameObject.SetActive(false);
-		};
-		Dispatcher.Instance.OnUIInputLocked += () => {
+		});
+		Dispatcher.Instance.UIInputLocked.Subscribe(() => {
 			gameObject.SetActive(false);
-		};
-		Dispatcher.Instance.OnUIInputUnLocked += () => {
+		});
+		Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
 			gameObject.SetActive(true);
-		};
+		});
 	}
 
 	void CheckWord(){
 
 		if (Dispatcher._State.UIInputLocked)
 			return;
-		Dispatcher.Instance.RecordUserSubmittedTheirLetters ();
+		Dispatcher.Instance.UserSubmittedTheirLetters.Fire ();
 	 
 
 	}

@@ -16,12 +16,12 @@ public class ToggleSyllableDivisionShowButton : MonoBehaviour {
 		  gameObject.SetActive(activity == Activity.SYLLABLE_DIVISION);
 		});
 
-		Dispatcher.Instance.OnUIInputLocked += () => {
+		Dispatcher.Instance.UIInputLocked.Subscribe(() => {
 			gameObject.SetActive(false);
-		};
-		Dispatcher.Instance.OnUIInputUnLocked += () => {
+		});
+		Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
 			gameObject.SetActive(true);
-		};
+		});
 	}
 
 	void ToggleSyllableDivisionShow(){

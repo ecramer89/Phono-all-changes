@@ -32,8 +32,8 @@ public class StudentActivityController : MonoBehaviour
 				Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 					
 						if (mode == Mode.STUDENT) {
-							Dispatcher.Instance.OnUserEnteredNewLetter += HandleNewArduinoLetter;
-							Dispatcher.Instance.OnUserSubmittedTheirLetters += HandleSubmittedAnswer;
+							Dispatcher.Instance.UserEnteredNewLetter.Subscribe(HandleNewArduinoLetter);
+							Dispatcher.Instance.UserSubmittedTheirLetters.Subscribe(HandleSubmittedAnswer);
 							CacheAudioClips ();
 							SubscribeToEvents();
 						} else {
@@ -71,7 +71,7 @@ public class StudentActivityController : MonoBehaviour
 		});
 		//if the user removes a letter at a position of a place holder letter,
 		//then restore the dashed letter outline for the placeholder.
-		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+		Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 			if(newLetter!=' ' || atPosition >= Dispatcher._State.PlaceHolderLetters.Length) return;
 			char placeholderLetter = Dispatcher._State.PlaceHolderLetters[atPosition];
 			if(placeholderLetter == ' ') return;
@@ -80,7 +80,7 @@ public class StudentActivityController : MonoBehaviour
 				atPosition, 
 				LetterImageTable.instance.GetLetterOutlineImageFromLetter(placeholderLetter));
 
-		};
+		});
 	}
 
 
@@ -154,7 +154,7 @@ public class StudentActivityController : MonoBehaviour
 		{  
 				Dispatcher.Instance.NewProblemBegun.Fire (ProblemsRepository.instance.GetNextProblem ());
 			
-				Dispatcher.Instance.EnterStudentModeMainActivity ();
+				Dispatcher.Instance.StudentModeMainActivityEntered.Fire ();
 				AudioSourceController.PushClips (Dispatcher._State.CurrentProblemInstructions);
 
 				
@@ -164,7 +164,7 @@ public class StudentActivityController : MonoBehaviour
 		void HandleEndOfActivity ()
 		{
 				if (ProblemsRepository.instance.AllProblemsDone ()) {
-						Dispatcher.Instance.RecordSessionCompleted ();
+						Dispatcher.Instance.SessionCompleted.Fire ();
 						AudioSourceController.PushClip (triumphantSoundForSessionDone);
 						
 				} else {
@@ -178,7 +178,7 @@ public class StudentActivityController : MonoBehaviour
 		public void HandleSubmittedAnswer ()
 		{     
 		       			
-				Dispatcher.Instance.IncrementTimesAttemptedCurrentProblem ();
+				Dispatcher.Instance.TimesAttemptedCurrentProblemIncremented.Fire ();
 		
 				if (Dispatcher._Selector.CurrentStateOfInputMatchesTarget) {
 					HandleCorrectAnswer ();
@@ -201,7 +201,7 @@ public class StudentActivityController : MonoBehaviour
 
 		void HandleIncorrectAnswer ()
 		{
-				Dispatcher.Instance.RecordUserSubmittedIncorrectAnswer ();
+				Dispatcher.Instance.UserSubmittedIncorrectAnswer.Fire ();
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
 				if(Dispatcher._State.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
@@ -211,10 +211,10 @@ public class StudentActivityController : MonoBehaviour
 	    
 		void CurrentProblemCompleted ()
 		{
-				Dispatcher.Instance.RecordCurrentProblemCompleted ();
+				Dispatcher.Instance.CurrentProblemCompleted.Fire ();
 		        //require user to remove all of the tangible letters from the platform before advancing to the next problem.
 		        //don't want the letters still on platform from problem n being interpreted as input for problem n+1.
-				Dispatcher.Instance.ForceRemoveAllLetters();
+				Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Fire();
 			
       
 		}

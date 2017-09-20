@@ -24,11 +24,11 @@ public class UserStarGridController : MonoBehaviour
 
 					PlaceUserStarOutlinesInGrid (); 
 
-					Dispatcher.Instance.OnCurrentProblemCompleted += () => {
+				Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
 						if (Dispatcher._Selector.SolvedOnFirstTry){
 							AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
 						}
-					};
+				});
 				}else {
 					gameObject.SetActive (false);
 				}

@@ -8,14 +8,14 @@ public class TeacherModeController : MonoBehaviour {
 		Dispatcher.Instance.ModeSelected.Subscribe(
 			(Mode mode) => {
 				if(mode == Mode.TEACHER){
-					Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+					Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, newLetter);
 						Colorer.Instance.ReColor ();
-					};
+					});
 
-					Dispatcher.Instance.OnUserSubmittedTheirLetters += () => {
-						Dispatcher.Instance.RecordUserAddedWordToHistory ();
-					};
+					Dispatcher.Instance.UserSubmittedTheirLetters.Subscribe(() => {
+						Dispatcher.Instance.UserAddedWordToHistory.Fire ();
+					});
 				}else {
 					gameObject.SetActive(false);
 				}

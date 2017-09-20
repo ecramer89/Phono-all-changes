@@ -28,7 +28,7 @@ public class Selector  {
 		});
 			
 			
-		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+		Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 			if(Dispatcher._State.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
 			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
@@ -38,11 +38,11 @@ public class Selector  {
 				(atPosition <  Dispatcher._State.TargetWord.Length && newLetter == Dispatcher._State.TargetWord[atPosition]);
 			
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
-		};
+		});
 
-		Dispatcher.Instance.OnCurrentProblemCompleted += () => {
+		Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
 			solvedOnFirstTry = Dispatcher._State.TimesAttemptedCurrentProblem == 1;
-		};
+		});
 
 		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
 			allLettersSelected = Dispatcher._State.SelectedUserInputLetters == Dispatcher._State.UserInputLetters;

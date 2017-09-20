@@ -92,7 +92,8 @@ public class Dispatcher: MonoBehaviour  {
 
 
 	public void Update(){
-
+		//...um change to "while movenext" and that should solve the problem!!
+		//remember that dispatch is effectively the LIST OF SUBSCRIBER EVENTS!!!
 		if(dispatch != null && dispatch.MoveNext()){
 			dispatch.Current();
 			return;
@@ -106,101 +107,6 @@ public class Dispatcher: MonoBehaviour  {
 
 	}
 
-
-	public event Action<Color[]> OnTargetColorsSet = (Color[] targetColors) => {};
-	public void SetTargetColors(Color[] targetColors){
-		OnTargetColorsSet (targetColors);
-	}
-
-
-	public event Action OnTimesAttemptedCurrentProblemIncremented = () => {};
-	public void IncrementTimesAttemptedCurrentProblem(){
-		OnTimesAttemptedCurrentProblemIncremented ();
-	}
-		
-
-	public event Action OnUserInputLettersUpdated = () => {};
-	public event Action<char, int> OnUserEnteredNewLetter = (char newLetter, int atPosition) => {};
-	public void RecordNewUserInputLetter(char newLetter, int atPosition){
-		OnUserEnteredNewLetter (newLetter, atPosition);
-		OnUserInputLettersUpdated ();
-	}
-
-	//distinguished from activity begun; may need to transition back into main activity state from a different state,
-	//i.e. such as force correct letter placement.
-	public event Action OnEnterStudentModeMainActivity = () => {};
-	public void EnterStudentModeMainActivity(){
-		OnEnterStudentModeMainActivity ();
-	}
-	public event Action OnEnterForceCorrectLetterPlacement = () => {};
-	public void ForceCorrectLetterPlacement(){
-		OnEnterForceCorrectLetterPlacement ();
-	}
-	public event Action OnEnterForceRemoveAllLetters = () => {};
-	public void ForceRemoveAllLetters(){
-		OnEnterForceRemoveAllLetters ();
-	}
-
-	public event Action OnUIInputLocked = () => {};
-	public void LockUIInput(){
-		OnUIInputLocked ();
-	}
-	public event Action OnUIInputUnLocked = ()=>{};
-	public void UnLockUIInput(){
-		OnUIInputUnLocked ();
-	}
-
-	//STUDENT MODE, TEACHER MODE
-	//intermediary event fired before one of user submitted incorrect answer or current problem completed (in student mode) OR
-	//user added word to history (teacher mode). 
-	//One of student or teacher mode subscribes to this event and determines which event(s) to fire as consequence.
-	public event Action OnUserSubmittedTheirLetters = () => {};
-	public void RecordUserSubmittedTheirLetters(){
-		OnUserSubmittedTheirLetters ();
-	}
-
-	public event Action OnHintRequested = () => {};
-	public void RecordUserRequestedHint(){
-		OnHintRequested ();
-	}
-
-	//STUDENT MODE
-	//fired if user presses check word button and current state of user input letters does not match target
-	public event Action OnUserSubmittedIncorrectAnswer = () => {};
-	public void RecordUserSubmittedIncorrectAnswer(){
-		OnUserSubmittedIncorrectAnswer ();
-	}
-
-	//STUDENT MODE
-	//fired once for each hint, after each successive hint is provided.
-	public event Action OnHintProvided = () => {};
-	public void RecordHintProvided(){
-		OnHintProvided ();
-	}
-
-	//STUDENT MODE
-	//fired if user presses check word button and current state of user input letters matces target word.
-	public Action OnCurrentProblemCompleted = () =>{};
-	public void RecordCurrentProblemCompleted(){
-		OnCurrentProblemCompleted ();
-	}
-
-	//TEACHER MODE
-	//fired when the user presses the check word button
-	public Action OnUserAddedWordToHistory = () => {};
-	public void RecordUserAddedWordToHistory(){
-		OnUserAddedWordToHistory ();
-	}
-
-	//STUDENT MODE
-	//fired when the user completes all of the problems for a particular session.
-	//e.g., for session 1, user has to spell:
-	//"bet","dad","tin". 
-	//OnSessionCompleted dispatched after Current Problem Completed when target word is "tin".
-	public Action OnSessionCompleted = () => {};
-	public void RecordSessionCompleted(){
-		OnSessionCompleted ();
-	}
 
 	public Action OnSyllableDivisionShowStateToggled = () => {};
 	public void RecordSyllableDivisionShowStateToggled(){

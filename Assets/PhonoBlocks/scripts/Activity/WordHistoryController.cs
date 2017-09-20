@@ -39,8 +39,8 @@ public class WordHistoryController : MonoBehaviour
 			};
 
 			//subscribe to events
-			Dispatcher.Instance.OnCurrentProblemCompleted += AddCurrentWordToHistory;
-			Dispatcher.Instance.OnUserAddedWordToHistory += AddCurrentWordToHistory;
+		    Dispatcher.Instance.CurrentProblemCompleted.Subscribe(AddCurrentWordToHistory);
+			Dispatcher.Instance.UserAddedWordToHistory.Subscribe(AddCurrentWordToHistory);
 		}
 
 		public int showImageTime = 60 * 8;

@@ -44,9 +44,9 @@ public class State {
 			this.uILetters = letters;
 		});
 			
-		Dispatcher.Instance.OnTargetColorsSet += (Color[] targetWordColors) => {
+		Dispatcher.Instance.TargetColorsSet.Subscribe((Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
-		};
+		});
 
 		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			placeHolderLetters = problem.initialWord;
@@ -62,40 +62,40 @@ public class State {
 
 		});
 	
-		Dispatcher.Instance.OnTimesAttemptedCurrentProblemIncremented += () => {
+		Dispatcher.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(() => {
 			timesAttemptedCurrentProblem++;
-		};
+		});
 			
 	 
-		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
+		Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 			previousUserInputLetters = userInputLetters;
 			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
 				
-		};
+		});
 	
-		Dispatcher.Instance.OnEnterStudentModeMainActivity += () => {
+		Dispatcher.Instance.StudentModeMainActivityEntered.Subscribe(() => {
 			studentModeState = StudentModeStates.MAIN_ACTIVITY;
-		};
-		Dispatcher.Instance.OnEnterForceCorrectLetterPlacement += () => {
+		});
+		Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() => {
 			studentModeState = StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT;
-		};
-		Dispatcher.Instance.OnEnterForceRemoveAllLetters += () => {
+		});
+		Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() => {
 			studentModeState = StudentModeStates.REMOVE_ALL_LETTERS;
-		};
+		});
 
-		Dispatcher.Instance.OnUIInputUnLocked += () => {
+		Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
 			uIInputLocked = false;
-		};
-		Dispatcher.Instance.OnUIInputLocked += () => {
+		});
+		Dispatcher.Instance.UIInputLocked.Subscribe(() => {
 			uIInputLocked = true;
-		};
-		Dispatcher.Instance.OnUserSubmittedIncorrectAnswer += () => {
+		});
+		Dispatcher.Instance.UserSubmittedIncorrectAnswer.Subscribe(() => {
 			this.hintAvailable=this.currentHintNumber < Parameters.Hints.NUM_HINTS;
-		};
-		Dispatcher.Instance.OnHintProvided += () => {
+		});
+		Dispatcher.Instance.HintProvided.Subscribe(() => {
 			this.hintAvailable = false;
 			this.currentHintNumber++;
-		};
+		});
 		Dispatcher.Instance.OnSyllableDivisionShowStateToggled += () => {
 			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
 				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;

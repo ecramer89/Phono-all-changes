@@ -16,23 +16,23 @@ public class RequestHintButton : MonoBehaviour {
 				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 						gameObject.SetActive (false);
 				});
-				Dispatcher.Instance.OnUIInputLocked += () => {
-					gameObject.SetActive (false);
-				};
+				Dispatcher.Instance.UIInputLocked.Subscribe(() => {
+						gameObject.SetActive (false);
+				});
 				//hint button should only be active if a hint is available, a
 				//state that is toggled by events user submits incorrect answer (hint is available)
 				//and hint is provided (hint no longer available).
 				//as such, shouldn't set the hint button to active again unless the hint is currently available.
-				Dispatcher.Instance.OnUIInputUnLocked += () => {
-					gameObject.SetActive(Dispatcher._State.HintAvailable);
-				};
-				Dispatcher.Instance.OnHintProvided += () => {
-					
-					gameObject.SetActive (false);
-				};
-				Dispatcher.Instance.OnUserSubmittedIncorrectAnswer += () => {
-					gameObject.SetActive(Dispatcher._State.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
-				};
+				Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
+						gameObject.SetActive(Dispatcher._State.HintAvailable);
+				});
+				Dispatcher.Instance.HintProvided.Subscribe(() => {
+						
+						gameObject.SetActive (false);
+				});
+				Dispatcher.Instance.UserSubmittedIncorrectAnswer.Subscribe(() => {
+						gameObject.SetActive(Dispatcher._State.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
+				});
 		}
 	}
 
@@ -42,7 +42,7 @@ public class RequestHintButton : MonoBehaviour {
 		if (Dispatcher._State.UIInputLocked || Dispatcher._State.Mode == Mode.TEACHER)
 			return;
 
-		Dispatcher.Instance.RecordUserRequestedHint ();
+		Dispatcher.Instance.HintRequested.Fire ();
 		
 
 	}

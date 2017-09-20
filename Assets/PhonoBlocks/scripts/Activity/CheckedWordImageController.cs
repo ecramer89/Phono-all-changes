@@ -21,17 +21,17 @@ public class CheckedWordImageController : MonoBehaviour
 							EndDisplay ();
 				});
 				//display the target word image
-				Dispatcher.Instance.OnCurrentProblemCompleted += DisplayTargetWord;
+				Dispatcher.Instance.CurrentProblemCompleted.Subscribe(DisplayTargetWord);
 				//level three hint; show the image of the target word.
-				Dispatcher.Instance.OnHintRequested += () => {
-				if(Dispatcher._State.CurrentHintNumber == Parameters.Hints.Descriptions.
-					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
-						DisplayTargetWord();
-					}
-				};
+				Dispatcher.Instance.HintRequested.Subscribe(() => {
+						if(Dispatcher._State.CurrentHintNumber == Parameters.Hints.Descriptions.
+							PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
+								DisplayTargetWord();
+							}
+				});
 		        //if the current state of user input letters corresponds to a saved image, then
 				//display it.
-				Dispatcher.Instance.OnUserAddedWordToHistory += DisplayCurrentInputWord;
+				Dispatcher.Instance.UserAddedWordToHistory.Subscribe(DisplayCurrentInputWord);
 
 				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 					if(scene.name == "Activity"){

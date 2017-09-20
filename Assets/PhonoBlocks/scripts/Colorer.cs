@@ -43,10 +43,10 @@ public class Colorer : MonoBehaviour   {
 
 
 		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
-			Debug.Log("on new problem begun invoked");
+			
 			TurnAllLettersOff();
 
-			Dispatcher.Instance.SetTargetColors(
+			Dispatcher.Instance.TargetColorsSet.Fire(
 				ruleBasedColorer.GetColorsOf(
 					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
 					//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite

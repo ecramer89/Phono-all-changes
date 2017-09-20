@@ -50,31 +50,31 @@ public class StudentsDataHandler: MonoBehaviour
 			Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
 					UpdateUsersSession (session);
 			});
-			Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
-				LogEvent ("change_letter", newLetter + "", atPosition + "");
-			};
+			Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+					LogEvent ("change_letter", newLetter + "", atPosition + "");
+			});
 			Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 					RecordActivityTargetWord (problem.targetWord);
 			});
-			Dispatcher.Instance.OnHintProvided += () => {
-				LogEvent ("requested_hint", $"{Dispatcher._State.CurrentHintNumber}", "NA");
-			};
-			Dispatcher.Instance.OnUserSubmittedTheirLetters += () => {
-				LogEvent ("submitted_answer", Dispatcher._State.UserInputLetters, Dispatcher._State.TargetWord);
-			};
-			Dispatcher.Instance.OnCurrentProblemCompleted += () => {
+			Dispatcher.Instance.HintProvided.Subscribe(() => {
+					LogEvent ("requested_hint", $"{Dispatcher._State.CurrentHintNumber}", "NA");
+			});
+			Dispatcher.Instance.UserSubmittedTheirLetters.Subscribe(() => {
+					LogEvent ("submitted_answer", Dispatcher._State.UserInputLetters, Dispatcher._State.TargetWord);
+			});
+			Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
 
-				RecordActivitySolved (
-				Dispatcher._Selector.CurrentStateOfInputMatchesTarget, 
-				Dispatcher._State.UserInputLetters, 
-				Dispatcher._Selector.SolvedOnFirstTry);
+					RecordActivitySolved (
+					Dispatcher._Selector.CurrentStateOfInputMatchesTarget, 
+					Dispatcher._State.UserInputLetters, 
+					Dispatcher._Selector.SolvedOnFirstTry);
 
-			SaveActivityDataAndClearForNext (Dispatcher._State.TargetWord, Dispatcher._State.PlaceHolderLetters);
+				SaveActivityDataAndClearForNext (Dispatcher._State.TargetWord, Dispatcher._State.PlaceHolderLetters);
 
-			};
+			});
 			
 
-			Dispatcher.Instance.OnSessionCompleted += UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs;
+			Dispatcher.Instance.SessionCompleted.Subscribe(UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
 
 		}
 

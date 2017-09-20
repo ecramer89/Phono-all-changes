@@ -206,7 +206,7 @@ public class ArduinoUnityInterface : MonoBehaviour
 
 								SearchForAndSaveChangedLetterAndPosition ();
 				if (WasAChange ())
-					Dispatcher.Instance.RecordNewUserInputLetter (
+					Dispatcher.Instance.UserEnteredNewLetter.Fire (
 						change.letter, 
 						AdjustArduinoPositionForScreen (change.position));
 									

@@ -14,12 +14,12 @@ public class ReplayInstructionsButton : MonoBehaviour {
 				messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
 
-				Dispatcher.Instance.OnUIInputLocked += () => {
-					gameObject.SetActive(false);
-				};
-				Dispatcher.Instance.OnUIInputUnLocked += () => {
-					gameObject.SetActive(true);
-				};
+				Dispatcher.Instance.UIInputLocked.Subscribe(() => {
+						gameObject.SetActive(false);
+				});
+				Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
+						gameObject.SetActive(true);
+				});
 			} else {
 				gameObject.SetActive(false);
 			}
