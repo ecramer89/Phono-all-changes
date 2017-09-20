@@ -27,7 +27,7 @@ public class UserStarGridController : MonoBehaviour
 
 						Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
 								if (Transaction.Selector.SolvedOnFirstTry){
-									AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
+									AddNewUserStar (true, ProblemsRepository.Instance.ProblemsCompleted-1);
 								}
 						});
 					}

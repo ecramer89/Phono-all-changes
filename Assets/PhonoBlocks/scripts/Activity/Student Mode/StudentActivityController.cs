@@ -47,7 +47,7 @@ public class StudentActivityController : MonoBehaviour
 
 	void SubscribeToEvents(){
 		Transaction.Instance.SessionSelected.Subscribe((int session) => {
-			ProblemsRepository.instance.Initialize (session);
+			ProblemsRepository.Instance.Initialize (session);
 		});
 		Transaction.Instance.ActivitySceneLoaded.Subscribe(SetUpNextProblem);
 
@@ -147,7 +147,7 @@ public class StudentActivityController : MonoBehaviour
 	}
 		
 	 void SetUpNextProblem ()
-	{       	ProblemData next = ProblemsRepository.instance.GetNextProblem ();
+		{       ProblemData next = ProblemsRepository.Instance.GetNextProblem ();
 				Transaction.Instance.NewProblemBegun.Fire (next);
 			
 				Transaction.Instance.StudentModeMainActivityEntered.Fire ();
@@ -157,7 +157,7 @@ public class StudentActivityController : MonoBehaviour
 
 		void HandleEndOfActivity ()
 		{
-				if (ProblemsRepository.instance.AllProblemsDone ()) {
+				if (ProblemsRepository.Instance.AllProblemsDone ()) {
 						Transaction.Instance.SessionCompleted.Fire ();
 						AudioSourceController.PushClip (triumphantSoundForSessionDone);
 						

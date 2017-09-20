@@ -6,7 +6,13 @@ using System.Collections.Generic;
 
 
 public class ProblemsRepository : MonoBehaviour
-{   
+{       static ProblemsRepository instance;
+		public static ProblemsRepository Instance{
+			get {
+				return instance;
+			}
+
+		}
 		ProblemData[] problemsForSession; 
 		int currProblem = 0;
 
@@ -16,7 +22,10 @@ public class ProblemsRepository : MonoBehaviour
 
 		}
 		
-		public static ProblemsRepository instance = new ProblemsRepository ();
+		void Start(){
+			instance = this;
+
+		}
 
 
 		public void Initialize (int sessionIndex)
