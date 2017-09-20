@@ -20,10 +20,39 @@ public class Dispatcher: MonoBehaviour  {
 		}
 	}
 		
+	public ParameterlessEvent StudentDataRetrieved = new ParameterlessEvent();
+	public ParameterlessEvent TimesAttemptedCurrentProblemIncremented = new ParameterlessEvent();
+	public ParameterlessEvent UserInputLettersUpdated = new ParameterlessEvent();
+	public ParameterlessEvent ActivitySceneLoaded = new ParameterlessEvent();
+	public ParameterlessEvent StudentModeMainActivityEntered = new ParameterlessEvent();
+	public ParameterlessEvent StudentModeForceCorrectLetterPlacementEntered = new ParameterlessEvent();
+	public ParameterlessEvent StudentModeForceRemoveAllLettersEntered = new ParameterlessEvent();
+	public ParameterlessEvent UIInputLocked = new ParameterlessEvent();
+	public ParameterlessEvent UIInputUnLocked = new ParameterlessEvent();
+	public ParameterlessEvent UserSubmittedTheirLetters = new ParameterlessEvent();
+	public ParameterlessEvent HintRequested = new ParameterlessEvent();
+	public ParameterlessEvent HintProvided = new ParameterlessEvent();
+	public ParameterlessEvent UserSubmittedIncorrectAnswer = new ParameterlessEvent();
+	public ParameterlessEvent CurrentProblemCompleted = new ParameterlessEvent();
+	public ParameterlessEvent UserAddedWordToHistory = new ParameterlessEvent();
+	public ParameterlessEvent SessionCompleted = new ParameterlessEvent();
+	public ParameterlessEvent SyllableDivisionShowStateToggled = new ParameterlessEvent();
 
-	public UnaryTypedEvent<string> TestEventA = new UnaryTypedEvent<string>();
-	public UnaryTypedEvent<string> TestEventB = new UnaryTypedEvent<string>();
 
+	public UnaryParameterizedEvent<Mode> ModeSelected = new UnaryParameterizedEvent<Mode>();
+	public UnaryParameterizedEvent<string> StudentNameEnetered = new UnaryParameterizedEvent<string>();
+	public UnaryParameterizedEvent<int> SessionSelected = new UnaryParameterizedEvent<int>();
+	public UnaryParameterizedEvent<List<InteractiveLetter>> InteractiveLettersCreated = new UnaryParameterizedEvent<List<InteractiveLetter>>();
+	public UnaryParameterizedEvent<Color[]> TargetColorsSet = new UnaryParameterizedEvent<Color[]>();
+	public UnaryParameterizedEvent<Activity> ActivitySelected = new UnaryParameterizedEvent<Activity>();
+	public UnaryParameterizedEvent<ProblemData> NewProblemBegun = new UnaryParameterizedEvent<ProblemData>();
+	public UnaryParameterizedEvent<InteractiveLetter> InteractiveLetterSelected = new UnaryParameterizedEvent<InteractiveLetter>();
+	public UnaryParameterizedEvent<InteractiveLetter> InteractiveLetterDeselected = new UnaryParameterizedEvent<InteractiveLetter>();
+	public UnaryParameterizedEvent<List<Match>> TargetWordSyllablesSet = new UnaryParameterizedEvent<List<Match>>();
+	public BinaryParameterizedEvent<char, int> UserEnteredNewLetter = new BinaryParameterizedEvent<char, int>();
+
+	public UnaryParameterizedEvent<string> TestEventA = new UnaryParameterizedEvent<string>();
+	public UnaryParameterizedEvent<string> TestEventB = new UnaryParameterizedEvent<string>();
 
 
 	public void EnqueueEvent(PhonoBlocksEvent evt){
