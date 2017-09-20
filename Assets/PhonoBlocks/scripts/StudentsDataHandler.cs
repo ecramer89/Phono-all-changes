@@ -29,7 +29,7 @@ public class StudentsDataHandler: MonoBehaviour
 
 		public void Start(){
 			assessmentStartTime = DateTime.Now;
-			Dispatcher.Instance.StudentNameEntered.Subscribe((string name) => {
+			Transaction.Instance.StudentNameEntered.Subscribe((string name) => {
 					string nameEntered = name.Trim ().ToLower ();
 					if (nameEntered.Length > 0) {
 					        
@@ -38,7 +38,7 @@ public class StudentsDataHandler: MonoBehaviour
 						bool wasStoredDataForName = LoadStudentData (nameEntered);
 
 						if (wasStoredDataForName) {
-							Dispatcher.Instance.StudentDataRetrieved.Fire ();
+							Transaction.Instance.StudentDataRetrieved.Fire ();
 
 						} else {
 							Debug.Log ("No data recorded for this student");
@@ -47,34 +47,34 @@ public class StudentsDataHandler: MonoBehaviour
 					}
 			});
 
-			Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
+			Transaction.Instance.SessionSelected.Subscribe((int session) => {
 					UpdateUsersSession (session);
 			});
-			Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+			Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 					LogEvent ("change_letter", newLetter + "", atPosition + "");
 			});
-			Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+			Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 					RecordActivityTargetWord (problem.targetWord);
 			});
-			Dispatcher.Instance.HintProvided.Subscribe(() => {
-					LogEvent ("requested_hint", $"{Dispatcher._State.CurrentHintNumber}", "NA");
+			Transaction.Instance.HintProvided.Subscribe(() => {
+					LogEvent ("requested_hint", $"{Transaction.State.CurrentHintNumber}", "NA");
 			});
-			Dispatcher.Instance.UserSubmittedTheirLetters.Subscribe(() => {
-					LogEvent ("submitted_answer", Dispatcher._State.UserInputLetters, Dispatcher._State.TargetWord);
+			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(() => {
+					LogEvent ("submitted_answer", Transaction.State.UserInputLetters, Transaction.State.TargetWord);
 			});
-			Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
+			Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
 
 					RecordActivitySolved (
-					Dispatcher._Selector.CurrentStateOfInputMatchesTarget, 
-					Dispatcher._State.UserInputLetters, 
-					Dispatcher._Selector.SolvedOnFirstTry);
+					Transaction.Selector.CurrentStateOfInputMatchesTarget, 
+					Transaction.State.UserInputLetters, 
+					Transaction.Selector.SolvedOnFirstTry);
 
-				SaveActivityDataAndClearForNext (Dispatcher._State.TargetWord, Dispatcher._State.PlaceHolderLetters);
+				SaveActivityDataAndClearForNext (Transaction.State.TargetWord, Transaction.State.PlaceHolderLetters);
 
 			});
 			
 
-			Dispatcher.Instance.SessionCompleted.Subscribe(UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
+			Transaction.Instance.SessionCompleted.Subscribe(UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
 
 		}
 
@@ -403,7 +403,7 @@ public class StudentsDataHandler: MonoBehaviour
 		public void LogEvent (string eventName, string eventParam1, string eventParam2)
 		{       //only log events in STUDENT mode.
 
-					if (Dispatcher._State.Mode == Mode.STUDENT) {
+					if (Transaction.State.Mode == Mode.STUDENT) {
 						// Write the string to a file.append mode is enabled so that the log
 						// lines get appended to  test.txt than wiping content and writing the log
 		

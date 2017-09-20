@@ -4,26 +4,24 @@ using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
 
-
-
-public class Dispatcher: MonoBehaviour  {
+public class Transaction: MonoBehaviour  {
 
 	private IEnumerator<Action> dispatch;
 	private Queue<PhonoBlocksEvent> events=new Queue<PhonoBlocksEvent>();
 
-	private static Dispatcher instance;
-	public static Dispatcher Instance{
+	private static Transaction instance;
+	public static Transaction Instance{
 		get {
 			if(state == null){
 				//gaurantees that state is first subscriber whose methods are invoked when new events occur.
 				//saves other classes that need to frequently refer to these data from having to cache additional
 				//references/copies to/of data
-				state = new State();
+				state = new PhonoBlocksState();
 				state.SubscribeToEvents ();
 				//ensure that selector is the second whose subscribers are invoked.
 				//selectors job is to compute/cache derived fields (e.g., whether or not current state of user input matches target,
 				//the location of each error, so on).
-				selector = new Selector();
+				selector = new PhonoBlocksSelector();
 				selector.SubscribeToEvents ();
 			}
 			return instance;
@@ -31,15 +29,15 @@ public class Dispatcher: MonoBehaviour  {
 		}
 	}
 
-	private static State state;
-	public static State _State{
+	private static PhonoBlocksState state;
+	public static PhonoBlocksState State{
 		get {
 			return state;
 		}
 
 	}
-	private static Selector selector;
-	public static Selector _Selector{
+	private static PhonoBlocksSelector selector;
+	public static PhonoBlocksSelector Selector{
 		get {
 			return selector;
 

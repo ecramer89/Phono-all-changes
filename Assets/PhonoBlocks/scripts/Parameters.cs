@@ -16,11 +16,11 @@ public class Parameters : MonoBehaviour {
 		//ensure that problem sets are sorted according to session number.
 		//expedites retrieval of session data from session index.
 		StudentMode.PROBLEM_SETS.Sort((SessionData x, SessionData y) => x.number - y.number);
-		Dispatcher.Instance.InputTypeSelected.Fire(inputType);
-		//Dispatcher.Instance.RecordInputTypeSelected (inputType);
-		Dispatcher.Instance.ActivitySelected.Subscribe((Activity obj) => {
+		Transaction.Instance.InputTypeSelected.Fire(inputType);
+		//Transaction.Instance.RecordInputTypeSelected (inputType);
+		Transaction.Instance.ActivitySelected.Subscribe((Activity obj) => {
 			SceneManager.LoadScene("Activity");
-			Dispatcher.Instance.ActivitySceneLoaded.Fire();
+			Transaction.Instance.ActivitySceneLoaded.Fire();
 		});
 
 

@@ -99,7 +99,7 @@ public class KeyboardLetterInput : MonoBehaviour {
 	{
 		if (testPosition != -1 && testLetter != null) {
 			
-			Dispatcher.Instance.UserEnteredNewLetter.Fire(testLetter [0], testPosition);
+			Transaction.Instance.UserEnteredNewLetter.Fire(testLetter [0], testPosition);
 			ClearTestPosition ();
 
 		}

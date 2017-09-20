@@ -27,7 +27,8 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 	}
 
 	public void Fire(){
-		Dispatcher.Instance.EnqueueEvent(this);
+		Debug.Log($"Firing event: {name}");
+		Transaction.Instance.EnqueueEvent(this);
 	}
 
 	public List<Action> Subscribers(){
@@ -56,11 +57,12 @@ public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 	}
 
 	public void Fire(T arg0){
+		Debug.Log($"Firing event: {name}");
 		generifiedSubscribers = new List<Action>();
 		foreach(Action<T> subscriber in typedSubscribers){
 			generifiedSubscribers.Add(()=>subscriber(arg0));
 		}
-		Dispatcher.Instance.EnqueueEvent(this);
+		Transaction.Instance.EnqueueEvent(this);
 	}
 
 	public List<Action> Subscribers(){
@@ -90,11 +92,12 @@ public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 	}
 
 	public void Fire(T arg0, V arg1){
+		Debug.Log($"Firing event: {name}");
 		generifiedSubscribers = new List<Action>();
 		foreach(Action<T,V> subscriber in typedSubscribers){
 			generifiedSubscribers.Add(()=>subscriber(arg0, arg1));
 		}
-		Dispatcher.Instance.EnqueueEvent(this);
+		Transaction.Instance.EnqueueEvent(this);
 	}
 
 	public List<Action> Subscribers(){

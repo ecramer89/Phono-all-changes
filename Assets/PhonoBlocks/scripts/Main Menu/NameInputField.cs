@@ -15,12 +15,12 @@ public class NameInputField : MonoBehaviour {
 	void Start(){
 		position = new Rect (300, 300, 200, 50);
 		gameObject.SetActive (false);
-		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
+		Transaction.Instance.ModeSelected.Subscribe((Mode mode) => {
 			if(mode == Mode.STUDENT){
 				gameObject.SetActive(true);
 			}
 		});
-		Dispatcher.Instance.StudentDataRetrieved.Subscribe(() => {
+		Transaction.Instance.StudentDataRetrieved.Subscribe(() => {
 			gameObject.SetActive(false);
 		});
 
@@ -52,7 +52,7 @@ public class NameInputField : MonoBehaviour {
 
 	void Update(){
 		if (enterKeyPressed) {
-			Dispatcher.Instance.StudentNameEntered.Fire (name);
+			Transaction.Instance.StudentNameEntered.Fire (name);
 			enterKeyPressed = false;
 		}
 	}

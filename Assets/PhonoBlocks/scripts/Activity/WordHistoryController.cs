@@ -27,7 +27,7 @@ public class WordHistoryController : MonoBehaviour
 		public void Start(){
 			instance = this;
 			
-			Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+			Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
 				words = new List<Word> ();
 				wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
 				wordHistoryGrid = GameObject.Find("WordHistoryGrid");
@@ -37,8 +37,8 @@ public class WordHistoryController : MonoBehaviour
 			});
 
 			//subscribe to events
-		    Dispatcher.Instance.CurrentProblemCompleted.Subscribe(AddCurrentWordToHistory);
-			Dispatcher.Instance.UserAddedWordToHistory.Subscribe(AddCurrentWordToHistory);
+		    Transaction.Instance.CurrentProblemCompleted.Subscribe(AddCurrentWordToHistory);
+			Transaction.Instance.UserAddedWordToHistory.Subscribe(AddCurrentWordToHistory);
 		}
 
 		public int showImageTime = 60 * 8;
@@ -48,7 +48,7 @@ public class WordHistoryController : MonoBehaviour
 		{           
 				AddLettersOfNewWordToHistory ();
 		        //cache an audio clip and string for each word that gets saved to the History
-				Word newWord = CreateNewWordAndAddToList (Dispatcher._State.UserInputLetters.Trim());
+				Word newWord = CreateNewWordAndAddToList (Transaction.State.UserInputLetters.Trim());
 				AudioSourceController.PushClip (newWord.Sound);
 			
 		}
@@ -57,7 +57,7 @@ public class WordHistoryController : MonoBehaviour
 		{ 
 				
 				int position = words.Count * Parameters.UI.ONSCREEN_LETTER_SPACES;
-				foreach (InteractiveLetter l in Dispatcher._State.UILetters) {
+				foreach (InteractiveLetter l in Transaction.State.UILetters) {
 					
 			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (
 							l.CurrentDisplayImage (), 

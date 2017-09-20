@@ -37,7 +37,7 @@ public class InteractiveLetter : MonoBehaviour{
 	    * pattern for handling interactive letter UI events differs a little from others.
 	    * basically, I don't want to even recognize swipes (selections) on the interactive letters in the word history panel
 	    * conversely, I don't want to recognize press events on the interactive letters on the main letter grid.
-	    * as such, I impose an additional layer between the interactive letter events and the main Event Dispatcher that
+	    * as such, I impose an additional layer between the interactive letter events and the main Event Transaction that
 	    * runs all the rest of the application.
 	    * the two classes (Arduino letter controller and word history controller) each subscribe directly to just the UI events they care about
 	    * and only subscribe to the instances of InteractiveLetter that they manage. 
@@ -247,10 +247,10 @@ public class InteractiveLetter : MonoBehaviour{
 
 
 		public void Start(){
-			Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+			Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 				if(this == letter) ToggleSelectHighlight(false);
 			});
-			Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+			Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
 				if(this == letter) ToggleSelectHighlight(true);
 			});
 		}

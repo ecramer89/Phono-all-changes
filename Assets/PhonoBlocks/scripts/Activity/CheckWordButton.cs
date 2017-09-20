@@ -11,26 +11,26 @@ public class CheckWordButton : MonoBehaviour {
 		messenger.functionName = "CheckWord";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
-		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			gameObject.SetActive(true);
 		});
 		//transition automatically from all letters removed to beginning of next problem; no need to press submit button again.
-		Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() =>{
+		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() =>{
 			gameObject.SetActive(false);
 		});
-		Dispatcher.Instance.UIInputLocked.Subscribe(() => {
+		Transaction.Instance.UIInputLocked.Subscribe(() => {
 			gameObject.SetActive(false);
 		});
-		Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
+		Transaction.Instance.UIInputUnLocked.Subscribe(() => {
 			gameObject.SetActive(true);
 		});
 	}
 
 	void CheckWord(){
 
-		if (Dispatcher._State.UIInputLocked)
+		if (Transaction.State.UIInputLocked)
 			return;
-		Dispatcher.Instance.UserSubmittedTheirLetters.Fire ();
+		Transaction.Instance.UserSubmittedTheirLetters.Fire ();
 	 
 
 	}

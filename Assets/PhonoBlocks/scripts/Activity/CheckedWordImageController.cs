@@ -17,22 +17,22 @@ public class CheckedWordImageController : MonoBehaviour
 			void Start (){
 
 				//remove the old image, if it's still there
-				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+				Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 							EndDisplay ();
 				});
 				//display the target word image
-				Dispatcher.Instance.CurrentProblemCompleted.Subscribe(DisplayTargetWord);
+				Transaction.Instance.CurrentProblemCompleted.Subscribe(DisplayTargetWord);
 				//level three hint; show the image of the target word.
-				Dispatcher.Instance.HintRequested.Subscribe(() => {
-						if(Dispatcher._State.CurrentHintNumber == Parameters.Hints.Descriptions.
+				Transaction.Instance.HintRequested.Subscribe(() => {
+						if(Transaction.State.CurrentHintNumber == Parameters.Hints.Descriptions.
 							PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
 								DisplayTargetWord();
 							}
 				});
 		        //if the current state of user input letters corresponds to a saved image, then
 				//display it.
-				Dispatcher.Instance.UserAddedWordToHistory.Subscribe(DisplayCurrentInputWord);
-				Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+				Transaction.Instance.UserAddedWordToHistory.Subscribe(DisplayCurrentInputWord);
+				Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
 						checkedWordImage = GameObject.Find("CheckedWordImage");
 						img = checkedWordImage.GetComponent<UITexture> ();
 						img.enabled = false;
@@ -43,12 +43,12 @@ public class CheckedWordImageController : MonoBehaviour
 		}
 
 		void DisplayCurrentInputWord(){
-			DisplayImageForWordIfAny (Dispatcher._State.UserInputLetters);
+			DisplayImageForWordIfAny (Transaction.State.UserInputLetters);
 		}
 
 
 		void DisplayTargetWord(){
-			DisplayImageForWordIfAny (Dispatcher._State.TargetWord);
+			DisplayImageForWordIfAny (Transaction.State.TargetWord);
 		}
 
 		void DisplayImageForWordIfAny(string word){

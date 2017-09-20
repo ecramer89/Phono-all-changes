@@ -15,7 +15,7 @@ public class ModeSelectionButton : MonoBehaviour {
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 		//any mode selection button (not just the one that was clicked) needs to deactivate 
 		//when any one of them is clicked.
-		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
+		Transaction.Instance.ModeSelected.Subscribe((Mode mode) => {
 			//since users need to enter their name following click the student mode selection button,
 			//it's a bit nicer to just leave the button onscreen rather than remove it entirely.
 			if(mode == Mode.TEACHER || this.mode == Mode.TEACHER){
@@ -29,7 +29,7 @@ public class ModeSelectionButton : MonoBehaviour {
 		});
 		//teacher mode button stays on while students enter name;
 		//disappears after name entered+data successfully loaded or created.
-		Dispatcher.Instance.StudentDataRetrieved.Subscribe(()=>{
+		Transaction.Instance.StudentDataRetrieved.Subscribe(()=>{
 			if(this.mode == Mode.STUDENT){
 				gameObject.SetActive(false);
 			}
@@ -39,9 +39,9 @@ public class ModeSelectionButton : MonoBehaviour {
 
 
 	void SelectMode(){
-		Dispatcher.Instance.ModeSelected.Fire (mode);
+		Transaction.Instance.ModeSelected.Fire (mode);
 
 
-		Dispatcher.Instance.TestEventA.Fire("dispatching event A from button");
+		Transaction.Instance.TestEventA.Fire("dispatching event A from button");
 	}
 }

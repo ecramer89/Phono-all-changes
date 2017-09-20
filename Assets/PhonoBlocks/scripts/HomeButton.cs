@@ -14,7 +14,7 @@ public class HomeButton : MonoBehaviour {
 		messenger.target = gameObject;
 		messenger.functionName = "ReturnToMainMenu";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
-		Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
 			gameObject.SetActive(true);
 		});
 	}

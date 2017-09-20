@@ -4,13 +4,13 @@ using UnityEngine;
 using System.Linq;
 using Extensions;
 using System;
-public class Selector  {
+public class PhonoBlocksSelector  {
 
 
 
 	public void SubscribeToEvents(){
 		
-		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
 			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
@@ -28,29 +28,29 @@ public class Selector  {
 		});
 			
 			
-		Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
-			if(Dispatcher._State.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
+		Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+			if(Transaction.State.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
 			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
 			//it's outside the bounds of target word and is blank.
 			correctlyPlacedLetters[atPosition] = 
-				(atPosition >= Dispatcher._State.TargetWord.Length && newLetter == ' ') ||
-				(atPosition <  Dispatcher._State.TargetWord.Length && newLetter == Dispatcher._State.TargetWord[atPosition]);
+				(atPosition >= Transaction.State.TargetWord.Length && newLetter == ' ') ||
+				(atPosition <  Transaction.State.TargetWord.Length && newLetter == Transaction.State.TargetWord[atPosition]);
 			
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
 		});
 
-		Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
-			solvedOnFirstTry = Dispatcher._State.TimesAttemptedCurrentProblem == 1;
+		Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
+			solvedOnFirstTry = Transaction.State.TimesAttemptedCurrentProblem == 1;
 		});
 
-		Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
-			allLettersSelected = Dispatcher._State.SelectedUserInputLetters == Dispatcher._State.UserInputLetters;
+		Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+			allLettersSelected = Transaction.State.SelectedUserInputLetters == Transaction.State.UserInputLetters;
 			allLettersDeSelected = false;
 		});
-		Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+		Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 			allLettersSelected = false;
-			allLettersDeSelected = Dispatcher._State.SelectedUserInputLetters.Trim().Length == 0;
+			allLettersDeSelected = Transaction.State.SelectedUserInputLetters.Trim().Length == 0;
 		});
 	}
 

@@ -28,33 +28,33 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 				
 
-				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+			Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 							ReplaceEachLetterWithBlank ();
 							PlaceWordInLetterGrid (problem.initialWord);
 							activateLinesBeneathLettersOfWord(problem.targetWord);
 				});
 				
-				Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+				Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
 							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
 							SubscribeToInteractiveLetterEvents(UILetters);
-							Dispatcher.Instance.InteractiveLettersCreated.Fire (UILetters);
+							Transaction.Instance.InteractiveLettersCreated.Fire (UILetters);
 				});
 
-				Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
-					if(Dispatcher._Selector.AllLettersSelected 
-								&& Dispatcher._State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
-									Dispatcher.Instance.SyllableDivisionShowStateToggled.Fire();
+				Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+					if(Transaction.Selector.AllLettersSelected 
+								&& Transaction.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
+									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
 							}
 				});
 
 
-				Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+				Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 
-							if(Dispatcher._Selector.AllLettersDeSelected &&
-								Dispatcher._State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
-									Dispatcher.Instance.SyllableDivisionShowStateToggled.Fire();
+							if(Transaction.Selector.AllLettersDeSelected &&
+								Transaction.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
 							}
 				});
 
@@ -64,16 +64,16 @@ public class ArduinoLetterController : MonoBehaviour{
 	{
 		foreach(InteractiveLetter letter in UILetters){
 			letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
-				if(Dispatcher._State.Activity != Activity.SYLLABLE_DIVISION) return;
-				if(Dispatcher._State.UserInputLetters[l.Position] == ' ') return;
+				if(Transaction.State.Activity != Activity.SYLLABLE_DIVISION) return;
+				if(Transaction.State.UserInputLetters[l.Position] == ' ') return;
 				//don't send event if position is already selected or deselected
-				if(wasSelected && Dispatcher._State.SelectedUserInputLetters[l.Position] != ' ' || 
-					!wasSelected && Dispatcher._State.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
-				if(Dispatcher._State.Mode == Mode.STUDENT && !Dispatcher._Selector.CurrentStateOfInputMatchesTarget) return;
+				if(wasSelected && Transaction.State.SelectedUserInputLetters[l.Position] != ' ' || 
+					!wasSelected && Transaction.State.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
+				if(Transaction.State.Mode == Mode.STUDENT && !Transaction.Selector.CurrentStateOfInputMatchesTarget) return;
 				if(wasSelected){
-					Dispatcher.Instance.InteractiveLetterSelected.Fire(l);
+					Transaction.Instance.InteractiveLetterSelected.Fire(l);
 				}else{
-					Dispatcher.Instance.InteractiveLetterDeselected.Fire(l);
+					Transaction.Instance.InteractiveLetterDeselected.Fire(l);
 				}
 
 			};
@@ -96,7 +96,7 @@ public class ArduinoLetterController : MonoBehaviour{
 		{   		InteractiveLetter letter = GetInteractiveLetterAt(atPosition);
 		            letter.UpdateLetterImage (letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
 					if(newLetter==" ") { //deselect letters that the user removes
-						Dispatcher.Instance.InteractiveLetterDeselected.Fire(letter);
+						Transaction.Instance.InteractiveLetterDeselected.Fire(letter);
 					}
 		}
 

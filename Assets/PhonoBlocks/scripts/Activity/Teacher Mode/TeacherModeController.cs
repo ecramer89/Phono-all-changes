@@ -5,16 +5,16 @@ using UnityEngine;
 public class TeacherModeController : MonoBehaviour {
 
 	void Start () {
-		Dispatcher.Instance.ModeSelected.Subscribe(
+		Transaction.Instance.ModeSelected.Subscribe(
 			(Mode mode) => {
 				if(mode == Mode.TEACHER){
-					Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+					Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, newLetter);
 						Colorer.Instance.ReColor ();
 					});
 
-					Dispatcher.Instance.UserSubmittedTheirLetters.Subscribe(() => {
-						Dispatcher.Instance.UserAddedWordToHistory.Fire ();
+					Transaction.Instance.UserSubmittedTheirLetters.Subscribe(() => {
+						Transaction.Instance.UserAddedWordToHistory.Fire ();
 					});
 				}else {
 					gameObject.SetActive(false);

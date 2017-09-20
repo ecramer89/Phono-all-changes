@@ -5,47 +5,47 @@ using Extensions;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using System.Linq;
-public class State {
+public class PhonoBlocksState {
 
 
 	public void SubscribeToEvents(){
 
-		Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
 			previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 		});
 
-		Dispatcher.Instance.InputTypeSelected.Subscribe(
+		Transaction.Instance.InputTypeSelected.Subscribe(
 			(InputType type) => {
 				inputType = type;
 			}
 		);
 
-		Dispatcher.Instance.ActivitySelected.Subscribe((Activity activity) => {
+		Transaction.Instance.ActivitySelected.Subscribe((Activity activity) => {
 			this.activity = activity;
 			if(activity == Activity.SYLLABLE_DIVISION){
 				syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
 			}
 		});
 
-		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
+		Transaction.Instance.ModeSelected.Subscribe((Mode mode) => {
 			this.mode = mode;
 		});
 
-		Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
+		Transaction.Instance.SessionSelected.Subscribe((int session) => {
 			this.session = session;
 		});
 
-		Dispatcher.Instance.InteractiveLettersCreated.Subscribe((List<InteractiveLetter> letters) => {
+		Transaction.Instance.InteractiveLettersCreated.Subscribe((List<InteractiveLetter> letters) => {
 			this.uILetters = letters;
 		});
 			
-		Dispatcher.Instance.TargetColorsSet.Subscribe((Color[] targetWordColors) => {
+		Transaction.Instance.TargetColorsSet.Subscribe((Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
 		});
 
-		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			placeHolderLetters = problem.initialWord;
 			this.targetWord = problem.targetWord;
 			currentProblemInstrutions = problem.instructions;
@@ -59,53 +59,53 @@ public class State {
 
 		});
 	
-		Dispatcher.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(() => {
+		Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(() => {
 			timesAttemptedCurrentProblem++;
 		});
 			
 	 
-		Dispatcher.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+		Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
 			previousUserInputLetters = userInputLetters;
 			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
 				
 		});
 	
-		Dispatcher.Instance.StudentModeMainActivityEntered.Subscribe(() => {
+		Transaction.Instance.StudentModeMainActivityEntered.Subscribe(() => {
 			studentModeState = StudentModeStates.MAIN_ACTIVITY;
 		});
-		Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() => {
+		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() => {
 			studentModeState = StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT;
 		});
-		Dispatcher.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() => {
+		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() => {
 			studentModeState = StudentModeStates.REMOVE_ALL_LETTERS;
 		});
 
-		Dispatcher.Instance.UIInputUnLocked.Subscribe(() => {
+		Transaction.Instance.UIInputUnLocked.Subscribe(() => {
 			uIInputLocked = false;
 		});
-		Dispatcher.Instance.UIInputLocked.Subscribe(() => {
+		Transaction.Instance.UIInputLocked.Subscribe(() => {
 			uIInputLocked = true;
 		});
-		Dispatcher.Instance.UserSubmittedIncorrectAnswer.Subscribe(() => {
+		Transaction.Instance.UserSubmittedIncorrectAnswer.Subscribe(() => {
 			this.hintAvailable=this.currentHintNumber < Parameters.Hints.NUM_HINTS;
 		});
-		Dispatcher.Instance.HintProvided.Subscribe(() => {
+		Transaction.Instance.HintProvided.Subscribe(() => {
 			this.hintAvailable = false;
 			this.currentHintNumber++;
 		});
-		Dispatcher.Instance.SyllableDivisionShowStateToggled.Subscribe(() => {
+		Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(() => {
 			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
 				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
 		});
-		Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+		Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				userInputLetters[letter.Position]);
 		});
-		Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+		Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				' ');
 		});
-		Dispatcher.Instance.TargetWordSyllablesSet.Subscribe((List<Match> syllables) => {
+		Transaction.Instance.TargetWordSyllablesSet.Subscribe((List<Match> syllables) => {
 			this.targetWordSyllables = syllables;
 
 		});
