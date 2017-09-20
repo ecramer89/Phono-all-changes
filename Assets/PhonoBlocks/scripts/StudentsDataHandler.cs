@@ -29,47 +29,47 @@ public class StudentsDataHandler: MonoBehaviour
 
 		public void Start(){
 			assessmentStartTime = DateTime.Now;
-			Dispatcher.Instance.OnStudentNameEntered += (string name) => {
-				string nameEntered = name.Trim ().ToLower ();
-				if (nameEntered.Length > 0) {
-				        
-					nameEntered = CreateNewFileIfNeeded (nameEntered);
+			Dispatcher.Instance.StudentNameEntered.Subscribe((string name) => {
+					string nameEntered = name.Trim ().ToLower ();
+					if (nameEntered.Length > 0) {
+					        
+						nameEntered = CreateNewFileIfNeeded (nameEntered);
 
-					bool wasStoredDataForName = LoadStudentData (nameEntered);
+						bool wasStoredDataForName = LoadStudentData (nameEntered);
 
-					if (wasStoredDataForName) {
-						Dispatcher.Instance.RecordStudentDataRetrieved ();
+						if (wasStoredDataForName) {
+							Dispatcher.Instance.StudentDataRetrieved.Fire ();
 
-					} else {
-						Debug.Log ("No data recorded for this student");
+						} else {
+							Debug.Log ("No data recorded for this student");
 
+						}
 					}
-				}
-			};
+			});
 
-			Dispatcher.Instance.OnSessionSelected += (int session) => {
-				UpdateUsersSession (session);
-			};
+			Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
+					UpdateUsersSession (session);
+			});
 			Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
 				LogEvent ("change_letter", newLetter + "", atPosition + "");
 			};
-			Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
-				RecordActivityTargetWord (problem.targetWord);
-			};
+			Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+					RecordActivityTargetWord (problem.targetWord);
+			});
 			Dispatcher.Instance.OnHintProvided += () => {
-				LogEvent ("requested_hint", $"{State.Current.CurrentHintNumber}", "NA");
+				LogEvent ("requested_hint", $"{Dispatcher._State.CurrentHintNumber}", "NA");
 			};
 			Dispatcher.Instance.OnUserSubmittedTheirLetters += () => {
-				LogEvent ("submitted_answer", State.Current.UserInputLetters, State.Current.TargetWord);
+				LogEvent ("submitted_answer", Dispatcher._State.UserInputLetters, Dispatcher._State.TargetWord);
 			};
 			Dispatcher.Instance.OnCurrentProblemCompleted += () => {
 
 				RecordActivitySolved (
-				Selector.Instance.CurrentStateOfInputMatchesTarget, 
-				State.Current.UserInputLetters, 
-				Selector.Instance.SolvedOnFirstTry);
+				Dispatcher._Selector.CurrentStateOfInputMatchesTarget, 
+				Dispatcher._State.UserInputLetters, 
+				Dispatcher._Selector.SolvedOnFirstTry);
 
-				SaveActivityDataAndClearForNext (State.Current.TargetWord, State.Current.PlaceHolderLetters);
+			SaveActivityDataAndClearForNext (Dispatcher._State.TargetWord, Dispatcher._State.PlaceHolderLetters);
 
 			};
 			
@@ -403,7 +403,7 @@ public class StudentsDataHandler: MonoBehaviour
 		public void LogEvent (string eventName, string eventParam1, string eventParam2)
 		{       //only log events in STUDENT mode.
 
-					if (State.Current.Mode == Mode.STUDENT) {
+					if (Dispatcher._State.Mode == Mode.STUDENT) {
 						// Write the string to a file.append mode is enabled so that the log
 						// lines get appended to  test.txt than wiping content and writing the log
 		

@@ -5,21 +5,10 @@ using Extensions;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using System.Linq;
-public class State: MonoBehaviour  {
-	private static State current;
-	public static State Current{
-		get {
-			return current;
-		}
+public class State {
 
-	}
-
-	public void Start(){
-		current = this;
-	}
 
 	public void SubscribeToEvents(){
-
 
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
 			if(scene.name == "Activity"){
@@ -36,30 +25,30 @@ public class State: MonoBehaviour  {
 			}
 		);
 
-		Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
+		Dispatcher.Instance.ActivitySelected.Subscribe((Activity activity) => {
 			this.activity = activity;
 			if(activity == Activity.SYLLABLE_DIVISION){
 				syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
 			}
-		};
+		});
 
 		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 			this.mode = mode;
 		});
 
-		Dispatcher.Instance.OnSessionSelected += (int session) => {
+		Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
 			this.session = session;
-		};
+		});
 
-		Dispatcher.Instance.OnUILettersCreated += (List<InteractiveLetter> letters) => {
+		Dispatcher.Instance.InteractiveLettersCreated.Subscribe((List<InteractiveLetter> letters) => {
 			this.uILetters = letters;
-		};
+		});
 			
 		Dispatcher.Instance.OnTargetColorsSet += (Color[] targetWordColors) => {
 			this.targetWordColors = targetWordColors;
 		};
 
-		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			placeHolderLetters = problem.initialWord;
 			this.targetWord = problem.targetWord;
 			currentProblemInstrutions = problem.instructions;
@@ -71,7 +60,7 @@ public class State: MonoBehaviour  {
 			//only matters in syllable division activity, but may as well reset whenever.
 			syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
 
-		};
+		});
 	
 		Dispatcher.Instance.OnTimesAttemptedCurrentProblemIncremented += () => {
 			timesAttemptedCurrentProblem++;

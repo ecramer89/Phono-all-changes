@@ -17,14 +17,14 @@ public class CheckedWordImageController : MonoBehaviour
 			void Start (){
 
 				//remove the old image, if it's still there
-				Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
-					EndDisplay ();
-				};
+				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+							EndDisplay ();
+				});
 				//display the target word image
 				Dispatcher.Instance.OnCurrentProblemCompleted += DisplayTargetWord;
 				//level three hint; show the image of the target word.
 				Dispatcher.Instance.OnHintRequested += () => {
-				if(State.Current.CurrentHintNumber == Parameters.Hints.Descriptions.
+				if(Dispatcher._State.CurrentHintNumber == Parameters.Hints.Descriptions.
 					PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
 						DisplayTargetWord();
 					}
@@ -45,12 +45,12 @@ public class CheckedWordImageController : MonoBehaviour
 		}
 
 		void DisplayCurrentInputWord(){
-			DisplayImageForWordIfAny (State.Current.UserInputLetters);
+			DisplayImageForWordIfAny (Dispatcher._State.UserInputLetters);
 		}
 
 
 		void DisplayTargetWord(){
-			DisplayImageForWordIfAny (State.Current.TargetWord);
+			DisplayImageForWordIfAny (Dispatcher._State.TargetWord);
 		}
 
 		void DisplayImageForWordIfAny(string word){

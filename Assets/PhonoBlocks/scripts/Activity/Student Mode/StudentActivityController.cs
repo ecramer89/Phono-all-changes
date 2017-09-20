@@ -46,34 +46,34 @@ public class StudentActivityController : MonoBehaviour
 
 
 	void SubscribeToEvents(){
-		Dispatcher.Instance.OnSessionSelected += (int session) => {
+		Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
 			ProblemsRepository.instance.Initialize (session);
-		};
+		});
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 			if(scene.name=="Activity"){
 				SetUpNextProblem ();
 			}
 		};
 
-		Dispatcher.Instance.OnActivitySelected+=(Activity activity) => {
+		Dispatcher.Instance.ActivitySelected.Subscribe((Activity activity) => {
 			if(activity == Activity.SYLLABLE_DIVISION){
-				Dispatcher.Instance.OnNewProblemBegun+=(ProblemData problem)=>{
+				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem)=>{
 					Dispatcher.Instance.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
-				};
+				});
 			}
-		};
+		});
 
 		//placeholder letters have the blank letter outline
-		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			for(int i=0;i<problem.initialWord.Length;i++){
 				ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
 			}
-		};
+		});
 		//if the user removes a letter at a position of a place holder letter,
 		//then restore the dashed letter outline for the placeholder.
 		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
-			if(newLetter!=' ' || atPosition >= State.Current.PlaceHolderLetters.Length) return;
-			char placeholderLetter = State.Current.PlaceHolderLetters[atPosition];
+			if(newLetter!=' ' || atPosition >= Dispatcher._State.PlaceHolderLetters.Length) return;
+			char placeholderLetter = Dispatcher._State.PlaceHolderLetters[atPosition];
 			if(placeholderLetter == ' ') return;
 
 			ArduinoLetterController.instance.ChangeTheImageOfASingleCell(
@@ -98,11 +98,11 @@ public class StudentActivityController : MonoBehaviour
 
 
 	bool AllUserControlledLettersAreBlank(){
-		return State.Current.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
+		return Dispatcher._State.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
 	}
 
 	void HandleNewArduinoLetter(char newLetter, int atPosition){
-		switch (State.Current.StudentModeState) {
+		switch (Dispatcher._State.StudentModeState) {
 		case StudentModeStates.MAIN_ACTIVITY:
 			MainActivityNewLetterHandler(newLetter, atPosition);
 			break;
@@ -122,10 +122,10 @@ public class StudentActivityController : MonoBehaviour
 	}
 
 	void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
-		InteractiveLetter asInteractiveLetter = State.Current.UILetters[atPosition];
-		if (Selector.Instance.IsCorrectlyPlaced(atPosition)){
+		InteractiveLetter asInteractiveLetter = Dispatcher._State.UILetters[atPosition];
+		if (Dispatcher._Selector.IsCorrectlyPlaced(atPosition)){
 			//in case the user removed and then replaced a letter correctly.
-			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (State.Current.TargetWordColors[atPosition]);
+			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Dispatcher._State.TargetWordColors[atPosition]);
 			return;
 		}
 		//otherwise, don't update the UI letters but do flash the error to indicate that child didn't place the right letter.	
@@ -152,12 +152,10 @@ public class StudentActivityController : MonoBehaviour
 		
 	 void SetUpNextProblem ()
 		{  
-		        Dispatcher.Instance.RecordNewProblemBegun (
-					ProblemsRepository.instance.GetNextProblem ()
-				);
+				Dispatcher.Instance.NewProblemBegun.Fire (ProblemsRepository.instance.GetNextProblem ());
 			
 				Dispatcher.Instance.EnterStudentModeMainActivity ();
-				AudioSourceController.PushClips (State.Current.CurrentProblemInstructions);
+				AudioSourceController.PushClips (Dispatcher._State.CurrentProblemInstructions);
 
 				
 
@@ -182,7 +180,7 @@ public class StudentActivityController : MonoBehaviour
 		       			
 				Dispatcher.Instance.IncrementTimesAttemptedCurrentProblem ();
 		
-				if (Selector.Instance.CurrentStateOfInputMatchesTarget) {
+				if (Dispatcher._Selector.CurrentStateOfInputMatchesTarget) {
 					HandleCorrectAnswer ();
 				} else {
 					HandleIncorrectAnswer ();				
@@ -194,7 +192,7 @@ public class StudentActivityController : MonoBehaviour
 
 		void HandleCorrectAnswer(){
 			AudioSourceController.PushClip (correctSoundEffect);
-			if (State.Current.TimesAttemptedCurrentProblem > 1)
+			if (Dispatcher._State.TimesAttemptedCurrentProblem > 1)
 				AudioSourceController.PushClip (youDidIt);
 			else
 				AudioSourceController.PushClip (excellent);
@@ -206,7 +204,7 @@ public class StudentActivityController : MonoBehaviour
 				Dispatcher.Instance.RecordUserSubmittedIncorrectAnswer ();
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
-				if(State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
+				if(Dispatcher._State.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
 					AudioSourceController.PushClip (offerHint);
 		}
 

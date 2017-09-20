@@ -29,11 +29,11 @@ public class ModeSelectionButton : MonoBehaviour {
 		});
 		//teacher mode button stays on while students enter name;
 		//disappears after name entered+data successfully loaded or created.
-		Dispatcher.Instance.OnStudentDataRetrieved+= ()=>{
+		Dispatcher.Instance.StudentDataRetrieved.Subscribe(()=>{
 			if(this.mode == Mode.STUDENT){
 				gameObject.SetActive(false);
 			}
-		};
+		});
 
 	}
 

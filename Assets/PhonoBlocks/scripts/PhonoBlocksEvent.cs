@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Linq;
+
 public interface PhonoBlocksEvent  {
 
 	List<Action> Subscribers();
+	string Name();
 }
 
 public class ParameterlessEvent : PhonoBlocksEvent{
-	private List<Action> subscribers;
+	private List<Action> subscribers = new List<Action>();
+	private string name;
 
+	public ParameterlessEvent(string name){
+		this.name = name;
+	}
+
+	public string Name(){
+		return name;
+	}
 
 	public void Subscribe(Action subscriber){
 		subscribers.Add(subscriber);
@@ -30,9 +39,15 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 	private List<Action<T>> typedSubscribers;
 	private List<Action> generifiedSubscribers;
+	string name;
 
-	public UnaryParameterizedEvent(){
+	public UnaryParameterizedEvent(string name){
+		this.name = name;
 		typedSubscribers = new List<Action<T>>();
+	}
+
+	public string Name(){
+		return name;
 	}
 
 	public void Subscribe(Action<T> subscriber){
@@ -57,9 +72,16 @@ public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 	private List<Action<T,V>> typedSubscribers;
 	private List<Action> generifiedSubscribers;
+	private string name;
 
-	public BinaryParameterizedEvent(){
+
+	public BinaryParameterizedEvent(string name){
 		typedSubscribers = new List<Action<T,V>>();
+		this.name = name;
+	}
+
+	public string Name(){
+		return name;
 	}
 
 	public void Subscribe(Action<T,V> subscriber){

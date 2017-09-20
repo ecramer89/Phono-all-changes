@@ -5,8 +5,7 @@ using System;
 using System.Text.RegularExpressions;
 
 
-[RequireComponent(typeof(State))]
-[RequireComponent(typeof(Selector))]
+
 public class Dispatcher: MonoBehaviour  {
 
 	private IEnumerator<Action> dispatch;
@@ -15,49 +14,80 @@ public class Dispatcher: MonoBehaviour  {
 	private static Dispatcher instance;
 	public static Dispatcher Instance{
 		get {
+			if(state == null){
+				//gaurantees that state is first subscriber whose methods are invoked when new events occur.
+				//saves other classes that need to frequently refer to these data from having to cache additional
+				//references/copies to/of data
+				state = new State();
+				state.SubscribeToEvents ();
+				//ensure that selector is the second whose subscribers are invoked.
+				//selectors job is to compute/cache derived fields (e.g., whether or not current state of user input matches target,
+				//the location of each error, so on).
+				selector = new Selector();
+				selector.SubscribeToEvents ();
+			}
 			return instance;
 
 		}
 	}
+
+	private static State state;
+	public static State _State{
+		get {
+			return state;
+		}
+
+	}
+	private static Selector selector;
+	public static Selector _Selector{
+		get {
+			return selector;
+
+		}
+	}
 		
-	public ParameterlessEvent StudentDataRetrieved = new ParameterlessEvent();
-	public ParameterlessEvent TimesAttemptedCurrentProblemIncremented = new ParameterlessEvent();
-	public ParameterlessEvent UserInputLettersUpdated = new ParameterlessEvent();
-	public ParameterlessEvent ActivitySceneLoaded = new ParameterlessEvent();
-	public ParameterlessEvent StudentModeMainActivityEntered = new ParameterlessEvent();
-	public ParameterlessEvent StudentModeForceCorrectLetterPlacementEntered = new ParameterlessEvent();
-	public ParameterlessEvent StudentModeForceRemoveAllLettersEntered = new ParameterlessEvent();
-	public ParameterlessEvent UIInputLocked = new ParameterlessEvent();
-	public ParameterlessEvent UIInputUnLocked = new ParameterlessEvent();
-	public ParameterlessEvent UserSubmittedTheirLetters = new ParameterlessEvent();
-	public ParameterlessEvent HintRequested = new ParameterlessEvent();
-	public ParameterlessEvent HintProvided = new ParameterlessEvent();
-	public ParameterlessEvent UserSubmittedIncorrectAnswer = new ParameterlessEvent();
-	public ParameterlessEvent CurrentProblemCompleted = new ParameterlessEvent();
-	public ParameterlessEvent UserAddedWordToHistory = new ParameterlessEvent();
-	public ParameterlessEvent SessionCompleted = new ParameterlessEvent();
-	public ParameterlessEvent SyllableDivisionShowStateToggled = new ParameterlessEvent();
+	public ParameterlessEvent StudentDataRetrieved = new ParameterlessEvent("StudentDataRetrieved");
+	public ParameterlessEvent TimesAttemptedCurrentProblemIncremented = new ParameterlessEvent("TimesAttemptedCurrentProblemIncremented");
+	public ParameterlessEvent UserInputLettersUpdated = new ParameterlessEvent("UserInputLettersUpdated");
+	public ParameterlessEvent ActivitySceneLoaded = new ParameterlessEvent("ActivitySceneLoaded");
+	public ParameterlessEvent StudentModeMainActivityEntered = new ParameterlessEvent("StudentModeMainActivityEntered");
+	public ParameterlessEvent StudentModeForceCorrectLetterPlacementEntered = new ParameterlessEvent("StudentModeForceCorrectLetterPlacementEntered");
+	public ParameterlessEvent StudentModeForceRemoveAllLettersEntered = new ParameterlessEvent("StudentModeForceRemoveAllLettersEntered");
+	public ParameterlessEvent UIInputLocked = new ParameterlessEvent("UIInputLocked");
+	public ParameterlessEvent UIInputUnLocked = new ParameterlessEvent("UIInputUnLocked");
+	public ParameterlessEvent UserSubmittedTheirLetters = new ParameterlessEvent("UserSubmittedTheirLetters");
+	public ParameterlessEvent HintRequested = new ParameterlessEvent("HintRequested");
+	public ParameterlessEvent HintProvided = new ParameterlessEvent("HintProvided");
+	public ParameterlessEvent UserSubmittedIncorrectAnswer = new ParameterlessEvent("UserSubmittedIncorrectAnswer");
+	public ParameterlessEvent CurrentProblemCompleted = new ParameterlessEvent("CurrentProblemCompleted");
+	public ParameterlessEvent UserAddedWordToHistory = new ParameterlessEvent("UserAddedWordToHistory");
+	public ParameterlessEvent SessionCompleted = new ParameterlessEvent("SessionCompleted");
+	public ParameterlessEvent SyllableDivisionShowStateToggled = new ParameterlessEvent("SyllableDivisionShowStateToggled");
 
-	public UnaryParameterizedEvent<InputType> InputTypeSelected = new UnaryParameterizedEvent<InputType>();
-	public UnaryParameterizedEvent<Mode> ModeSelected = new UnaryParameterizedEvent<Mode>();
-	public UnaryParameterizedEvent<string> StudentNameEnetered = new UnaryParameterizedEvent<string>();
-	public UnaryParameterizedEvent<int> SessionSelected = new UnaryParameterizedEvent<int>();
-	public UnaryParameterizedEvent<List<InteractiveLetter>> InteractiveLettersCreated = new UnaryParameterizedEvent<List<InteractiveLetter>>();
-	public UnaryParameterizedEvent<Color[]> TargetColorsSet = new UnaryParameterizedEvent<Color[]>();
-	public UnaryParameterizedEvent<Activity> ActivitySelected = new UnaryParameterizedEvent<Activity>();
-	public UnaryParameterizedEvent<ProblemData> NewProblemBegun = new UnaryParameterizedEvent<ProblemData>();
-	public UnaryParameterizedEvent<InteractiveLetter> InteractiveLetterSelected = new UnaryParameterizedEvent<InteractiveLetter>();
-	public UnaryParameterizedEvent<InteractiveLetter> InteractiveLetterDeselected = new UnaryParameterizedEvent<InteractiveLetter>();
-	public UnaryParameterizedEvent<List<Match>> TargetWordSyllablesSet = new UnaryParameterizedEvent<List<Match>>();
-	public BinaryParameterizedEvent<char, int> UserEnteredNewLetter = new BinaryParameterizedEvent<char, int>();
+	public UnaryParameterizedEvent<InputType> InputTypeSelected = new UnaryParameterizedEvent<InputType>("InputTypeSelected");
+	public UnaryParameterizedEvent<Mode> ModeSelected = new UnaryParameterizedEvent<Mode>("ModeSelected");
+	public UnaryParameterizedEvent<string> StudentNameEntered = new UnaryParameterizedEvent<string>("StudentNameEntered");
+	public UnaryParameterizedEvent<int> SessionSelected = new UnaryParameterizedEvent<int>("SessionSelected");
+	public UnaryParameterizedEvent<List<InteractiveLetter>> InteractiveLettersCreated = new UnaryParameterizedEvent<List<InteractiveLetter>>("InteractiveLettersCreated");
+	public UnaryParameterizedEvent<Color[]> TargetColorsSet = new UnaryParameterizedEvent<Color[]>("TargetColorsSet");
+	public UnaryParameterizedEvent<Activity> ActivitySelected = new UnaryParameterizedEvent<Activity>("ActivitySelected");
+	public UnaryParameterizedEvent<ProblemData> NewProblemBegun = new UnaryParameterizedEvent<ProblemData>("NewProblemBegun");
+	public UnaryParameterizedEvent<InteractiveLetter> InteractiveLetterSelected = new UnaryParameterizedEvent<InteractiveLetter>("InteractiveLetterSelected");
+	public UnaryParameterizedEvent<InteractiveLetter> InteractiveLetterDeselected = new UnaryParameterizedEvent<InteractiveLetter>("InteractiveLetterDeselected");
+	public UnaryParameterizedEvent<List<Match>> TargetWordSyllablesSet = new UnaryParameterizedEvent<List<Match>>("TargetWordSyllablesSet");
+	public BinaryParameterizedEvent<char, int> UserEnteredNewLetter = new BinaryParameterizedEvent<char, int>("UserEnteredNewLetter");
 
-	public UnaryParameterizedEvent<string> TestEventA = new UnaryParameterizedEvent<string>();
-	public UnaryParameterizedEvent<string> TestEventB = new UnaryParameterizedEvent<string>();
+	public UnaryParameterizedEvent<string> TestEventA = new UnaryParameterizedEvent<string>("TestA");
+	public UnaryParameterizedEvent<string> TestEventB = new UnaryParameterizedEvent<string>("TestB");
 
 
 	public void EnqueueEvent(PhonoBlocksEvent evt){
 		events.Enqueue(evt);
 
+	}
+
+	public void Awake(){
+		instance = this;
 	}
 
 
@@ -74,37 +104,6 @@ public class Dispatcher: MonoBehaviour  {
 
 		}
 
-	}
-		
-	/*public event Action<Mode> OnModeSelected = (Mode mode) => {};
-	public void RecordModeSelected(Mode mode){
-		OnModeSelected (mode);
-	}*/
-
-	public event Action<string> OnStudentNameEntered = (string name) => {};
-	public void RecordStudentNameEntered(string name){
-		OnStudentNameEntered (name);
-	}
-
-	public event Action OnStudentDataRetrieved = ()=>{};
-	public void RecordStudentDataRetrieved(){
-		OnStudentDataRetrieved ();
-	}
-
-	public event Action<int> OnSessionSelected = (int session) => {};
-	public void RecordSessionSelected(int session){
-		OnSessionSelected (session);
-	}
-
-
-	public event Action<Activity> OnActivitySelected = (Activity activity)=>{};
-	public void RecordActivitySelected(Activity activity){
-		OnActivitySelected (activity);
-	}
-
-	public event Action<List<InteractiveLetter>> OnUILettersCreated = (List<InteractiveLetter> UILetters)=>{};
-	public void UILettersCreated(List<InteractiveLetter> UILetters){
-		OnUILettersCreated(UILetters);
 	}
 
 
@@ -127,10 +126,6 @@ public class Dispatcher: MonoBehaviour  {
 		OnUserInputLettersUpdated ();
 	}
 
-	public event Action<ProblemData> OnNewProblemBegun = (ProblemData problem) => {};
-	public void RecordNewProblemBegun(ProblemData problem){
-		OnNewProblemBegun (problem);
-	}
 	//distinguished from activity begun; may need to transition back into main activity state from a different state,
 	//i.e. such as force correct letter placement.
 	public event Action OnEnterStudentModeMainActivity = () => {};
@@ -224,28 +219,7 @@ public class Dispatcher: MonoBehaviour  {
 	public void RecordTargetWordSyllablesSet(List<Match> syllables){
 		OnTargetWordSyllablesSet(syllables);
 	}
-
-
-	void Awake(){
-		instance = this;
-		//gaurantees that state is first subscriber whose methods are invoked when new events occur.
-		//saves other classes that need to frequently refer to these data from having to cache additional
-		//references/copies to/of data
-		State state = GetComponent<State> ();
-		state.SubscribeToEvents ();
-		//ensure that selector is the second whose subscribers are invoked.
-		//selectors job is to compute/cache derived fields (e.g., whether or not current state of user input matches target,
-		//the location of each error, so on).
-		Selector selector = GetComponent<Selector> ();
-		selector.SubscribeToEvents ();
-
-
-
-	}
-
-
 		
-
 
 }
 

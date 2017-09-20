@@ -20,9 +20,9 @@ public class NameInputField : MonoBehaviour {
 				gameObject.SetActive(true);
 			}
 		});
-		Dispatcher.Instance.OnStudentDataRetrieved += () => {
+		Dispatcher.Instance.StudentDataRetrieved.Subscribe(() => {
 			gameObject.SetActive(false);
-		};
+		});
 
 	}
 
@@ -52,7 +52,7 @@ public class NameInputField : MonoBehaviour {
 
 	void Update(){
 		if (enterKeyPressed) {
-			Dispatcher.Instance.RecordStudentNameEntered (name);
+			Dispatcher.Instance.StudentNameEntered.Fire (name);
 			enterKeyPressed = false;
 		}
 	}

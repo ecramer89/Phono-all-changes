@@ -18,14 +18,14 @@ public class UserStarGridController : MonoBehaviour
 		{
 
 			SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
-				if(scene.name == "Activity" && State.Current.Mode == Mode.STUDENT){
+				if(scene.name == "Activity" && Dispatcher._State.Mode == Mode.STUDENT){
 					userStarGrid = GameObject.Find("UserStarGrid");
 					MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
 
 					PlaceUserStarOutlinesInGrid (); 
 
 					Dispatcher.Instance.OnCurrentProblemCompleted += () => {
-						if (Selector.Instance.SolvedOnFirstTry){
+						if (Dispatcher._Selector.SolvedOnFirstTry){
 							AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
 						}
 					};

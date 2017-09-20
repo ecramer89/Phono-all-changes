@@ -17,9 +17,9 @@ public class Parameters : MonoBehaviour {
 		StudentMode.PROBLEM_SETS.Sort((SessionData x, SessionData y) => x.number - y.number);
 		Dispatcher.Instance.InputTypeSelected.Fire(inputType);
 		//Dispatcher.Instance.RecordInputTypeSelected (inputType);
-		Dispatcher.Instance.OnActivitySelected += (Activity obj) => {
+		Dispatcher.Instance.ActivitySelected.Subscribe((Activity obj) => {
 			Application.LoadLevel ("Activity");
-		};
+		});
 
 		Dispatcher.Instance.TestEventA.Subscribe((string s)=>{
 			Debug.Log($"event a handled in parameters {s}");

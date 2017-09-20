@@ -8,14 +8,14 @@ public class RequestHintButton : MonoBehaviour {
 
 	void Start(){
 			gameObject.SetActive(false); //inactive to begin with.
-			if (State.Current.Mode == Mode.STUDENT) { //only bother subscribing to events that would set active in student mode
+			if (Dispatcher._State.Mode == Mode.STUDENT) { //only bother subscribing to events that would set active in student mode
 				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "RequestHint";
 				messenger.trigger = UIButtonMessage.Trigger.OnClick;
-				Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
-					gameObject.SetActive (false);
-				};
+				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+						gameObject.SetActive (false);
+				});
 				Dispatcher.Instance.OnUIInputLocked += () => {
 					gameObject.SetActive (false);
 				};
@@ -24,14 +24,14 @@ public class RequestHintButton : MonoBehaviour {
 				//and hint is provided (hint no longer available).
 				//as such, shouldn't set the hint button to active again unless the hint is currently available.
 				Dispatcher.Instance.OnUIInputUnLocked += () => {
-					gameObject.SetActive(State.Current.HintAvailable);
+					gameObject.SetActive(Dispatcher._State.HintAvailable);
 				};
 				Dispatcher.Instance.OnHintProvided += () => {
 					
 					gameObject.SetActive (false);
 				};
 				Dispatcher.Instance.OnUserSubmittedIncorrectAnswer += () => {
-					gameObject.SetActive(State.Current.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
+					gameObject.SetActive(Dispatcher._State.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
 				};
 		}
 	}
@@ -39,7 +39,7 @@ public class RequestHintButton : MonoBehaviour {
 
 
 	void RequestHint(){
-		if (State.Current.UIInputLocked || State.Current.Mode == Mode.TEACHER)
+		if (Dispatcher._State.UIInputLocked || Dispatcher._State.Mode == Mode.TEACHER)
 			return;
 
 		Dispatcher.Instance.RecordUserRequestedHint ();

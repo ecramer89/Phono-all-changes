@@ -32,18 +32,18 @@ public class Colorer : MonoBehaviour   {
 	public void Start(){
 		instance = this;
 
-		Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
+		Dispatcher.Instance.ActivitySelected.Subscribe((Activity activity) => {
 			InitializeRuleBasedColorer();
-		};
+		});
 
 
-		Dispatcher.Instance.OnUILettersCreated += (List<InteractiveLetter> letters) => {
+		Dispatcher.Instance.InteractiveLettersCreated.Subscribe((List<InteractiveLetter> letters) => {
 			RegisterLettersToColorer(letters);
-		};
+		});
 
 
-		Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
-
+		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+			Debug.Log("on new problem begun invoked");
 			TurnAllLettersOff();
 
 			Dispatcher.Instance.SetTargetColors(
@@ -53,14 +53,14 @@ public class Colorer : MonoBehaviour   {
 					//indieces that correspond to those of target word.
 					problem.targetWord
 				));
-		};
+		});
 			
 
 		Dispatcher.Instance.OnSyllableDivisionShowStateToggled += ReColor;
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
-		switch (State.Current.Activity) {
+		switch (Dispatcher._State.Activity) {
 		case Activity.CONSONANT_BLENDS:
 			ruleBasedColorer = consonantBlendsColorer;
 			break;
@@ -87,7 +87,10 @@ public class Colorer : MonoBehaviour   {
 	};
 
 	static Action TurnAllLettersOff = () => {
-		State.Current.UILetters.ForEach (UILetter => {
+		Debug.Log("state: "+Dispatcher._State);
+		Debug.Log("state: "+Dispatcher._State.UILetters);
+		Dispatcher._State.UILetters.ForEach (UILetter => {
+			
 			UILetter.UpdateInputDerivedAndDisplayColor (offColor);
 		});
 	};
@@ -95,7 +98,7 @@ public class Colorer : MonoBehaviour   {
 
 	static Action<string> ReapplyDefaultOrOff = (string updatedUserInputLetters) => {
 		int index = 0;
-		State.Current.UILetters.ForEach (UILetter => {
+		Dispatcher._State.UILetters.ForEach (UILetter => {
 			UILetter.UpdateInputDerivedAndDisplayColor (updatedUserInputLetters [index] == ' ' ? offColor : onColor);
 			index++;
 		});
@@ -109,7 +112,7 @@ public class Colorer : MonoBehaviour   {
 	//which tell each interactive letter to start the flash routine/clear out old flash configuration.
 	//enables us to start and clear flashes of all letters simultaneously.
 	static void RegisterLettersToColorer(List<InteractiveLetter> letters){
-		State.Current.UILetters.ForEach (UILetter => {
+		Dispatcher._State.UILetters.ForEach (UILetter => {
 			StartAllInteractiveLetterFlashes += UILetter.StartFlash;
 			ResetAllInteractiveLetterFlashConfigurations += UILetter.ResetFlashParameters;
 		});
@@ -117,8 +120,8 @@ public class Colorer : MonoBehaviour   {
 
 
 	public void ReColor (){
-		string updatedUserInputLetters = State.Current.UserInputLetters;
-		string previousUserInputLetters = State.Current.PreviousUserInputLetters;
+		string updatedUserInputLetters = Dispatcher._State.UserInputLetters;
+		string previousUserInputLetters = Dispatcher._State.PreviousUserInputLetters;
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 	
@@ -126,13 +129,13 @@ public class Colorer : MonoBehaviour   {
 			updatedUserInputLetters
 		);
 
-		if (State.Current.Mode == Mode.TEACHER) {
+		if (Dispatcher._State.Mode == Mode.TEACHER) {
 			ruleBasedColorer.ColorAndConfigureFlashForTeacherMode (
 				updatedUserInputLetters, 
 				previousUserInputLetters
 			);
 		} else {
-			string targetWord = State.Current.TargetWord;
+			string targetWord = Dispatcher._State.TargetWord;
 			ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 				updatedUserInputLetters.Substring(0,targetWord.Length), //only want the special rule-based colors
 				//to apply to letters that the user placed in the spaces that match those of the target word.
@@ -155,13 +158,13 @@ public class Colorer : MonoBehaviour   {
 	}
 
 	public static void ChangeDisplayColourOfASingleLetter(int at, Color newDisplayColor){
-		if (at >= State.Current.UILetters.Count)
+		if (at >= Dispatcher._State.UILetters.Count)
 			return;
-		State.Current.UILetters [at].UpdateDisplayColour (newDisplayColor);
+		Dispatcher._State.UILetters [at].UpdateDisplayColour (newDisplayColor);
 	}
 		
 	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput,string target){
-		List<InteractiveLetter> UILetters = State.Current.UILetters;
+		List<InteractiveLetter> UILetters = Dispatcher._State.UILetters;
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
 			//letter is incorrectly placed if it was placed outside the bounds or the target word OR
@@ -222,7 +225,7 @@ public class Colorer : MonoBehaviour   {
 		string previousUserInputLetters,
 		Regex spellingRuleRegex,
 		Color multiLetterUnitColor){
-		List<InteractiveLetter> UIletters = State.Current.UILetters;
+		List<InteractiveLetter> UIletters = Dispatcher._State.UILetters;
 		//find and match each successive blend.
 		//because some strings could contain blends that cross boundaries (e.g., bll)
 		//input to the regex match is a buffer from which we replace the 
@@ -265,7 +268,7 @@ public class Colorer : MonoBehaviour   {
 		Color singleLetterOfTargetUnitColor,
 		Action<InteractiveLetter> hintPartialMatches
 	){
-		List<InteractiveLetter> UIletters = State.Current.UILetters;
+		List<InteractiveLetter> UIletters = Dispatcher._State.UILetters;
 		string unmatchedTargetInputLetters=targetWord;
 		Match targetUnit;
 		while(true){
@@ -357,7 +360,7 @@ public class Colorer : MonoBehaviour   {
 		    //in the single consonant color.
 			MatchCollection singleConsonants = SpellingRuleRegex.Consonant.Matches(unmatchedUserInputLetters);
 			foreach (Match consonant in singleConsonants) {
-				InteractiveLetter consonantLetter = State.Current.UILetters.ElementAt (consonant.Index);
+				InteractiveLetter consonantLetter = Dispatcher._State.UILetters.ElementAt (consonant.Index);
 				consonantLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
 
 			}
@@ -608,7 +611,7 @@ public class Colorer : MonoBehaviour   {
 		}
 
 		void ColorConsonants(string updatedUserInputLetters){
-			List<InteractiveLetter> UIletters = State.Current.UILetters;
+			List<InteractiveLetter> UIletters = Dispatcher._State.UILetters;
 			//color consonants in alternating blue-green
 			MatchCollection consonants = SpellingRuleRegex.AnyConsonant.Matches (updatedUserInputLetters);
 			for (int i = 0; i < consonants.Count; i++) {
@@ -624,7 +627,7 @@ public class Colorer : MonoBehaviour   {
 		}
 
 		public void ColorVowels(string updatedUserInputLetters){
-			List<InteractiveLetter> UIletters = State.Current.UILetters;
+			List<InteractiveLetter> UIletters = Dispatcher._State.UILetters;
 			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
 
@@ -744,7 +747,7 @@ public class Colorer : MonoBehaviour   {
 			string previousUserInputLetters, 
 			Func<Match, bool> shouldFlash
 		){
-			List<InteractiveLetter> UIletters = State.Current.UILetters;
+			List<InteractiveLetter> UIletters = Dispatcher._State.UILetters;
 			Match magicE = SpellingRuleRegex.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
@@ -790,11 +793,11 @@ public class Colorer : MonoBehaviour   {
 			//have no place in any phonotactically legal string.
 			for(int i=0;i<syllables.Count;i++){
 				Match syllable = syllables[i];
-				List<InteractiveLetter> letters = State.Current.UILetters.GetRange(syllable.Index, syllable.Length);
+				List<InteractiveLetter> letters = Dispatcher._State.UILetters.GetRange(syllable.Index, syllable.Length);
 			
 				foreach(InteractiveLetter letter in letters){
 					letter.UpdateInputDerivedAndDisplayColor(
-						State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
+						Dispatcher._State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
 						wholeWordColor : AlternateBy(i));
 				}
 			}
@@ -817,14 +820,14 @@ public class Colorer : MonoBehaviour   {
 			//if it's whole word mode, color each letter pink provided it matches the target word.
 			//if it's show division mode, then only if the user input letter currently matches target
 			//should we show the divided colors.
-			bool divided=State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
+			bool divided=Dispatcher._State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
 			if(divided && targetWord == updatedUserInputLetters.Trim()){
 				colorSyllables(updatedUserInputLetters);
 				return;
 			}
 
 			//otherwise we just color the letters pink, provided they are correctly placed.
-			List<InteractiveLetter> letters = State.Current.UILetters.GetRange(0, targetWord.Length);
+			List<InteractiveLetter> letters = Dispatcher._State.UILetters.GetRange(0, targetWord.Length);
 			for(int i=0;i<letters.Count;i++){
 				InteractiveLetter letter = letters[i];
 				if(updatedUserInputLetters[i] == targetWord[i]){

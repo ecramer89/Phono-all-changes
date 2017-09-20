@@ -10,14 +10,14 @@ public class SpellingRuleSelectionButton : MonoBehaviour {
 		gameObject.SetActive(false);
 		Dispatcher.Instance.ModeSelected.Subscribe((Mode mode) => {
 			if (mode == Mode.TEACHER) {
-				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
-				messenger.target = gameObject;
-				messenger.functionName = "SelectActivity";
-				messenger.trigger = UIButtonMessage.Trigger.OnClick;
-				gameObject.SetActive(true);
-				Dispatcher.Instance.OnActivitySelected += (Activity activity) => {
-					gameObject.SetActive(false);
-				};
+					UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
+					messenger.target = gameObject;
+					messenger.functionName = "SelectActivity";
+					messenger.trigger = UIButtonMessage.Trigger.OnClick;
+					gameObject.SetActive(true);
+					Dispatcher.Instance.ActivitySelected.Subscribe((Activity activity) => {
+						gameObject.SetActive(false);
+					});
 			} else {
 				gameObject.SetActive(false);
 			}
@@ -29,7 +29,7 @@ public class SpellingRuleSelectionButton : MonoBehaviour {
 
 	void SelectActivity(){
 
-		Dispatcher.Instance.RecordActivitySelected (activity);
+		Dispatcher.Instance.ActivitySelected.Fire (activity);
 
 
 	}

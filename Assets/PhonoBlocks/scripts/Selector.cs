@@ -4,29 +4,13 @@ using UnityEngine;
 using System.Linq;
 using Extensions;
 using System;
-public class Selector : MonoBehaviour {
+public class Selector  {
 
-	private static Selector instance;
-	public static Selector Instance{
-		get {
-			return instance;
-		}
-	}
 
-	public void Start(){
-		instance = this;
-		Dispatcher.Instance.TestEventA.Subscribe((string s)=>{
-			Debug.Log($"event a handled in selector {s}");
-	
-		});
-		Dispatcher.Instance.TestEventB.Subscribe((string s)=>{
-			Debug.Log($"event b handled in selector {s}");
-		});
-	}
 
 	public void SubscribeToEvents(){
 		
-			Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
+		Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
 			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
@@ -41,32 +25,32 @@ public class Selector : MonoBehaviour {
 			}
 
 			targetWordWithBlanksOnEnd = string.Concat(problem.targetWord, _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES-problem.targetWord.Length));
-		};
+		});
 			
 			
 		Dispatcher.Instance.OnUserEnteredNewLetter += (char newLetter, int atPosition) => {
-			if(State.Current.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
+			if(Dispatcher._State.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
 			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
 			//it's outside the bounds of target word and is blank.
 			correctlyPlacedLetters[atPosition] = 
-				(atPosition >= State.Current.TargetWord.Length && newLetter == ' ') ||
-				(atPosition <  State.Current.TargetWord.Length && newLetter == State.Current.TargetWord[atPosition]);
+				(atPosition >= Dispatcher._State.TargetWord.Length && newLetter == ' ') ||
+				(atPosition <  Dispatcher._State.TargetWord.Length && newLetter == Dispatcher._State.TargetWord[atPosition]);
 			
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
 		};
 
 		Dispatcher.Instance.OnCurrentProblemCompleted += () => {
-			solvedOnFirstTry = State.Current.TimesAttemptedCurrentProblem == 1;
+			solvedOnFirstTry = Dispatcher._State.TimesAttemptedCurrentProblem == 1;
 		};
 
 		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
-			allLettersSelected = State.Current.SelectedUserInputLetters == State.Current.UserInputLetters;
+			allLettersSelected = Dispatcher._State.SelectedUserInputLetters == Dispatcher._State.UserInputLetters;
 			allLettersDeSelected = false;
 		};
 		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
 			allLettersSelected = false;
-			allLettersDeSelected = State.Current.SelectedUserInputLetters.Trim().Length == 0;
+			allLettersDeSelected = Dispatcher._State.SelectedUserInputLetters.Trim().Length == 0;
 		};
 	}
 

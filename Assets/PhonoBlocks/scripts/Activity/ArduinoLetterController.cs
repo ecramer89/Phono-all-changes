@@ -28,11 +28,11 @@ public class ArduinoLetterController : MonoBehaviour{
 				instance = this;
 				
 
-			Dispatcher.Instance.OnNewProblemBegun += (ProblemData problem) => {
-					ReplaceEachLetterWithBlank ();
-					PlaceWordInLetterGrid (problem.initialWord);
-					activateLinesBeneathLettersOfWord(problem.targetWord);
-				};
+				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+							ReplaceEachLetterWithBlank ();
+							PlaceWordInLetterGrid (problem.initialWord);
+							activateLinesBeneathLettersOfWord(problem.targetWord);
+				});
 				
 				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 						if (scene.name == "Activity") {
@@ -41,14 +41,14 @@ public class ArduinoLetterController : MonoBehaviour{
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
 							SubscribeToInteractiveLetterEvents(UILetters);
-							Dispatcher.Instance.UILettersCreated (UILetters);
+							Dispatcher.Instance.InteractiveLettersCreated.Fire (UILetters);
 						}
 
 				};
 
 				Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
-					if(Selector.Instance.AllLettersSelected 
-						&& State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
+			if(Dispatcher._Selector.AllLettersSelected 
+						&& Dispatcher._State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
 							Dispatcher.Instance.RecordSyllableDivisionShowStateToggled();
 					}
 				};
@@ -56,8 +56,8 @@ public class ArduinoLetterController : MonoBehaviour{
 
 				Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
 
-					if(Selector.Instance.AllLettersDeSelected &&
-						State.Current.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+					if(Dispatcher._Selector.AllLettersDeSelected &&
+						Dispatcher._State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
 							Dispatcher.Instance.RecordSyllableDivisionShowStateToggled();
 					}
 				};
@@ -68,12 +68,12 @@ public class ArduinoLetterController : MonoBehaviour{
 	{
 		foreach(InteractiveLetter letter in UILetters){
 			letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
-				if(State.Current.Activity != Activity.SYLLABLE_DIVISION) return;
-				if(State.Current.UserInputLetters[l.Position] == ' ') return;
+				if(Dispatcher._State.Activity != Activity.SYLLABLE_DIVISION) return;
+				if(Dispatcher._State.UserInputLetters[l.Position] == ' ') return;
 				//don't send event if position is already selected or deselected
-				if(wasSelected && State.Current.SelectedUserInputLetters[l.Position] != ' ' || 
-					!wasSelected && State.Current.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
-				if(State.Current.Mode == Mode.STUDENT && !Selector.Instance.CurrentStateOfInputMatchesTarget) return;
+				if(wasSelected && Dispatcher._State.SelectedUserInputLetters[l.Position] != ' ' || 
+					!wasSelected && Dispatcher._State.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
+				if(Dispatcher._State.Mode == Mode.STUDENT && !Dispatcher._Selector.CurrentStateOfInputMatchesTarget) return;
 				if(wasSelected){
 					Dispatcher.Instance.RecordInteractiveLetterSelected(l);
 				}else{
