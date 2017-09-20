@@ -92,16 +92,18 @@ public class Dispatcher: MonoBehaviour  {
 
 
 	public void Update(){
-		//...um change to "while movenext" and that should solve the problem!!
-		//remember that dispatch is effectively the LIST OF SUBSCRIBER EVENTS!!!
+
 		if(dispatch != null && dispatch.MoveNext()){
-			dispatch.Current();
+			do{
+				dispatch.Current();
+			}while(dispatch.MoveNext());
+
 			return;
 		}
 
 		if(events.Count > 0){
-			List<Action> subs = events.Dequeue().Subscribers();
-			dispatch = subs.GetEnumerator();
+			List<Action> subscribers = events.Dequeue().Subscribers();
+			dispatch = subscribers.GetEnumerator();
 
 		}
 

@@ -87,8 +87,6 @@ public class Colorer : MonoBehaviour   {
 	};
 
 	static Action TurnAllLettersOff = () => {
-		Debug.Log("state: "+Dispatcher._State);
-		Debug.Log("state: "+Dispatcher._State.UILetters);
 		Dispatcher._State.UILetters.ForEach (UILetter => {
 			
 			UILetter.UpdateInputDerivedAndDisplayColor (offColor);
