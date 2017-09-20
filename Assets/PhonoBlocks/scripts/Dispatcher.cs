@@ -108,25 +108,6 @@ public class Dispatcher: MonoBehaviour  {
 	}
 
 
-	public Action OnSyllableDivisionShowStateToggled = () => {};
-	public void RecordSyllableDivisionShowStateToggled(){
-		OnSyllableDivisionShowStateToggled ();
-	}
-
-	public event Action<InteractiveLetter> OnInteractiveLetterSelected = (InteractiveLetter letter) => {};
-	public void RecordInteractiveLetterSelected(InteractiveLetter letter){
-		OnInteractiveLetterSelected(letter);
-	}
-	public event Action<InteractiveLetter> OnInteractiveLetterDeSelected = (InteractiveLetter letter) => {};
-	public void RecordInteractiveLetterDeSelected(InteractiveLetter letter){
-		OnInteractiveLetterDeSelected(letter);
-	}
-	public event Action<List<Match>> OnTargetWordSyllablesSet = (List<Match> syllables) => {};
-	public void RecordTargetWordSyllablesSet(List<Match> syllables){
-		OnTargetWordSyllablesSet(syllables);
-	}
-		
-
 }
 
 

@@ -10,14 +10,11 @@ public class State {
 
 	public void SubscribeToEvents(){
 
-		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
-			if(scene.name == "Activity"){
-				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-			}
-		
-		};
+		Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+			previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+			selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+		});
 
 		Dispatcher.Instance.InputTypeSelected.Subscribe(
 			(InputType type) => {
@@ -96,22 +93,22 @@ public class State {
 			this.hintAvailable = false;
 			this.currentHintNumber++;
 		});
-		Dispatcher.Instance.OnSyllableDivisionShowStateToggled += () => {
+		Dispatcher.Instance.SyllableDivisionShowStateToggled.Subscribe(() => {
 			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
 				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
-		};
-		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+		});
+		Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				userInputLetters[letter.Position]);
-		};
-		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+		});
+		Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 				' ');
-		};
-		Dispatcher.Instance.OnTargetWordSyllablesSet += (List<Match> syllables) => {
+		});
+		Dispatcher.Instance.TargetWordSyllablesSet.Subscribe((List<Match> syllables) => {
 			this.targetWordSyllables = syllables;
 
-		};
+		});
 	
 	}
 

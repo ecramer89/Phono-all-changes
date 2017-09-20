@@ -56,7 +56,7 @@ public class Colorer : MonoBehaviour   {
 		});
 			
 
-		Dispatcher.Instance.OnSyllableDivisionShowStateToggled += ReColor;
+		Dispatcher.Instance.SyllableDivisionShowStateToggled.Subscribe(ReColor);
 	}
 
 	static Action InitializeRuleBasedColorer = () => {

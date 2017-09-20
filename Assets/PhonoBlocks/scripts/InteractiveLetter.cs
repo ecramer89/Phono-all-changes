@@ -246,14 +246,14 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 
 
-	public void Start(){
-		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
-			if(this == letter) ToggleSelectHighlight(false);
-		};
-		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
-			if(this == letter) ToggleSelectHighlight(true);
-		};
-	}
+		public void Start(){
+			Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+				if(this == letter) ToggleSelectHighlight(false);
+			});
+			Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+				if(this == letter) ToggleSelectHighlight(true);
+			});
+		}
 		
 		public void Update ()
 	{

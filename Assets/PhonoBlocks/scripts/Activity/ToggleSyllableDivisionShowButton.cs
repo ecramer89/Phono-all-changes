@@ -28,7 +28,7 @@ public class ToggleSyllableDivisionShowButton : MonoBehaviour {
 
 		if (Dispatcher._State.UIInputLocked)
 			return;
-		Dispatcher.Instance.RecordSyllableDivisionShowStateToggled ();
+		Dispatcher.Instance.SyllableDivisionShowStateToggled.Fire ();
 
 
 	}

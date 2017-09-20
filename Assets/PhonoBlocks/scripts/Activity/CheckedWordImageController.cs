@@ -32,16 +32,14 @@ public class CheckedWordImageController : MonoBehaviour
 		        //if the current state of user input letters corresponds to a saved image, then
 				//display it.
 				Dispatcher.Instance.UserAddedWordToHistory.Subscribe(DisplayCurrentInputWord);
-
-				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
-					if(scene.name == "Activity"){
+				Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
 						checkedWordImage = GameObject.Find("CheckedWordImage");
 						img = checkedWordImage.GetComponent<UITexture> ();
 						img.enabled = false;
 						clickTrigger = checkedWordImage.GetComponent<BoxCollider> ();
 						clickTrigger.enabled = false;
-					}
-				};
+				});
+				
 		}
 
 		void DisplayCurrentInputWord(){

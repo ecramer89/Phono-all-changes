@@ -49,16 +49,12 @@ public class StudentActivityController : MonoBehaviour
 		Dispatcher.Instance.SessionSelected.Subscribe((int session) => {
 			ProblemsRepository.instance.Initialize (session);
 		});
-		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
-			if(scene.name=="Activity"){
-				SetUpNextProblem ();
-			}
-		};
+		Dispatcher.Instance.ActivitySceneLoaded.Subscribe(SetUpNextProblem);
 
 		Dispatcher.Instance.ActivitySelected.Subscribe((Activity activity) => {
 			if(activity == Activity.SYLLABLE_DIVISION){
 				Dispatcher.Instance.NewProblemBegun.Subscribe((ProblemData problem)=>{
-					Dispatcher.Instance.RecordTargetWordSyllablesSet(SpellingRuleRegex.Syllabify(problem.targetWord));
+					Dispatcher.Instance.TargetWordSyllablesSet.Fire(SpellingRuleRegex.Syllabify(problem.targetWord));
 				});
 			}
 		});

@@ -27,16 +27,14 @@ public class WordHistoryController : MonoBehaviour
 		public void Start(){
 			instance = this;
 			
-			SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
-				if (scene.name == "Activity") {
-					words = new List<Word> ();
-					wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
-					wordHistoryGrid = GameObject.Find("WordHistoryGrid");
-					lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
-					wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
-					letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
-				}
-			};
+			Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+				words = new List<Word> ();
+				wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
+				wordHistoryGrid = GameObject.Find("WordHistoryGrid");
+				lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
+				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
+				letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
+			});
 
 			//subscribe to events
 		    Dispatcher.Instance.CurrentProblemCompleted.Subscribe(AddCurrentWordToHistory);

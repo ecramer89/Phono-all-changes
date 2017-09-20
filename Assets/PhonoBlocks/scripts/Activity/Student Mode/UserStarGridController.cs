@@ -16,25 +16,23 @@ public class UserStarGridController : MonoBehaviour
 
 		public void Start ()
 		{
+			gameObject.SetActive(false);
+			Dispatcher.Instance.ActivitySceneLoaded.Subscribe(() => {
+					if(Dispatcher._State.Mode == Mode.STUDENT){
+						gameObject.SetActive(true);
+						userStarGrid = GameObject.Find("UserStarGrid");
+						MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
 
-			SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
-				if(scene.name == "Activity" && Dispatcher._State.Mode == Mode.STUDENT){
-					userStarGrid = GameObject.Find("UserStarGrid");
-					MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
+						PlaceUserStarOutlinesInGrid (); 
 
-					PlaceUserStarOutlinesInGrid (); 
-
-				Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
-						if (Dispatcher._Selector.SolvedOnFirstTry){
-							AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
-						}
-				});
-				}else {
-					gameObject.SetActive (false);
-				}
-			};
-
-
+						Dispatcher.Instance.CurrentProblemCompleted.Subscribe(() => {
+								if (Dispatcher._Selector.SolvedOnFirstTry){
+									AddNewUserStar (true, ProblemsRepository.instance.ProblemsCompleted-1);
+								}
+						});
+					}
+			});
+			
 		}
 
 		void PlaceUserStarOutlinesInGrid ()

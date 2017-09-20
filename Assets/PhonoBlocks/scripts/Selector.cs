@@ -44,14 +44,14 @@ public class Selector  {
 			solvedOnFirstTry = Dispatcher._State.TimesAttemptedCurrentProblem == 1;
 		});
 
-		Dispatcher.Instance.OnInteractiveLetterSelected += (InteractiveLetter letter) => {
+		Dispatcher.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
 			allLettersSelected = Dispatcher._State.SelectedUserInputLetters == Dispatcher._State.UserInputLetters;
 			allLettersDeSelected = false;
-		};
-		Dispatcher.Instance.OnInteractiveLetterDeSelected += (InteractiveLetter letter) => {
+		});
+		Dispatcher.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 			allLettersSelected = false;
 			allLettersDeSelected = Dispatcher._State.SelectedUserInputLetters.Trim().Length == 0;
-		};
+		});
 	}
 
 	private string targetWordWithBlanksOnEnd;

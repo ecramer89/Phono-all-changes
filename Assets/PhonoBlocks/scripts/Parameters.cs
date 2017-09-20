@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 using Extensions;
+using UnityEngine.SceneManagement;
 public class Parameters : MonoBehaviour {
 
 	[SerializeField] InputType inputType;
@@ -18,18 +19,11 @@ public class Parameters : MonoBehaviour {
 		Dispatcher.Instance.InputTypeSelected.Fire(inputType);
 		//Dispatcher.Instance.RecordInputTypeSelected (inputType);
 		Dispatcher.Instance.ActivitySelected.Subscribe((Activity obj) => {
-			Application.LoadLevel ("Activity");
+			SceneManager.LoadScene("Activity");
+			Dispatcher.Instance.ActivitySceneLoaded.Fire();
 		});
 
-		Dispatcher.Instance.TestEventA.Subscribe((string s)=>{
-			Debug.Log($"event a handled in parameters {s}");
-			Dispatcher.Instance.TestEventB.Fire("bar");
-		});
-		Dispatcher.Instance.TestEventB.Subscribe((string s)=>{
-			Debug.Log($"event b handled in parameters {s}");
-		});
 
-			
 	}
 		
 
