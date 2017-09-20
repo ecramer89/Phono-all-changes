@@ -20,12 +20,15 @@ public class State: MonoBehaviour  {
 
 	public void SubscribeToEvents(){
 
+	
+
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
 			if(scene.name == "Activity"){
 				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 			}
+		
 		};
 
 		Events.Dispatcher.OnInputTypeSelected += (InputType type) => {
