@@ -36,6 +36,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				
 				SceneManager.sceneLoaded += (Scene scene, LoadSceneMode arg1) => {
 						if (scene.name == "Activity") {
+				            
 							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
