@@ -10,6 +10,11 @@ public class HomeButton : MonoBehaviour {
 
 	void Start(){
 		gameObject.SetActive(false);
+		SceneManager.sceneLoaded+=(Scene scene, LoadSceneMode arg1) =>{
+			if(scene.name == "MainMenu"){
+				gameObject.SetActive(false);
+			}
+		};
 		UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 		messenger.target = gameObject;
 		messenger.functionName = "ReturnToMainMenu";

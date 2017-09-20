@@ -66,8 +66,7 @@ public class LetterGridController : MonoBehaviour
 
 
 
-		//added in april; sets numVisibleLetterLines' UITexture components to active, starting from the leftmost cell; sets the rest to be inactive.
-		//call when you initialize a new word. argument should be the number of letters in the word.
+
 		public void setNumVisibleLetterLines (int numVisibleLetterLines)
 		{
 				int i = 0;

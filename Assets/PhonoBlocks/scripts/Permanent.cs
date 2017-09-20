@@ -5,7 +5,7 @@ public class Permanent : MonoBehaviour
 {
 
 
-		void Start ()
+		void Awake ()
 		{
 				Object.DontDestroyOnLoad (gameObject);
 		}
