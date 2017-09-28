@@ -201,8 +201,10 @@ public class LetterGridController : MonoBehaviour
 	
 
 				InteractiveLetter l = ut.gameObject.AddComponent<InteractiveLetter> ();
+				l.texture = ut;
 				l.Trigger = b;
 				l.UpdateLetterImageAndInputDerivedColor (tex2dCopy, c);
+				
 	
 				ut.gameObject.name = position;
 				ut.MakePixelPerfect ();

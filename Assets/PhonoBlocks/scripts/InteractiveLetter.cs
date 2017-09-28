@@ -53,6 +53,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 		public event PressAction LetterPressed;
 
+	    public UITexture texture; //cache reference to UITexture component
 		UITexture selectHighlight;
 		Color selectColor = Color.clear;
 
@@ -91,6 +92,8 @@ public class InteractiveLetter : MonoBehaviour{
 
 		this.numFlashCycles = numCycles;
 	}
+
+
 
 	public void ResetFlashParameters(){
 		flashColors [0] = colorFromInput;
@@ -144,12 +147,12 @@ public class InteractiveLetter : MonoBehaviour{
 	
 		public Texture2D CurrentDisplayImage ()
 		{
-				return (Texture2D)gameObject.GetComponent<UITexture> ().mainTexture;
+				return (Texture2D)texture.mainTexture;
 		}
 
 		public UnityEngine.Color CurrentDisplayColor ()
 		{
-				return gameObject.GetComponent<UITexture> ().color;
+				return texture.color;
 		}
 
 
@@ -188,13 +191,13 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 		
 		public void UpdateDisplayColour (Color c)
-		{
-
+		{   
+			
 				if (c == Color.clear)
 						c = Color.white;
 		
-				GetComponent<UITexture> ().color = c;
-				//change colour of counterpart tangible letter
+				texture.color = c;
+	
 				ChangeColourOfTangibleCounterpartIfThereIsOne (c);
 			
 		}
@@ -230,10 +233,12 @@ public class InteractiveLetter : MonoBehaviour{
 		}
 
 
-		
+
 		public void UpdateLetterImage (Texture2D img)
-		{
-				gameObject.GetComponent<UITexture> ().mainTexture = img;
+	{
+		Debug.Log(gameObject);
+				texture.mainTexture = img;
+
 		}
 		
 
@@ -244,14 +249,14 @@ public class InteractiveLetter : MonoBehaviour{
 			colorFromInput = c == Color.clear ? Color.white : c;
 
 		}
-
-
+		
 		public void Start(){
+		Debug.Log($"instance id of iletter on start: {GetInstanceID()}");
 			Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
-				if(this == letter) ToggleSelectHighlight(false);
+				if(ReferenceEquals(this, letter)) ToggleSelectHighlight(false);
 			});
 			Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
-				if(this == letter) ToggleSelectHighlight(true);
+				if(ReferenceEquals(this, letter)) ToggleSelectHighlight(true);
 			});
 		}
 		

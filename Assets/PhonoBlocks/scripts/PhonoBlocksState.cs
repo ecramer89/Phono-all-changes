@@ -38,6 +38,10 @@ public class PhonoBlocksState {
 		});
 
 		Transaction.Instance.InteractiveLettersCreated.Subscribe((List<InteractiveLetter> letters) => {
+			foreach(InteractiveLetter il in letters){
+				Debug.Log($"instance id of iletter on state: {il.GetInstanceID()}");
+
+			}
 			this.uILetters = letters;
 		});
 			
