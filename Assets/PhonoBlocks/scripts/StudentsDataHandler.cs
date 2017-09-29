@@ -4,7 +4,7 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 
-public class StudentsDataHandler: MonoBehaviour
+public class StudentsDataHandler: PhonoBlocksSubscriber
 {
 
 		static readonly string DATA_FILE_EXTENSION = ".csv";
@@ -77,6 +77,22 @@ public class StudentsDataHandler: MonoBehaviour
 			Transaction.Instance.SessionCompleted.Subscribe(UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
 
 		}
+
+
+	public override void Subscribe(){
+		Debug.Log("Student data handler subscribing");
+
+	}
+
+	public override void Unsubscribe(){
+		Debug.Log("Student data handler unsubscribing");
+
+	}
+
+	public override bool IsSubscribed(){
+		Debug.Log("invoked the student data handler is subscribed");
+		return true;
+	}
 
 		public class StudentData
 		{

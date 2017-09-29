@@ -7,6 +7,7 @@ public interface PhonoBlocksEvent  {
 
 	List<Action> Subscribers();
 	string Name();
+	void ClearSubscribers();
 }
 
 public class ParameterlessEvent : PhonoBlocksEvent{
@@ -35,6 +36,11 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 		return subscribers;
 	}
 
+
+	public void ClearSubscribers(){
+		subscribers.Clear();
+	}
+
 }
 
 public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
@@ -54,6 +60,10 @@ public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 	public void Subscribe(Action<T> subscriber){
 		typedSubscribers.Add(subscriber);
 
+	}
+	public void ClearSubscribers(){
+		typedSubscribers.Clear();
+		generifiedSubscribers.Clear();
 	}
 
 	public void Fire(T arg0){
@@ -108,6 +118,11 @@ public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 
 	public List<Action> Subscribers(){
 		return generifiedSubscribers;
+	}
+
+	public void ClearSubscribers(){
+		typedSubscribers.Clear();
+		generifiedSubscribers.Clear();
 	}
 
 }

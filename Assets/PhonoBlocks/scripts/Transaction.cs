@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 
 public class Transaction: MonoBehaviour  {
 
-	private IEnumerator<Action> dispatch;
-	private Queue<PhonoBlocksEvent> events=new Queue<PhonoBlocksEvent>();
+	private IEnumerator<Action> dispatch; //list of event handler actions for the current event
+	private Queue<PhonoBlocksEvent> events=new Queue<PhonoBlocksEvent>(); //queue of events that are waiting to be dispatched
 
 	private static Transaction instance;
 	public static Transaction Instance{
