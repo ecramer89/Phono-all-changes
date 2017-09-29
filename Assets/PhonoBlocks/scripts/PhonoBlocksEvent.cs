@@ -71,6 +71,12 @@ public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 
 }
 
+/*
+ * activity scene loaded
+ * i letters created
+ * new problem begun
+ * */
+
 public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 	private List<Action<T,V>> typedSubscribers;
 	private List<Action> generifiedSubscribers;
