@@ -1,4 +1,6 @@
-﻿public enum Mode{TEACHER, STUDENT};
+﻿public enum PhonoBlocksScene{MainMenu, Activity}; //be sure that these match the scene names exactly
+
+public enum Mode{TEACHER, STUDENT};
 
 public enum Activity{
 	MAGIC_E, 

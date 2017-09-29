@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NameInputField : MonoBehaviour {
+public class NameInputField : PhonoBlocksSubscriber {
 	static string placeholder="name or name*";
 	string name=placeholder;
 	Rect position;
@@ -11,16 +11,20 @@ public class NameInputField : MonoBehaviour {
 			return name;
 		}
 	}
+
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+
+
 	//becomes active when student mode selected. otherwise inactive.
 	void Start(){
 		position = new Rect (300, 300, 200, 50);
 		gameObject.SetActive (false);
-		Transaction.Instance.ModeSelected.Subscribe((Mode mode) => {
+		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
 			if(mode == Mode.STUDENT){
 				gameObject.SetActive(true);
 			}
 		});
-		Transaction.Instance.StudentDataRetrieved.Subscribe(() => {
+		Transaction.Instance.StudentDataRetrieved.Subscribe(this,() => {
 			gameObject.SetActive(false);
 		});
 

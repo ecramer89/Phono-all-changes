@@ -3,13 +3,14 @@ using System.Collections;
 using System.Text;
 using Extensions;
 using System.Text.RegularExpressions;
-public class HintController : MonoBehaviour
+public class HintController : PhonoBlocksSubscriber
 {
-	
+	public override void SubscribeToAll(PhonoBlocksScene scene){}
+
 
 		public void Start ()
 		{
-			Transaction.Instance.HintRequested.Subscribe(ProvideHint);
+			Transaction.Instance.HintRequested.Subscribe(this, ProvideHint);
 		}
 
 

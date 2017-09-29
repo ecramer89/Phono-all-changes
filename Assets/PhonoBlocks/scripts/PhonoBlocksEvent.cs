@@ -5,13 +5,13 @@ using System;
 
 public interface PhonoBlocksEvent  {
 
-	List<Action> Subscribers();
+	IEnumerator<Action> Subscribers();
 	string Name();
 	void ClearSubscribers();
 }
 
 public class ParameterlessEvent : PhonoBlocksEvent{
-	private List<Action> subscribers = new List<Action>();
+	Dictionary<PhonoBlocksSubscriber, Action> subscribers = new Dictionary<PhonoBlocksSubscriber, Action>();
 	private string name;
 
 	public ParameterlessEvent(string name){
@@ -22,9 +22,15 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 		return name;
 	}
 
-	public void Subscribe(Action subscriber){
-		subscribers.Add(subscriber);
+	public void Subscribe(PhonoBlocksSubscriber subscriber, Action handler){
+		subscribers[subscriber]=handler;
 
+	}
+
+	public void Unsubscribe(PhonoBlocksSubscriber subscriber){
+		if(subscribers.ContainsKey(subscriber)){
+			subscribers.Remove(subscriber);
+		}
 	}
 
 	public void Fire(){
@@ -32,8 +38,8 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 		Transaction.Instance.EnqueueEvent(this);
 	}
 
-	public List<Action> Subscribers(){
-		return subscribers;
+	public IEnumerator<Action> Subscribers(){
+		return subscribers.Values.GetEnumerator();
 	}
 
 
@@ -44,57 +50,58 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 }
 
 public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
-	private List<Action<T>> typedSubscribers;
+	private Dictionary<PhonoBlocksSubscriber, Action<T>> subscribers = new Dictionary<PhonoBlocksSubscriber, Action<T>>();
 	private List<Action> generifiedSubscribers;
+
 	string name;
 
 	public UnaryParameterizedEvent(string name){
 		this.name = name;
-		typedSubscribers = new List<Action<T>>();
 	}
 
 	public string Name(){
 		return name;
 	}
 
-	public void Subscribe(Action<T> subscriber){
-		typedSubscribers.Add(subscriber);
-
+	public void Subscribe(PhonoBlocksSubscriber subscriber, Action<T> handler){
+		subscribers[subscriber] = handler;
 	}
+
 	public void ClearSubscribers(){
-		typedSubscribers.Clear();
-		generifiedSubscribers.Clear();
+		subscribers.Clear();
+	}
+
+	public void Unsubscribe(PhonoBlocksSubscriber subscriber){
+		if(subscribers.ContainsKey(subscriber)){
+			subscribers.Remove(subscriber);
+		}
 	}
 
 	public void Fire(T arg0){
 		Debug.Log($"Firing event: {name}");
+	
 		generifiedSubscribers = new List<Action>();
-		foreach(Action<T> subscriber in typedSubscribers){
+		foreach(Action<T> subscriber in subscribers.Values){
 			generifiedSubscribers.Add(()=>subscriber(arg0));
 		}
 		Transaction.Instance.EnqueueEvent(this);
 	}
 
-	public List<Action> Subscribers(){
-		return generifiedSubscribers;
+
+	public IEnumerator<Action> Subscribers(){
+		return generifiedSubscribers.GetEnumerator();
 	}
 
 }
-
-/*
- * activity scene loaded
- * i letters created
- * new problem begun
- * */
+	
 
 public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
-	private List<Action<T,V>> typedSubscribers;
+	private Dictionary<PhonoBlocksSubscriber, Action<T,V>> subscribers = new Dictionary<PhonoBlocksSubscriber, Action<T,V>>();
 	private List<Action> generifiedSubscribers;
 	private string name;
 
 
 	public BinaryParameterizedEvent(string name){
-		typedSubscribers = new List<Action<T,V>>();
 		this.name = name;
 	}
 
@@ -102,26 +109,32 @@ public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 		return name;
 	}
 
-	public void Subscribe(Action<T,V> subscriber){
-		typedSubscribers.Add(subscriber);
+	public void Subscribe(PhonoBlocksSubscriber subscriber, Action<T,V> handler){
+		subscribers[subscriber] = handler;
 
+	}
+
+	public void Unsubscribe(PhonoBlocksSubscriber subscriber){
+		if(subscribers.ContainsKey(subscriber)){
+			subscribers.Remove(subscriber);
+		}
 	}
 
 	public void Fire(T arg0, V arg1){
 		Debug.Log($"Firing event: {name}");
 		generifiedSubscribers = new List<Action>();
-		foreach(Action<T,V> subscriber in typedSubscribers){
+		foreach(Action<T,V> subscriber in subscribers.Values){
 			generifiedSubscribers.Add(()=>subscriber(arg0, arg1));
 		}
 		Transaction.Instance.EnqueueEvent(this);
 	}
 
-	public List<Action> Subscribers(){
-		return generifiedSubscribers;
+	public IEnumerator<Action> Subscribers(){
+		return generifiedSubscribers.GetEnumerator();
 	}
 
 	public void ClearSubscribers(){
-		typedSubscribers.Clear();
+		subscribers.Clear();
 		generifiedSubscribers.Clear();
 	}
 

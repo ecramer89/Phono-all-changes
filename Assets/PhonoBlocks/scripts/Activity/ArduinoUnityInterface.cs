@@ -11,8 +11,13 @@ using System.Text;
 
 //..receives new color data back from the controller and uses it to update the arduino letters.
 //(implement this later)
-public class ArduinoUnityInterface : MonoBehaviour
+public class ArduinoUnityInterface : PhonoBlocksSubscriber
 {
+
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+
+
+
 		private static ArduinoUnityInterface instance;
 		public static ArduinoUnityInterface Instance{
 			get {
@@ -92,7 +97,7 @@ public class ArduinoUnityInterface : MonoBehaviour
 		public void Start(){
 				instance = this;
 				GameObject uniduino = GameObject.Find ("Uniduino");
-				Transaction.Instance.InputTypeSelected.Subscribe(
+		Transaction.Instance.InputTypeSelected.Subscribe(this,
 					(InputType type) => {
 						if(type == InputType.KEYBOARD) {
 							gameObject.SetActive(false);

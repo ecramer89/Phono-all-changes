@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class StudentsDataHandler: PhonoBlocksSubscriber
 {
-
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 		static readonly string DATA_FILE_EXTENSION = ".csv";
 		static readonly string DATA_FILE_DIRECTORY = "data";
 		static readonly string LOG_FILE_DIRECTORY = "logs";
@@ -29,7 +29,7 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 
 		public void Start(){
 			assessmentStartTime = DateTime.Now;
-			Transaction.Instance.StudentNameEntered.Subscribe((string name) => {
+			Transaction.Instance.StudentNameEntered.Subscribe(this,(string name) => {
 					string nameEntered = name.Trim ().ToLower ();
 					if (nameEntered.Length > 0) {
 					        
@@ -47,22 +47,22 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 					}
 			});
 
-			Transaction.Instance.SessionSelected.Subscribe((int session) => {
+			Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
 					UpdateUsersSession (session);
 			});
-			Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
 					LogEvent ("change_letter", newLetter + "", atPosition + "");
 			});
-			Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+			Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 					RecordActivityTargetWord (problem.targetWord);
 			});
-			Transaction.Instance.HintProvided.Subscribe(() => {
+			Transaction.Instance.HintProvided.Subscribe(this,() => {
 					LogEvent ("requested_hint", $"{Transaction.Instance.State.CurrentHintNumber}", "NA");
 			});
-			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(() => {
+			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,() => {
 			LogEvent ("submitted_answer", Transaction.Instance.State.UserInputLetters, Transaction.Instance.State.TargetWord);
 			});
-			Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
+			Transaction.Instance.CurrentProblemCompleted.Subscribe(this,() => {
 
 					RecordActivitySolved (
 				Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget, 
@@ -74,25 +74,10 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 			});
 			
 
-			Transaction.Instance.SessionCompleted.Subscribe(UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
+			Transaction.Instance.SessionCompleted.Subscribe(this, UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
 
 		}
 
-
-	public override void Subscribe(){
-		Debug.Log("Student data handler subscribing");
-
-	}
-
-	public override void Unsubscribe(){
-		Debug.Log("Student data handler unsubscribing");
-
-	}
-
-	public override bool IsSubscribed(){
-		Debug.Log("invoked the student data handler is subscribed");
-		return true;
-	}
 
 		public class StudentData
 		{

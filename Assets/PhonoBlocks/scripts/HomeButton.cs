@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(UIButtonMessage))]
 [RequireComponent(typeof(UIImageButton))]
-public class HomeButton : MonoBehaviour {
+public class HomeButton : PhonoBlocksSubscriber {
 	[SerializeField] Mode mode;
-
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 	void Start(){
 
 		gameObject.SetActive(false);
@@ -20,7 +20,7 @@ public class HomeButton : MonoBehaviour {
 		messenger.target = gameObject;
 		messenger.functionName = "ReturnToMainMenu";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
-		Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
 			gameObject.SetActive(true);
 		});
 	}

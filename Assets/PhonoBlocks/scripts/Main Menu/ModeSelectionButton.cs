@@ -5,9 +5,9 @@ using UnityEngine;
 
 [RequireComponent(typeof(UIButtonMessage))]
 [RequireComponent(typeof(UIImageButton))]
-public class ModeSelectionButton : MonoBehaviour {
+public class ModeSelectionButton : PhonoBlocksSubscriber {
 	[SerializeField] Mode mode;
-
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 	void Start(){
 		UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 		messenger.target = gameObject;
@@ -15,7 +15,7 @@ public class ModeSelectionButton : MonoBehaviour {
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 		//any mode selection button (not just the one that was clicked) needs to deactivate 
 		//when any one of them is clicked.
-		Transaction.Instance.ModeSelected.Subscribe((Mode mode) => {
+		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
 			//since users need to enter their name following click the student mode selection button,
 			//it's a bit nicer to just leave the button onscreen rather than remove it entirely.
 			if(mode == Mode.TEACHER || this.mode == Mode.TEACHER){
@@ -29,7 +29,7 @@ public class ModeSelectionButton : MonoBehaviour {
 		});
 		//teacher mode button stays on while students enter name;
 		//disappears after name entered+data successfully loaded or created.
-		Transaction.Instance.StudentDataRetrieved.Subscribe(()=>{
+		Transaction.Instance.StudentDataRetrieved.Subscribe(this,()=>{
 			if(this.mode == Mode.STUDENT){
 				gameObject.SetActive(false);
 			}

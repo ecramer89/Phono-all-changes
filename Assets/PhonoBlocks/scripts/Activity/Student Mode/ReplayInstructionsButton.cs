@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIButtonMessage))]
-public class ReplayInstructionsButton : MonoBehaviour {
-
+public class ReplayInstructionsButton : PhonoBlocksSubscriber {
+	public override void SubscribeToAll(PhonoBlocksScene scene){}
 	void Start(){
 			if (Transaction.Instance.State.Mode == Mode.STUDENT) {
 				gameObject.SetActive(true);
@@ -14,10 +14,10 @@ public class ReplayInstructionsButton : MonoBehaviour {
 				messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
 
-				Transaction.Instance.UIInputLocked.Subscribe(() => {
+			Transaction.Instance.UIInputLocked.Subscribe(this,() => {
 						gameObject.SetActive(false);
 				});
-				Transaction.Instance.UIInputUnLocked.Subscribe(() => {
+			Transaction.Instance.UIInputUnLocked.Subscribe(this,() => {
 						gameObject.SetActive(true);
 				});
 			} else {

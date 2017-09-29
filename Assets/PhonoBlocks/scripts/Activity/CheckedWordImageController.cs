@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
 
-public class CheckedWordImageController : MonoBehaviour
+public class CheckedWordImageController : PhonoBlocksSubscriber
 {
 		GameObject checkedWordImage;
 		UITexture img;
@@ -14,16 +14,18 @@ public class CheckedWordImageController : MonoBehaviour
 		bool caller_ends_display;
 
 
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+
 			void Start (){
 
 				//remove the old image, if it's still there
-				Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 							EndDisplay ();
 				});
 				//display the target word image
-				Transaction.Instance.CurrentProblemCompleted.Subscribe(DisplayTargetWord);
+				Transaction.Instance.CurrentProblemCompleted.Subscribe(this,DisplayTargetWord);
 				//level three hint; show the image of the target word.
-				Transaction.Instance.HintRequested.Subscribe(() => {
+		Transaction.Instance.HintRequested.Subscribe(this,() => {
 						if(Transaction.Instance.State.CurrentHintNumber == Parameters.Hints.Descriptions.
 							PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
 								DisplayTargetWord();
@@ -31,8 +33,8 @@ public class CheckedWordImageController : MonoBehaviour
 				});
 		        //if the current state of user input letters corresponds to a saved image, then
 				//display it.
-				Transaction.Instance.UserAddedWordToHistory.Subscribe(DisplayCurrentInputWord);
-				Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
+				Transaction.Instance.UserAddedWordToHistory.Subscribe(this,DisplayCurrentInputWord);
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
 						checkedWordImage = GameObject.Find("CheckedWordImage");
 						img = checkedWordImage.GetComponent<UITexture> ();
 						img.enabled = false;

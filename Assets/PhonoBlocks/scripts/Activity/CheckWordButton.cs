@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 [RequireComponent(typeof(UIButtonMessage))]
-public class CheckWordButton : MonoBehaviour {
+public class CheckWordButton : PhonoBlocksSubscriber {
+
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+
 
 	void Start(){
 		UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
@@ -11,17 +15,17 @@ public class CheckWordButton : MonoBehaviour {
 		messenger.functionName = "CheckWord";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
-		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 			gameObject.SetActive(true);
 		});
 		//transition automatically from all letters removed to beginning of next problem; no need to press submit button again.
-		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(() =>{
+		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(this,() =>{
 			gameObject.SetActive(false);
 		});
-		Transaction.Instance.UIInputLocked.Subscribe(() => {
+		Transaction.Instance.UIInputLocked.Subscribe(this,() => {
 			gameObject.SetActive(false);
 		});
-		Transaction.Instance.UIInputUnLocked.Subscribe(() => {
+		Transaction.Instance.UIInputUnLocked.Subscribe(this,() => {
 			Debug.Log("ui input unlocked handler for checked word button fired");
 			gameObject.SetActive(true);
 		});

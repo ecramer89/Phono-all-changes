@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-public class UserStarGridController : MonoBehaviour
+public class UserStarGridController : PhonoBlocksSubscriber
 {
+
+	public override void SubscribeToAll(PhonoBlocksScene scene){}
 
 		public GameObject userStarGrid;
 		public Texture2D userStarImg;
@@ -17,7 +19,7 @@ public class UserStarGridController : MonoBehaviour
 		public void Start ()
 		{
 			gameObject.SetActive(false);
-			Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
 					if(Transaction.Instance.State.Mode == Mode.STUDENT){
 						gameObject.SetActive(true);
 						userStarGrid = GameObject.Find("UserStarGrid");
@@ -25,7 +27,7 @@ public class UserStarGridController : MonoBehaviour
 
 						PlaceUserStarOutlinesInGrid (); 
 
-						Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
+				Transaction.Instance.CurrentProblemCompleted.Subscribe(this,() => {
 								if (Transaction.Instance.Selector.SolvedOnFirstTry){
 									AddNewUserStar (true, ProblemsRepository.Instance.ProblemsCompleted-1);
 								}

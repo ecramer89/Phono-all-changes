@@ -86,7 +86,9 @@ public class Transaction: MonoBehaviour  {
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
 
 			//subscribe the selector and the and the state first.
-			if(scene.name == "MainMenu"){
+			PhonoBlocksScene currentScene = scene.name == PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
+
+			if(currentScene == PhonoBlocksScene.MainMenu){
 				state.SubscribeToEvents();
 				selector.SubscribeToEvents();
 			}
@@ -94,8 +96,10 @@ public class Transaction: MonoBehaviour  {
 			PhonoBlocksSubscriber[] subscribersInScene = FindObjectsOfType(typeof(PhonoBlocksSubscriber)) as PhonoBlocksSubscriber[];
 			if(subscribersInScene == null) return;  //check safety of cast
 			foreach(PhonoBlocksSubscriber subscriber in subscribersInScene){
-				if(subscriber.IsSubscribed()) continue;
-				subscriber.Subscribe();
+				//check whether the subscriber is the state or selector and skip
+				//or give subscribers concept of priority which defaults to 0 if not specified
+				//andsort by priority
+				subscriber.SubscribeToAll(currentScene); 
 			}
 
 
@@ -131,9 +135,7 @@ public class Transaction: MonoBehaviour  {
 		}
 
 		if(events.Count > 0){
-			List<Action> subscribers = events.Dequeue().Subscribers();
-			dispatch = subscribers.GetEnumerator();
-
+			dispatch = events.Dequeue().Subscribers();
 		}
 
 	}

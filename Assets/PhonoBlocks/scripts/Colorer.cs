@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Extensions;
 	
-public class Colorer : MonoBehaviour   {
-
+public class Colorer : PhonoBlocksSubscriber   {
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 	private static Colorer instance;
 	public static Colorer Instance{
 		get {
@@ -32,17 +32,17 @@ public class Colorer : MonoBehaviour   {
 	public void Start(){
 		instance = this;
 
-		Transaction.Instance.ActivitySelected.Subscribe((Activity activity) => {
+		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
 			InitializeRuleBasedColorer();
 		});
 
 
-		Transaction.Instance.InteractiveLettersCreated.Subscribe((List<InteractiveLetter> letters) => {
+		Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters) => {
 			RegisterLettersToColorer(letters);
 		});
 
 
-		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 			
 			TurnAllLettersOff();
 
@@ -56,7 +56,7 @@ public class Colorer : MonoBehaviour   {
 		});
 			
 
-		Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(ReColor);
+		Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,ReColor);
 	}
 
 	static Action InitializeRuleBasedColorer = () => {

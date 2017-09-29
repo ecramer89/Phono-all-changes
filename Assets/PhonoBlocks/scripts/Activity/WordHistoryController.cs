@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine.SceneManagement;
 
-public class WordHistoryController : MonoBehaviour
+public class WordHistoryController : PhonoBlocksSubscriber
 {
+
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 		private static WordHistoryController instance;
 		public static WordHistoryController Instance{
 			get {
@@ -27,7 +29,7 @@ public class WordHistoryController : MonoBehaviour
 		public void Start(){
 			instance = this;
 			
-			Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
 				words = new List<Word> ();
 				wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
 				wordHistoryGrid = GameObject.Find("WordHistoryGrid");
@@ -37,8 +39,8 @@ public class WordHistoryController : MonoBehaviour
 			});
 
 			//subscribe to events
-		    Transaction.Instance.CurrentProblemCompleted.Subscribe(AddCurrentWordToHistory);
-			Transaction.Instance.UserAddedWordToHistory.Subscribe(AddCurrentWordToHistory);
+		    Transaction.Instance.CurrentProblemCompleted.Subscribe(this,AddCurrentWordToHistory);
+			Transaction.Instance.UserAddedWordToHistory.Subscribe(this,AddCurrentWordToHistory);
 		}
 
 		public int showImageTime = 60 * 8;

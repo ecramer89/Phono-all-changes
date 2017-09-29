@@ -5,9 +5,10 @@ using System.Text;
 using System;
 using System.Collections;
 using Extensions;
-using UnityEngine.SceneManagement;
 
-public class ArduinoLetterController : MonoBehaviour{
+
+public class ArduinoLetterController : PhonoBlocksSubscriber{
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 		public static ArduinoLetterController instance;
 		
 		private StringBuilder selectedUserControlledLettersAsStringBuilder;
@@ -23,18 +24,20 @@ public class ArduinoLetterController : MonoBehaviour{
 		LetterGridController letterGrid;
 
 
+
+
 		public void Start ()
 		{
 				instance = this;
 				
 
-			Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+				Transaction.Instance.NewProblemBegun.Subscribe(this, (ProblemData problem) => {
 							ReplaceEachLetterWithBlank ();
 							PlaceWordInLetterGrid (problem.initialWord);
 							activateLinesBeneathLettersOfWord(problem.targetWord);
 				});
 				
-				Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
+			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
 							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
 							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
@@ -42,7 +45,7 @@ public class ArduinoLetterController : MonoBehaviour{
 							Transaction.Instance.InteractiveLettersCreated.Fire (UILetters);
 				});
 
-				Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+			Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
 					if(Transaction.Instance.Selector.AllLettersSelected 
 								&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
 									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
@@ -50,7 +53,7 @@ public class ArduinoLetterController : MonoBehaviour{
 				});
 
 
-				Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+			Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
 
 							if(Transaction.Instance.Selector.AllLettersDeSelected &&
 								Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
@@ -59,6 +62,9 @@ public class ArduinoLetterController : MonoBehaviour{
 				});
 
 		}
+
+
+
 
 	void SubscribeToInteractiveLetterEvents (List<InteractiveLetter> UILetters)
 	{

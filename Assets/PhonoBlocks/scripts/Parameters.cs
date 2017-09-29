@@ -7,9 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Extensions;
 using UnityEngine.SceneManagement;
-public class Parameters : MonoBehaviour {
+public class Parameters : PhonoBlocksSubscriber {
 
 	[SerializeField] InputType inputType;
+
+
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+
 
 	void Start ()
 	{     
@@ -18,7 +22,7 @@ public class Parameters : MonoBehaviour {
 		StudentMode.PROBLEM_SETS.Sort((SessionData x, SessionData y) => x.number - y.number);
 		Transaction.Instance.InputTypeSelected.Fire(inputType);
 		//Transaction.Instance.RecordInputTypeSelected (inputType);
-		Transaction.Instance.ActivitySelected.Subscribe((Activity obj) => {
+		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity obj) => {
 			SceneManager.LoadScene("Activity");
 			Transaction.Instance.ActivitySceneLoaded.Fire();
 		});

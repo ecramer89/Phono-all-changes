@@ -6,22 +6,11 @@ using Extensions;
 using System;
 public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 
-	public override void Subscribe(){
-		Debug.Log("Phono selectr subscribed");
-	}
-
-	public override void Unsubscribe(){
-		Debug.Log("Phono selector un subscribed");
-	}
-
-	public override bool IsSubscribed(){
-		return false;
-	}
-
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 
 	public void SubscribeToEvents(){
 		
-		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
 			correctlyPlacedLetters = new bool[Parameters.UI.ONSCREEN_LETTER_SPACES];
@@ -39,7 +28,7 @@ public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 		});
 			
 			
-		Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+		Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
 			if(Transaction.Instance.State.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
 			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
@@ -51,15 +40,15 @@ public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
 		});
 
-		Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
+		Transaction.Instance.CurrentProblemCompleted.Subscribe(this,() => {
 			solvedOnFirstTry = Transaction.Instance.State.TimesAttemptedCurrentProblem == 1;
 		});
 
-		Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
+		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
 			allLettersSelected = Transaction.Instance.State.SelectedUserInputLetters == Transaction.Instance.State.UserInputLetters;
 			allLettersDeSelected = false;
 		});
-		Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
+		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
 			allLettersSelected = false;
 			allLettersDeSelected = Transaction.Instance.State.SelectedUserInputLetters.Trim().Length == 0;
 		});

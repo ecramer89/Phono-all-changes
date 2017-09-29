@@ -4,11 +4,11 @@ using UnityEngine;
 using System;
 
 [RequireComponent(typeof(UIButtonMessage))]
-public class SessionButton : MonoBehaviour {
-
+public class SessionButton : PhonoBlocksSubscriber {
+	public override void SubscribeToAll(PhonoBlocksScene forScene){}
 	void Start(){
 		gameObject.SetActive(false);
-		Transaction.Instance.StudentDataRetrieved.Subscribe(() => {
+		Transaction.Instance.StudentDataRetrieved.Subscribe(this,() => {
 			if (Transaction.Instance.State.Mode == Mode.STUDENT) {
 					UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 					messenger.target = gameObject;
@@ -17,7 +17,7 @@ public class SessionButton : MonoBehaviour {
 					gameObject.SetActive(true);
 					//need -every- session selection button to deactivate when a session is selected.
 					//as such, just subscribe to the event here.
-					Transaction.Instance.SessionSelected.Subscribe((int session) => {
+				Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
 						gameObject.SetActive(false);
 					});
 			} else {

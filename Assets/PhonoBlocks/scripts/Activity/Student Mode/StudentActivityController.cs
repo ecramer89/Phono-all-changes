@@ -6,8 +6,9 @@ using System.Text;
 using System;
 using System.Linq;
 
-public class StudentActivityController : MonoBehaviour
+public class StudentActivityController : PhonoBlocksSubscriber
 {
+	public override void SubscribeToAll(PhonoBlocksScene scene){}
 		private static StudentActivityController instance;
 		public static StudentActivityController Instance{
 			get {
@@ -29,11 +30,11 @@ public class StudentActivityController : MonoBehaviour
 		void Start ()
 		{      instance = this;
 		
-				Transaction.Instance.ModeSelected.Subscribe((Mode mode) => {
+		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
 					
 						if (mode == Mode.STUDENT) {
-							Transaction.Instance.UserEnteredNewLetter.Subscribe(HandleNewArduinoLetter);
-							Transaction.Instance.UserSubmittedTheirLetters.Subscribe(HandleSubmittedAnswer);
+							Transaction.Instance.UserEnteredNewLetter.Subscribe(this,HandleNewArduinoLetter);
+							Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,HandleSubmittedAnswer);
 							CacheAudioClips ();
 							SubscribeToEvents();
 						} else {
@@ -46,28 +47,28 @@ public class StudentActivityController : MonoBehaviour
 
 
 	void SubscribeToEvents(){
-		Transaction.Instance.SessionSelected.Subscribe((int session) => {
+		Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
 			ProblemsRepository.Instance.Initialize (session);
 		});
-		Transaction.Instance.ActivitySceneLoaded.Subscribe(SetUpNextProblem);
+		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,SetUpNextProblem);
 
-		Transaction.Instance.ActivitySelected.Subscribe((Activity activity) => {
+		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
 			if(activity == Activity.SYLLABLE_DIVISION){
-				Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem)=>{
+				Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem)=>{
 					Transaction.Instance.TargetWordSyllablesSet.Fire(SpellingRuleRegex.Syllabify(problem.targetWord));
 				});
 			}
 		});
 
 		//placeholder letters have the blank letter outline
-		Transaction.Instance.NewProblemBegun.Subscribe((ProblemData problem) => {
+		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 			for(int i=0;i<problem.initialWord.Length;i++){
 				ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
 			}
 		});
 		//if the user removes a letter at a position of a place holder letter,
 		//then restore the dashed letter outline for the placeholder.
-		Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
+		Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
 			if(newLetter!=' ' || atPosition >= Transaction.Instance.State.PlaceHolderLetters.Length) return;
 			char placeholderLetter = Transaction.Instance.State.PlaceHolderLetters[atPosition];
 			if(placeholderLetter == ' ') return;
