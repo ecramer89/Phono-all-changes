@@ -6,7 +6,7 @@ using UnityEngine;
 public class ReplayInstructionsButton : MonoBehaviour {
 
 	void Start(){
-			if (Transaction.State.Mode == Mode.STUDENT) {
+			if (Transaction.Instance.State.Mode == Mode.STUDENT) {
 				gameObject.SetActive(true);
 				UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
@@ -27,9 +27,9 @@ public class ReplayInstructionsButton : MonoBehaviour {
 	}
 
 	void ReplayInstructions(){
-		if (Transaction.State.UIInputLocked)
+		if (Transaction.Instance.State.UIInputLocked)
 			return;
-		AudioSourceController.PushClips (Transaction.State.CurrentProblemInstructions);
+		AudioSourceController.PushClips (Transaction.Instance.State.CurrentProblemInstructions);
 
 	}
 }

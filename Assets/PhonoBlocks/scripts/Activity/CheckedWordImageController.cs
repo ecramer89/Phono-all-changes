@@ -24,7 +24,7 @@ public class CheckedWordImageController : MonoBehaviour
 				Transaction.Instance.CurrentProblemCompleted.Subscribe(DisplayTargetWord);
 				//level three hint; show the image of the target word.
 				Transaction.Instance.HintRequested.Subscribe(() => {
-						if(Transaction.State.CurrentHintNumber == Parameters.Hints.Descriptions.
+						if(Transaction.Instance.State.CurrentHintNumber == Parameters.Hints.Descriptions.
 							PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
 								DisplayTargetWord();
 							}
@@ -43,12 +43,12 @@ public class CheckedWordImageController : MonoBehaviour
 		}
 
 		void DisplayCurrentInputWord(){
-			DisplayImageForWordIfAny (Transaction.State.UserInputLetters);
+			DisplayImageForWordIfAny (Transaction.Instance.State.UserInputLetters);
 		}
 
 
 		void DisplayTargetWord(){
-			DisplayImageForWordIfAny (Transaction.State.TargetWord);
+			DisplayImageForWordIfAny (Transaction.Instance.State.TargetWord);
 		}
 
 		void DisplayImageForWordIfAny(string word){

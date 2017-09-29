@@ -60,7 +60,7 @@ public class Colorer : MonoBehaviour   {
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
-		switch (Transaction.State.Activity) {
+		switch (Transaction.Instance.State.Activity) {
 		case Activity.CONSONANT_BLENDS:
 			ruleBasedColorer = consonantBlendsColorer;
 			break;
@@ -87,7 +87,7 @@ public class Colorer : MonoBehaviour   {
 	};
 
 	static Action TurnAllLettersOff = () => {
-		Transaction.State.UILetters.ForEach (UILetter => {
+		Transaction.Instance.State.UILetters.ForEach (UILetter => {
 			
 			UILetter.UpdateInputDerivedAndDisplayColor (offColor);
 		});
@@ -96,7 +96,7 @@ public class Colorer : MonoBehaviour   {
 
 	static Action<string> ReapplyDefaultOrOff = (string updatedUserInputLetters) => {
 		int index = 0;
-		Transaction.State.UILetters.ForEach (UILetter => {
+		Transaction.Instance.State.UILetters.ForEach (UILetter => {
 			UILetter.UpdateInputDerivedAndDisplayColor (updatedUserInputLetters [index] == ' ' ? offColor : onColor);
 			index++;
 		});
@@ -110,7 +110,7 @@ public class Colorer : MonoBehaviour   {
 	//which tell each interactive letter to start the flash routine/clear out old flash configuration.
 	//enables us to start and clear flashes of all letters simultaneously.
 	static void RegisterLettersToColorer(List<InteractiveLetter> letters){
-		Transaction.State.UILetters.ForEach (UILetter => {
+		Transaction.Instance.State.UILetters.ForEach (UILetter => {
 			StartAllInteractiveLetterFlashes += UILetter.StartFlash;
 			ResetAllInteractiveLetterFlashConfigurations += UILetter.ResetFlashParameters;
 		});
@@ -118,8 +118,8 @@ public class Colorer : MonoBehaviour   {
 
 
 	public void ReColor (){
-		string updatedUserInputLetters = Transaction.State.UserInputLetters;
-		string previousUserInputLetters = Transaction.State.PreviousUserInputLetters;
+		string updatedUserInputLetters = Transaction.Instance.State.UserInputLetters;
+		string previousUserInputLetters = Transaction.Instance.State.PreviousUserInputLetters;
 
 		ResetAllInteractiveLetterFlashConfigurations ();
 	
@@ -127,13 +127,13 @@ public class Colorer : MonoBehaviour   {
 			updatedUserInputLetters
 		);
 
-		if (Transaction.State.Mode == Mode.TEACHER) {
+		if (Transaction.Instance.State.Mode == Mode.TEACHER) {
 			ruleBasedColorer.ColorAndConfigureFlashForTeacherMode (
 				updatedUserInputLetters, 
 				previousUserInputLetters
 			);
 		} else {
-			string targetWord = Transaction.State.TargetWord;
+			string targetWord = Transaction.Instance.State.TargetWord;
 			ruleBasedColorer.ColorAndConfigureFlashForStudentMode (
 				updatedUserInputLetters.Substring(0,targetWord.Length), //only want the special rule-based colors
 				//to apply to letters that the user placed in the spaces that match those of the target word.
@@ -156,13 +156,13 @@ public class Colorer : MonoBehaviour   {
 	}
 
 	public static void ChangeDisplayColourOfASingleLetter(int at, Color newDisplayColor){
-		if (at >= Transaction.State.UILetters.Count)
+		if (at >= Transaction.Instance.State.UILetters.Count)
 			return;
-		Transaction.State.UILetters [at].UpdateDisplayColour (newDisplayColor);
+		Transaction.Instance.State.UILetters [at].UpdateDisplayColour (newDisplayColor);
 	}
 		
 	static void TurnOffAndConfigureFlashForErroneousLetters(string input, string previousInput,string target){
-		List<InteractiveLetter> UILetters = Transaction.State.UILetters;
+		List<InteractiveLetter> UILetters = Transaction.Instance.State.UILetters;
 		for (int i = 0; i < UILetters.Count; i++) {
 			InteractiveLetter UILetter = UILetters [i];
 			//letter is incorrectly placed if it was placed outside the bounds or the target word OR
@@ -223,7 +223,7 @@ public class Colorer : MonoBehaviour   {
 		string previousUserInputLetters,
 		Regex spellingRuleRegex,
 		Color multiLetterUnitColor){
-		List<InteractiveLetter> UIletters = Transaction.State.UILetters;
+		List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 		//find and match each successive blend.
 		//because some strings could contain blends that cross boundaries (e.g., bll)
 		//input to the regex match is a buffer from which we replace the 
@@ -266,7 +266,7 @@ public class Colorer : MonoBehaviour   {
 		Color singleLetterOfTargetUnitColor,
 		Action<InteractiveLetter> hintPartialMatches
 	){
-		List<InteractiveLetter> UIletters = Transaction.State.UILetters;
+		List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 		string unmatchedTargetInputLetters=targetWord;
 		Match targetUnit;
 		while(true){
@@ -358,7 +358,7 @@ public class Colorer : MonoBehaviour   {
 		    //in the single consonant color.
 			MatchCollection singleConsonants = SpellingRuleRegex.Consonant.Matches(unmatchedUserInputLetters);
 			foreach (Match consonant in singleConsonants) {
-				InteractiveLetter consonantLetter = Transaction.State.UILetters.ElementAt (consonant.Index);
+				InteractiveLetter consonantLetter = Transaction.Instance.State.UILetters.ElementAt (consonant.Index);
 				consonantLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
 
 			}
@@ -609,7 +609,7 @@ public class Colorer : MonoBehaviour   {
 		}
 
 		void ColorConsonants(string updatedUserInputLetters){
-			List<InteractiveLetter> UIletters = Transaction.State.UILetters;
+			List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 			//color consonants in alternating blue-green
 			MatchCollection consonants = SpellingRuleRegex.AnyConsonant.Matches (updatedUserInputLetters);
 			for (int i = 0; i < consonants.Count; i++) {
@@ -625,7 +625,7 @@ public class Colorer : MonoBehaviour   {
 		}
 
 		public void ColorVowels(string updatedUserInputLetters){
-			List<InteractiveLetter> UIletters = Transaction.State.UILetters;
+			List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
 
@@ -745,7 +745,7 @@ public class Colorer : MonoBehaviour   {
 			string previousUserInputLetters, 
 			Func<Match, bool> shouldFlash
 		){
-			List<InteractiveLetter> UIletters = Transaction.State.UILetters;
+			List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 			Match magicE = SpellingRuleRegex.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
 				//no match found; switch to open/closed vowel coloring rules.
@@ -791,11 +791,11 @@ public class Colorer : MonoBehaviour   {
 			//have no place in any phonotactically legal string.
 			for(int i=0;i<syllables.Count;i++){
 				Match syllable = syllables[i];
-				List<InteractiveLetter> letters = Transaction.State.UILetters.GetRange(syllable.Index, syllable.Length);
+				List<InteractiveLetter> letters = Transaction.Instance.State.UILetters.GetRange(syllable.Index, syllable.Length);
 			
 				foreach(InteractiveLetter letter in letters){
 					letter.UpdateInputDerivedAndDisplayColor(
-						Transaction.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
+						Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
 						wholeWordColor : AlternateBy(i));
 				}
 			}
@@ -818,14 +818,14 @@ public class Colorer : MonoBehaviour   {
 			//if it's whole word mode, color each letter pink provided it matches the target word.
 			//if it's show division mode, then only if the user input letter currently matches target
 			//should we show the divided colors.
-			bool divided=Transaction.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
+			bool divided=Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
 			if(divided && targetWord == updatedUserInputLetters.Trim()){
 				colorSyllables(updatedUserInputLetters);
 				return;
 			}
 
 			//otherwise we just color the letters pink, provided they are correctly placed.
-			List<InteractiveLetter> letters = Transaction.State.UILetters.GetRange(0, targetWord.Length);
+			List<InteractiveLetter> letters = Transaction.Instance.State.UILetters.GetRange(0, targetWord.Length);
 			for(int i=0;i<letters.Count;i++){
 				InteractiveLetter letter = letters[i];
 				if(updatedUserInputLetters[i] == targetWord[i]){

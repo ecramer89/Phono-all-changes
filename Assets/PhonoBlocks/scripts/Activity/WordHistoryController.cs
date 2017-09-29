@@ -48,7 +48,7 @@ public class WordHistoryController : MonoBehaviour
 		{           
 				AddLettersOfNewWordToHistory ();
 		        //cache an audio clip and string for each word that gets saved to the History
-				Word newWord = CreateNewWordAndAddToList (Transaction.State.UserInputLetters.Trim());
+				Word newWord = CreateNewWordAndAddToList (Transaction.Instance.State.UserInputLetters.Trim());
 				AudioSourceController.PushClip (newWord.Sound);
 			
 		}
@@ -57,7 +57,7 @@ public class WordHistoryController : MonoBehaviour
 		{ 
 				
 				int position = words.Count * Parameters.UI.ONSCREEN_LETTER_SPACES;
-				foreach (InteractiveLetter l in Transaction.State.UILetters) {
+				foreach (InteractiveLetter l in Transaction.Instance.State.UILetters) {
 					
 			     		GameObject letterInWord = lettersOfWordInHistory.CreateLetterBarCell (
 							l.CurrentDisplayImage (), 

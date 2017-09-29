@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
+using System.Reflection;
+using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(PhonoBlocksState), typeof(PhonoBlocksSelector))]
 public class Transaction: MonoBehaviour  {
 
 	private IEnumerator<Action> dispatch; //list of event handler actions for the current event
@@ -12,34 +15,7 @@ public class Transaction: MonoBehaviour  {
 	private static Transaction instance;
 	public static Transaction Instance{
 		get {
-			if(state == null){
-				//gaurantees that state is first subscriber whose methods are invoked when new events occur.
-				//saves other classes that need to frequently refer to these data from having to cache additional
-				//references/copies to/of data
-				state = new PhonoBlocksState();
-				state.SubscribeToEvents ();
-				//ensure that selector is the second whose subscribers are invoked.
-				//selectors job is to compute/cache derived fields (e.g., whether or not current state of user input matches target,
-				//the location of each error, so on).
-				selector = new PhonoBlocksSelector();
-				selector.SubscribeToEvents ();
-			}
 			return instance;
-
-		}
-	}
-
-	private static PhonoBlocksState state;
-	public static PhonoBlocksState State{
-		get {
-			return state;
-		}
-
-	}
-	private static PhonoBlocksSelector selector;
-	public static PhonoBlocksSelector Selector{
-		get {
-			return selector;
 
 		}
 	}
@@ -75,8 +51,56 @@ public class Transaction: MonoBehaviour  {
 	public UnaryParameterizedEvent<List<Match>> TargetWordSyllablesSet = new UnaryParameterizedEvent<List<Match>>("TargetWordSyllablesSet");
 	public BinaryParameterizedEvent<char, int> UserEnteredNewLetter = new BinaryParameterizedEvent<char, int>("UserEnteredNewLetter");
 
-	public UnaryParameterizedEvent<string> TestEventA = new UnaryParameterizedEvent<string>("TestA");
-	public UnaryParameterizedEvent<string> TestEventB = new UnaryParameterizedEvent<string>("TestB");
+	private List<PhonoBlocksEvent> phonoblocksEvents;
+	private PhonoBlocksState state;
+	public PhonoBlocksState State{
+		get {
+			return state;
+		}
+		
+	}
+
+	private PhonoBlocksSelector selector;
+	public PhonoBlocksSelector Selector{
+		get {
+			return selector;
+
+		}
+
+	}
+
+
+	public void Awake(){
+		instance = this;
+		state = GetComponent<PhonoBlocksState>();
+		selector =GetComponent<PhonoBlocksSelector>();
+		phonoblocksEvents = new List<PhonoBlocksEvent>();
+		foreach(FieldInfo field in typeof(Transaction).GetFields()){
+			var value = field.GetValue(this);
+			if(value != null && typeof(PhonoBlocksEvent).IsAssignableFrom(value.GetType())){
+				phonoblocksEvents.Add((PhonoBlocksEvent)value);
+			}
+
+		}
+
+		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
+
+			//subscribe the selector and the and the state first.
+			if(scene.name == "MainMenu"){
+				state.SubscribeToEvents();
+				selector.SubscribeToEvents();
+			}
+
+			PhonoBlocksSubscriber[] subscribersInScene = FindObjectsOfType(typeof(PhonoBlocksSubscriber)) as PhonoBlocksSubscriber[];
+			if(subscribersInScene == null) return;  //check safety of cast
+			foreach(PhonoBlocksSubscriber subscriber in subscribersInScene){
+				if(subscriber.IsSubscribed()) continue;
+				subscriber.Subscribe();
+			}
+
+
+		};
+	}
 
 
 	public void EnqueueEvent(PhonoBlocksEvent evt){
@@ -84,9 +108,16 @@ public class Transaction: MonoBehaviour  {
 
 	}
 
-	public void Awake(){
-		instance = this;
+	public void ReturnToMainMenu(){
+		foreach(PhonoBlocksEvent evt in phonoblocksEvents){
+			evt.ClearSubscribers();
+		}
+
+		SceneManager.LoadScene("MainMenu");
+
 	}
+
+
 
 
 	public void Update(){
@@ -106,6 +137,7 @@ public class Transaction: MonoBehaviour  {
 		}
 
 	}
+
 
 
 }

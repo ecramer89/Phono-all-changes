@@ -8,7 +8,7 @@ public class RequestHintButton : MonoBehaviour {
 
 	void Start(){
 			gameObject.SetActive(false); //inactive to begin with.
-			if (Transaction.State.Mode == Mode.STUDENT) { //only bother subscribing to events that would set active in student mode
+			if (Transaction.Instance.State.Mode == Mode.STUDENT) { //only bother subscribing to events that would set active in student mode
 				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 				messenger.target = gameObject;
 				messenger.functionName = "RequestHint";
@@ -24,14 +24,14 @@ public class RequestHintButton : MonoBehaviour {
 				//and hint is provided (hint no longer available).
 				//as such, shouldn't set the hint button to active again unless the hint is currently available.
 				Transaction.Instance.UIInputUnLocked.Subscribe(() => {
-						gameObject.SetActive(Transaction.State.HintAvailable);
+						gameObject.SetActive(Transaction.Instance.State.HintAvailable);
 				});
 				Transaction.Instance.HintProvided.Subscribe(() => {
 						
 						gameObject.SetActive (false);
 				});
 				Transaction.Instance.UserSubmittedIncorrectAnswer.Subscribe(() => {
-						gameObject.SetActive(Transaction.State.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
+						gameObject.SetActive(Transaction.Instance.State.StudentModeState == StudentModeStates.MAIN_ACTIVITY);
 				});
 		}
 	}
@@ -39,7 +39,7 @@ public class RequestHintButton : MonoBehaviour {
 
 
 	void RequestHint(){
-		if (Transaction.State.UIInputLocked || Transaction.State.Mode == Mode.TEACHER)
+		if (Transaction.Instance.State.UIInputLocked || Transaction.Instance.State.Mode == Mode.TEACHER)
 			return;
 
 		Transaction.Instance.HintRequested.Fire ();

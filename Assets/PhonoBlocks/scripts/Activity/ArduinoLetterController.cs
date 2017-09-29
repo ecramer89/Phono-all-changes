@@ -43,8 +43,8 @@ public class ArduinoLetterController : MonoBehaviour{
 				});
 
 				Transaction.Instance.InteractiveLetterSelected.Subscribe((InteractiveLetter letter) => {
-					if(Transaction.Selector.AllLettersSelected 
-								&& Transaction.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
+					if(Transaction.Instance.Selector.AllLettersSelected 
+								&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
 									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
 							}
 				});
@@ -52,8 +52,8 @@ public class ArduinoLetterController : MonoBehaviour{
 
 				Transaction.Instance.InteractiveLetterDeselected.Subscribe((InteractiveLetter letter) => {
 
-							if(Transaction.Selector.AllLettersDeSelected &&
-								Transaction.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+							if(Transaction.Instance.Selector.AllLettersDeSelected &&
+								Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
 									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
 							}
 				});
@@ -64,12 +64,12 @@ public class ArduinoLetterController : MonoBehaviour{
 	{
 		foreach(InteractiveLetter letter in UILetters){
 			letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
-				if(Transaction.State.Activity != Activity.SYLLABLE_DIVISION) return;
-				if(Transaction.State.UserInputLetters[l.Position] == ' ') return;
+				if(Transaction.Instance.State.Activity != Activity.SYLLABLE_DIVISION) return;
+				if(Transaction.Instance.State.UserInputLetters[l.Position] == ' ') return;
 				//don't send event if position is already selected or deselected
-				if(wasSelected && Transaction.State.SelectedUserInputLetters[l.Position] != ' ' || 
-					!wasSelected && Transaction.State.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
-				if(Transaction.State.Mode == Mode.STUDENT && !Transaction.Selector.CurrentStateOfInputMatchesTarget) return;
+				if(wasSelected && Transaction.Instance.State.SelectedUserInputLetters[l.Position] != ' ' || 
+					!wasSelected && Transaction.Instance.State.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
+				if(Transaction.Instance.State.Mode == Mode.STUDENT && !Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget) return;
 				if(wasSelected){
 					Transaction.Instance.InteractiveLetterSelected.Fire(l);
 				}else{

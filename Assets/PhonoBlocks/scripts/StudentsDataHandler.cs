@@ -57,19 +57,19 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 					RecordActivityTargetWord (problem.targetWord);
 			});
 			Transaction.Instance.HintProvided.Subscribe(() => {
-					LogEvent ("requested_hint", $"{Transaction.State.CurrentHintNumber}", "NA");
+					LogEvent ("requested_hint", $"{Transaction.Instance.State.CurrentHintNumber}", "NA");
 			});
 			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(() => {
-					LogEvent ("submitted_answer", Transaction.State.UserInputLetters, Transaction.State.TargetWord);
+			LogEvent ("submitted_answer", Transaction.Instance.State.UserInputLetters, Transaction.Instance.State.TargetWord);
 			});
 			Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
 
 					RecordActivitySolved (
-					Transaction.Selector.CurrentStateOfInputMatchesTarget, 
-					Transaction.State.UserInputLetters, 
-					Transaction.Selector.SolvedOnFirstTry);
+				Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget, 
+				Transaction.Instance.State.UserInputLetters, 
+				Transaction.Instance.Selector.SolvedOnFirstTry);
 
-				SaveActivityDataAndClearForNext (Transaction.State.TargetWord, Transaction.State.PlaceHolderLetters);
+			SaveActivityDataAndClearForNext (Transaction.Instance.State.TargetWord, Transaction.Instance.State.PlaceHolderLetters);
 
 			});
 			
@@ -419,7 +419,7 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 		public void LogEvent (string eventName, string eventParam1, string eventParam2)
 		{       //only log events in STUDENT mode.
 
-					if (Transaction.State.Mode == Mode.STUDENT) {
+					if (Transaction.Instance.State.Mode == Mode.STUDENT) {
 						// Write the string to a file.append mode is enabled so that the log
 						// lines get appended to  test.txt than wiping content and writing the log
 		

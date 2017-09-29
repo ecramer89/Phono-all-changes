@@ -29,7 +29,7 @@ public class CheckWordButton : MonoBehaviour {
 
 	void CheckWord(){
 
-		if (Transaction.State.UIInputLocked)
+		if (Transaction.Instance.State.UIInputLocked)
 			return;
 		Transaction.Instance.UserSubmittedTheirLetters.Fire ();
 	 

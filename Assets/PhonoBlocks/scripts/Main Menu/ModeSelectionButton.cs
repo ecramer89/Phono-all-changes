@@ -42,6 +42,5 @@ public class ModeSelectionButton : MonoBehaviour {
 		Transaction.Instance.ModeSelected.Fire (mode);
 
 
-		Transaction.Instance.TestEventA.Fire("dispatching event A from button");
 	}
 }

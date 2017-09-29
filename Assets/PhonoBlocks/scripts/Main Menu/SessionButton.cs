@@ -9,7 +9,7 @@ public class SessionButton : MonoBehaviour {
 	void Start(){
 		gameObject.SetActive(false);
 		Transaction.Instance.StudentDataRetrieved.Subscribe(() => {
-			if (Transaction.State.Mode == Mode.STUDENT) {
+			if (Transaction.Instance.State.Mode == Mode.STUDENT) {
 					UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
 					messenger.target = gameObject;
 					messenger.functionName = "SelectSession";

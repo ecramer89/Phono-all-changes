@@ -5,9 +5,19 @@ using Extensions;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using System.Linq;
-public class PhonoBlocksState {
+public class PhonoBlocksState : PhonoBlocksSubscriber {
 
+	public override void Subscribe(){
+		Debug.Log("Phono state subscribed");
+	}
 
+	public override void Unsubscribe(){
+		Debug.Log("Phono state un subscribed");
+	}
+
+	public override bool IsSubscribed(){
+		return false;
+	}
 	public void SubscribeToEvents(){
 
 		Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {

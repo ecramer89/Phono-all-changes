@@ -9,6 +9,7 @@ public class HomeButton : MonoBehaviour {
 	[SerializeField] Mode mode;
 
 	void Start(){
+
 		gameObject.SetActive(false);
 		SceneManager.sceneLoaded+=(Scene scene, LoadSceneMode arg1) =>{
 			if(scene.name == "MainMenu"){
@@ -26,6 +27,6 @@ public class HomeButton : MonoBehaviour {
 
 
 	void ReturnToMainMenu(){
-		SceneManager.LoadScene("MainMenu");
+		Transaction.Instance.ReturnToMainMenu();
 	}
 }

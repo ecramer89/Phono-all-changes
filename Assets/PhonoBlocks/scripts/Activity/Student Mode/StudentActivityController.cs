@@ -68,8 +68,8 @@ public class StudentActivityController : MonoBehaviour
 		//if the user removes a letter at a position of a place holder letter,
 		//then restore the dashed letter outline for the placeholder.
 		Transaction.Instance.UserEnteredNewLetter.Subscribe((char newLetter, int atPosition) => {
-			if(newLetter!=' ' || atPosition >= Transaction.State.PlaceHolderLetters.Length) return;
-			char placeholderLetter = Transaction.State.PlaceHolderLetters[atPosition];
+			if(newLetter!=' ' || atPosition >= Transaction.Instance.State.PlaceHolderLetters.Length) return;
+			char placeholderLetter = Transaction.Instance.State.PlaceHolderLetters[atPosition];
 			if(placeholderLetter == ' ') return;
 
 			ArduinoLetterController.instance.ChangeTheImageOfASingleCell(
@@ -94,11 +94,11 @@ public class StudentActivityController : MonoBehaviour
 
 
 	bool AllUserControlledLettersAreBlank(){
-		return Transaction.State.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
+		return Transaction.Instance.State.UserInputLetters.Aggregate(true,(bool result, char nxt)=>result && nxt == ' ');
 	}
 
 	void HandleNewArduinoLetter(char newLetter, int atPosition){
-		switch (Transaction.State.StudentModeState) {
+		switch (Transaction.Instance.State.StudentModeState) {
 		case StudentModeStates.MAIN_ACTIVITY:
 			MainActivityNewLetterHandler(newLetter, atPosition);
 			break;
@@ -118,10 +118,10 @@ public class StudentActivityController : MonoBehaviour
 	}
 
 	void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
-		InteractiveLetter asInteractiveLetter = Transaction.State.UILetters[atPosition];
-		if (Transaction.Selector.IsCorrectlyPlaced(atPosition)){
+		InteractiveLetter asInteractiveLetter = Transaction.Instance.State.UILetters[atPosition];
+		if (Transaction.Instance.Selector.IsCorrectlyPlaced(atPosition)){
 			//in case the user removed and then replaced a letter correctly.
-			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Transaction.State.TargetWordColors[atPosition]);
+			asInteractiveLetter.UpdateInputDerivedAndDisplayColor (Transaction.Instance.State.TargetWordColors[atPosition]);
 			return;
 		}
 		//otherwise, don't update the UI letters but do flash the error to indicate that child didn't place the right letter.	
@@ -174,7 +174,7 @@ public class StudentActivityController : MonoBehaviour
 		       			
 				Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Fire ();
 		
-				if (Transaction.Selector.CurrentStateOfInputMatchesTarget) {
+		if (Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget) {
 					HandleCorrectAnswer ();
 				} else {
 					HandleIncorrectAnswer ();				
@@ -186,7 +186,7 @@ public class StudentActivityController : MonoBehaviour
 
 		void HandleCorrectAnswer(){
 			AudioSourceController.PushClip (correctSoundEffect);
-			if (Transaction.State.TimesAttemptedCurrentProblem > 1)
+		if (Transaction.Instance.State.TimesAttemptedCurrentProblem > 1)
 				AudioSourceController.PushClip (youDidIt);
 			else
 				AudioSourceController.PushClip (excellent);
@@ -198,7 +198,7 @@ public class StudentActivityController : MonoBehaviour
 				Transaction.Instance.UserSubmittedIncorrectAnswer.Fire ();
 				AudioSourceController.PushClip (incorrectSoundEffect);
 				AudioSourceController.PushClip (notQuiteIt);
-				if(Transaction.State.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
+		if(Transaction.Instance.State.StudentModeState == StudentModeStates.MAIN_ACTIVITY) 
 					AudioSourceController.PushClip (offerHint);
 		}
 

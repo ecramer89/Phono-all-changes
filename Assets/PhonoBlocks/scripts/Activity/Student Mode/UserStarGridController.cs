@@ -18,7 +18,7 @@ public class UserStarGridController : MonoBehaviour
 		{
 			gameObject.SetActive(false);
 			Transaction.Instance.ActivitySceneLoaded.Subscribe(() => {
-					if(Transaction.State.Mode == Mode.STUDENT){
+					if(Transaction.Instance.State.Mode == Mode.STUDENT){
 						gameObject.SetActive(true);
 						userStarGrid = GameObject.Find("UserStarGrid");
 						MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
@@ -26,7 +26,7 @@ public class UserStarGridController : MonoBehaviour
 						PlaceUserStarOutlinesInGrid (); 
 
 						Transaction.Instance.CurrentProblemCompleted.Subscribe(() => {
-								if (Transaction.Selector.SolvedOnFirstTry){
+								if (Transaction.Instance.Selector.SolvedOnFirstTry){
 									AddNewUserStar (true, ProblemsRepository.Instance.ProblemsCompleted-1);
 								}
 						});
