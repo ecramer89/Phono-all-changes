@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 
-public class InteractiveLetter : PhonoBlocksSubscriber{
+public class InteractiveLetter : MonoBehaviour{
 	
 		int position; //position of this letter in the on screen word.
 		public int Position{
@@ -251,17 +251,6 @@ public class InteractiveLetter : PhonoBlocksSubscriber{
 
 		}
 		
-	public override void SubscribeToAll(PhonoBlocksScene forScene){
-
-		if(forScene != PhonoBlocksScene.Activity) return;
-
-		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
-			if(ReferenceEquals(this, letter)) ToggleSelectHighlight(false);
-		});
-		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
-			if(ReferenceEquals(this, letter)) ToggleSelectHighlight(true);
-		});
-	}
 
 
 

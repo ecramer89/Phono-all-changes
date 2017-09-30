@@ -47,15 +47,20 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 
 
 		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
-			if(Transaction.Instance.Selector.AllLettersSelected 
+				letter.ToggleSelectHighlight(true);
+				if(Transaction.Instance.Selector.AllLettersSelected 
 				&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
-				Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
+				
+					Debug.Log("fiding syllable show state togle");
+					Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
 			}
 		});
 
 
 		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
+				letter.ToggleSelectHighlight(false);
 
+				Debug.Log("all letters deselected: "+Transaction.Instance.Selector.AllLettersDeSelected);
 			if(Transaction.Instance.Selector.AllLettersDeSelected &&
 				Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
 				Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
@@ -84,6 +89,7 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 				if(wasSelected && Transaction.Instance.State.SelectedUserInputLetters[l.Position] != ' ' || 
 					!wasSelected && Transaction.Instance.State.SelectedUserInputLetters[l.Position] == ' ') return; //don't select a letter if already selected
 				if(Transaction.Instance.State.Mode == Mode.STUDENT && !Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget) return;
+
 				if(wasSelected){
 					Transaction.Instance.InteractiveLetterSelected.Fire(l);
 				}else{

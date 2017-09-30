@@ -46,6 +46,8 @@ public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
 			allLettersSelected = Transaction.Instance.State.SelectedUserInputLetters == Transaction.Instance.State.UserInputLetters;
 			allLettersDeSelected = false;
+
+		
 		});
 		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
 			allLettersSelected = false;
