@@ -14,35 +14,37 @@ public class CheckedWordImageController : PhonoBlocksSubscriber
 		bool caller_ends_display;
 
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-
-			void Start (){
-
-				//remove the old image, if it's still there
+	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
+		if(nextToLoad == PhonoBlocksScene.MainMenu) return;
+		if(nextToLoad == PhonoBlocksScene.Activity) {
+			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
+				checkedWordImage = GameObject.Find("CheckedWordImage");
+				img = checkedWordImage.GetComponent<UITexture> ();
+				img.enabled = false;
+				clickTrigger = checkedWordImage.GetComponent<BoxCollider> ();
+				clickTrigger.enabled = false;
+			});
+		//remove the old image, if it's still there
 		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
-							EndDisplay ();
-				});
-				//display the target word image
-				Transaction.Instance.CurrentProblemCompleted.Subscribe(this,DisplayTargetWord);
-				//level three hint; show the image of the target word.
+			EndDisplay ();
+		});
+		//display the target word image
+		Transaction.Instance.CurrentProblemCompleted.Subscribe(this,DisplayTargetWord);
+		//level three hint; show the image of the target word.
 		Transaction.Instance.HintRequested.Subscribe(this,() => {
-						if(Transaction.Instance.State.CurrentHintNumber == Parameters.Hints.Descriptions.
-							PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
-								DisplayTargetWord();
-							}
-				});
-		        //if the current state of user input letters corresponds to a saved image, then
-				//display it.
-				Transaction.Instance.UserAddedWordToHistory.Subscribe(this,DisplayCurrentInputWord);
-		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
-						checkedWordImage = GameObject.Find("CheckedWordImage");
-						img = checkedWordImage.GetComponent<UITexture> ();
-						img.enabled = false;
-						clickTrigger = checkedWordImage.GetComponent<BoxCollider> ();
-						clickTrigger.enabled = false;
-				});
-				
+			if(Transaction.Instance.State.CurrentHintNumber == Parameters.Hints.Descriptions.
+				PRESENT_TARGET_WORD_WITH_IMAGE_AND_FORCE_CORRECT_PLACEMENT){
+				DisplayTargetWord();
+			}
+		});
+		//if the current state of user input letters corresponds to a saved image, then
+		//display it.
+		Transaction.Instance.UserAddedWordToHistory.Subscribe(this,DisplayCurrentInputWord);
 		}
+
+	}
+
+
 
 		void DisplayCurrentInputWord(){
 			DisplayImageForWordIfAny (Transaction.Instance.State.UserInputLetters);

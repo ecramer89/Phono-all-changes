@@ -14,9 +14,6 @@ using System.Text;
 public class ArduinoUnityInterface : PhonoBlocksSubscriber
 {
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-
-
 
 		private static ArduinoUnityInterface instance;
 		public static ArduinoUnityInterface Instance{
@@ -94,25 +91,33 @@ public class ArduinoUnityInterface : PhonoBlocksSubscriber
 		const char SAME = '?';
 		ArduinoLetterData change;
 
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		Transaction.Instance.InputTypeSelected.Subscribe(this,
+			(InputType type) => {
+				GameObject uniduino = GameObject.Find ("Uniduino");
+				if(type == InputType.KEYBOARD) {
+					gameObject.SetActive(false);
+					uniduino.SetActive(false);
+				} else {
+
+					uniduino.GetComponent<Uniduino.Arduino> ().Connect ();
+					change = new ArduinoLetterData ();
+					arduino = Arduino.global;
+					arduino.Setup (ConfigurePins);
+
+				}
+			}
+
+		);
+	}
+
+
+
+
 		public void Start(){
 				instance = this;
-				GameObject uniduino = GameObject.Find ("Uniduino");
-		Transaction.Instance.InputTypeSelected.Subscribe(this,
-					(InputType type) => {
-						if(type == InputType.KEYBOARD) {
-							gameObject.SetActive(false);
-							uniduino.SetActive(false);
-						} else {
-
-							uniduino.GetComponent<Uniduino.Arduino> ().Connect ();
-							change = new ArduinoLetterData ();
-							arduino = Arduino.global;
-							arduino.Setup (ConfigurePins);
-
-						}
-					}
 				
-				);
+	
 
 
 

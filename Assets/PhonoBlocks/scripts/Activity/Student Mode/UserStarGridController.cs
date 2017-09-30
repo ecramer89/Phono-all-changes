@@ -3,8 +3,31 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 public class UserStarGridController : PhonoBlocksSubscriber
 {
+	//invoked only when a new scene begins, from the on scene loaded handler.
+	public override void SubscribeToAll(PhonoBlocksScene scene){
+		
+	
+		if(scene == PhonoBlocksScene.Activity) {
 
-	public override void SubscribeToAll(PhonoBlocksScene scene){}
+		if(Transaction.Instance.State.Mode == Mode.STUDENT){
+
+				Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
+					gameObject.SetActive(true);
+					userStarGrid = GameObject.Find("UserStarGrid");
+					MatchStarImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
+
+					PlaceUserStarOutlinesInGrid (); 
+				});
+
+			Transaction.Instance.CurrentProblemCompleted.Subscribe(this,() => {
+				if (Transaction.Instance.Selector.SolvedOnFirstTry){
+					AddNewUserStar (true, ProblemsRepository.Instance.ProblemsCompleted-1);
+				}
+			});
+		}
+		}
+
+	}
 
 		public GameObject userStarGrid;
 		public Texture2D userStarImg;
@@ -16,7 +39,7 @@ public class UserStarGridController : PhonoBlocksSubscriber
 		float secondsDelayBetweenFlashes = .20f;
 		UITexture toFlash;
 
-		public void Start ()
+		/*public void Start ()
 		{
 			gameObject.SetActive(false);
 		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
@@ -35,7 +58,7 @@ public class UserStarGridController : PhonoBlocksSubscriber
 					}
 			});
 			
-		}
+		}*/
 
 		void PlaceUserStarOutlinesInGrid ()
 		{

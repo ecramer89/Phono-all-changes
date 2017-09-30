@@ -12,13 +12,8 @@ public class NameInputField : PhonoBlocksSubscriber {
 		}
 	}
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-
-
-	//becomes active when student mode selected. otherwise inactive.
-	void Start(){
-		position = new Rect (300, 300, 200, 50);
-		gameObject.SetActive (false);
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		if(forScene != PhonoBlocksScene.MainMenu) return;
 		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
 			if(mode == Mode.STUDENT){
 				gameObject.SetActive(true);
@@ -27,6 +22,15 @@ public class NameInputField : PhonoBlocksSubscriber {
 		Transaction.Instance.StudentDataRetrieved.Subscribe(this,() => {
 			gameObject.SetActive(false);
 		});
+
+	}
+
+
+	//becomes active when student mode selected. otherwise inactive.
+	void Start(){
+		position = new Rect (300, 300, 200, 50);
+		gameObject.SetActive (false);
+
 
 	}
 

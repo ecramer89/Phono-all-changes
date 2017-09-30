@@ -8,7 +8,7 @@ using Extensions;
 
 
 public class ArduinoLetterController : PhonoBlocksSubscriber{
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+	    
 		public static ArduinoLetterController instance;
 		
 		private StringBuilder selectedUserControlledLettersAsStringBuilder;
@@ -24,43 +24,51 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		LetterGridController letterGrid;
 
 
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
 
+
+		if(forScene == PhonoBlocksScene.Activity){
+			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
+				letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
+				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
+				List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
+				SubscribeToInteractiveLetterEvents(UILetters);
+				Transaction.Instance.InteractiveLettersCreated.Fire (UILetters);
+			});
+
+
+		Transaction.Instance.NewProblemBegun.Subscribe(this, (ProblemData problem) => {
+			ReplaceEachLetterWithBlank ();
+			PlaceWordInLetterGrid (problem.initialWord, LetterImageTable.instance.GetLetterOutlineImageFromLetter);
+			activateLinesBeneathLettersOfWord(problem.targetWord);
+		});
+		
+
+
+
+		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
+			if(Transaction.Instance.Selector.AllLettersSelected 
+				&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
+				Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
+			}
+		});
+
+
+		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
+
+			if(Transaction.Instance.Selector.AllLettersDeSelected &&
+				Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+				Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
+			}
+		});
+
+		}
+	}
 
 		public void Start ()
 		{
 				instance = this;
 				
-
-				Transaction.Instance.NewProblemBegun.Subscribe(this, (ProblemData problem) => {
-							ReplaceEachLetterWithBlank ();
-							PlaceWordInLetterGrid (problem.initialWord);
-							activateLinesBeneathLettersOfWord(problem.targetWord);
-				});
-				
-			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
-							letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
-							letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
-							List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
-							SubscribeToInteractiveLetterEvents(UILetters);
-							Transaction.Instance.InteractiveLettersCreated.Fire (UILetters);
-				});
-
-			Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
-					if(Transaction.Instance.Selector.AllLettersSelected 
-								&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
-									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
-							}
-				});
-
-
-			Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
-
-							if(Transaction.Instance.Selector.AllLettersDeSelected &&
-								Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
-									Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
-							}
-				});
-
 		}
 
 
@@ -87,9 +95,9 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		}
 	}
 		
-		public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter)
+	public void ChangeTheLetterOfASingleCell (int atPosition, char newLetter,Func<char, Texture2D> imageGetter)
 		{
-			ChangeTheLetterOfASingleCell (atPosition, newLetter + "");
+			ChangeTheLetterOfASingleCell (atPosition, newLetter + "", imageGetter);
 
 		}
 
@@ -98,9 +106,9 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 			letter.UpdateLetterImage(letterGrid.ConfigureTextureForLetterGrid(image));
 		}
 
-		public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter)
+	public void ChangeTheLetterOfASingleCell (int atPosition, String newLetter, Func<char, Texture2D> imageGetter)
 		{   		InteractiveLetter letter = GetInteractiveLetterAt(atPosition);
-		            letter.UpdateLetterImage (letterGrid.GetAppropriatelyScaledImageForLetter(newLetter));
+					ChangeTheImageOfASingleCell(atPosition, imageGetter(newLetter[0]));
 					if(newLetter==" ") { //deselect letters that the user removes
 						Transaction.Instance.InteractiveLetterDeselected.Fire(letter);
 					}
@@ -108,11 +116,11 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 
 
 		//updates letters and images of letter cells
-		public void PlaceWordInLetterGrid (string word)
+	public void PlaceWordInLetterGrid (string word, Func<char, Texture2D> imageGetter)
 		{
 
 				for (int i=0;i<word.Length; i++) {
-						ChangeTheLetterOfASingleCell (i, word[i]);
+					ChangeTheLetterOfASingleCell (i, word[i],imageGetter);
 					
 				}
 		
@@ -133,7 +141,7 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		
 		for (int i=0; i<word.Length; i++) {
 					if(!ignoreBlanks || word[i] != ' ')
-						ChangeTheLetterOfASingleCell (i, word[i]);
+				ChangeTheLetterOfASingleCell (i, word[i], LetterImageTable.instance.GetLetterImageFromLetter);
 			
 				}
 		
@@ -143,7 +151,7 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		public void ReplaceEachLetterWithBlank ()
 		{
 			for (int i = 0; i < Parameters.UI.ONSCREEN_LETTER_SPACES; i++) {
-					ChangeTheLetterOfASingleCell (i, ' ');
+			ChangeTheLetterOfASingleCell (i, ' ', LetterImageTable.instance.GetBlankLetterImage);
 			}
 		}
 		

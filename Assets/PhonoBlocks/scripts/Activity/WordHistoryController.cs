@@ -8,7 +8,25 @@ using UnityEngine.SceneManagement;
 public class WordHistoryController : PhonoBlocksSubscriber
 {
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
+		
+
+		if(nextToLoad == PhonoBlocksScene.Activity) {
+
+			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
+				words = new List<Word> ();
+				wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
+				wordHistoryGrid = GameObject.Find("WordHistoryGrid");
+				lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
+				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
+				letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
+			});
+
+		//subscribe to events
+		Transaction.Instance.CurrentProblemCompleted.Subscribe(this,AddCurrentWordToHistory);
+		Transaction.Instance.UserAddedWordToHistory.Subscribe(this,AddCurrentWordToHistory);
+		}
+	}
 		private static WordHistoryController instance;
 		public static WordHistoryController Instance{
 			get {
@@ -29,18 +47,7 @@ public class WordHistoryController : PhonoBlocksSubscriber
 		public void Start(){
 			instance = this;
 			
-		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
-				words = new List<Word> ();
-				wordHistoryPanelBackground = GameObject.Find("WordHistoryBackground");
-				wordHistoryGrid = GameObject.Find("WordHistoryGrid");
-				lettersOfWordInHistory = wordHistoryGrid.gameObject.GetComponent<LetterGridController> ();
-				wordHistoryGrid.GetComponent<UIGrid> ().maxPerLine = Parameters.UI.ONSCREEN_LETTER_SPACES;
-				letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
-			});
 
-			//subscribe to events
-		    Transaction.Instance.CurrentProblemCompleted.Subscribe(this,AddCurrentWordToHistory);
-			Transaction.Instance.UserAddedWordToHistory.Subscribe(this,AddCurrentWordToHistory);
 		}
 
 		public int showImageTime = 60 * 8;
@@ -120,7 +127,7 @@ public class WordHistoryController : PhonoBlocksSubscriber
 		}
 
 	//private inner class; just a convenient package for all the data pertaining to a specific word.
-	class Word : MonoBehaviour
+	class Word 
 	{
 
 		string asString;

@@ -6,10 +6,8 @@ using Extensions;
 using System;
 public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-
-	public void SubscribeToEvents(){
-		
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		if(forScene != PhonoBlocksScene.Activity) return;
 		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 			solvedOnFirstTry = false;
 			currentStateOfUserInputMatchesTarget = false;
@@ -19,16 +17,17 @@ public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 			//i.e., when target word is "thin", 
 			//there are two spaces left after "n"; since there isn't anything there to begin with, 
 			//those spots are correctly placed.
-		
+
 			for(int i=problem.targetWord.Length;i<correctlyPlacedLetters.Length;i++){
 				correctlyPlacedLetters[i] = true;
 			}
 
 			targetWordWithBlanksOnEnd = string.Concat(problem.targetWord, _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES-problem.targetWord.Length));
 		});
-			
-			
+
+
 		Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
+
 			if(Transaction.Instance.State.Mode == Mode.TEACHER) return; //only relevant in Student mode when there is a target word
 			//by which to judge correctness.
 			//a letter at a given position is correctly placed if it's part of the target word and has the matching letter OR
@@ -36,7 +35,7 @@ public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 			correctlyPlacedLetters[atPosition] = 
 				(atPosition >= Transaction.Instance.State.TargetWord.Length && newLetter == ' ') ||
 				(atPosition <  Transaction.Instance.State.TargetWord.Length && newLetter == Transaction.Instance.State.TargetWord[atPosition]);
-			
+
 			currentStateOfUserInputMatchesTarget = correctlyPlacedLetters.All(placement => placement);
 		});
 
@@ -52,7 +51,10 @@ public class PhonoBlocksSelector : PhonoBlocksSubscriber {
 			allLettersSelected = false;
 			allLettersDeSelected = Transaction.Instance.State.SelectedUserInputLetters.Trim().Length == 0;
 		});
+
+
 	}
+		
 
 	private string targetWordWithBlanksOnEnd;
 	public string TargetWordWithBlanksForUnusedPositions{

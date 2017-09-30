@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 public class StudentsDataHandler: PhonoBlocksSubscriber
 {
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+	
 		static readonly string DATA_FILE_EXTENSION = ".csv";
 		static readonly string DATA_FILE_DIRECTORY = "data";
 		static readonly string LOG_FILE_DIRECTORY = "logs";
 		public readonly string ASSESSMENT_EXTENSION = "_t";
-		public static StudentsDataHandler instance = new StudentsDataHandler ();
+
 		static string templateForExperimentWideParams = "[0,0]";
 		const string experimentWideParamStart = "[";
 		const string experimentWideParamEnd = "]";
@@ -27,55 +27,72 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 		const int asciiFor0 = 48;
 		DateTime assessmentStartTime; 
 
-		public void Start(){
-			assessmentStartTime = DateTime.Now;
+
+	public override void SubscribeToAll(PhonoBlocksScene nextScene){
+		
+		if(nextScene == PhonoBlocksScene.MainMenu){
 			Transaction.Instance.StudentNameEntered.Subscribe(this,(string name) => {
-					string nameEntered = name.Trim ().ToLower ();
-					if (nameEntered.Length > 0) {
-					        
-						nameEntered = CreateNewFileIfNeeded (nameEntered);
+				string nameEntered = name.Trim ().ToLower ();
+				if (nameEntered.Length > 0) {
 
-						bool wasStoredDataForName = LoadStudentData (nameEntered);
+					nameEntered = CreateNewFileIfNeeded (nameEntered);
 
-						if (wasStoredDataForName) {
-							Transaction.Instance.StudentDataRetrieved.Fire ();
+					bool wasStoredDataForName = LoadStudentData (nameEntered);
 
-						} else {
-							Debug.Log ("No data recorded for this student");
+					if (wasStoredDataForName) {
+						Transaction.Instance.StudentDataRetrieved.Fire ();
 
-						}
+					} else {
+						Debug.Log ("No data recorded for this student");
+
 					}
+				}
 			});
 
 			Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
-					UpdateUsersSession (session);
+				if(Transaction.Instance.State.Mode != Mode.STUDENT) return;
+				UpdateUsersSession (session);
 			});
+		}
+
+		if(nextScene == PhonoBlocksScene.Activity){
+			if(Transaction.Instance.State.Mode != Mode.STUDENT) return;
 			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
-					LogEvent ("change_letter", newLetter + "", atPosition + "");
+				LogEvent ("change_letter", newLetter + "", atPosition + "");
 			});
 			Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
-					RecordActivityTargetWord (problem.targetWord);
+				RecordActivityTargetWord (problem.targetWord);
 			});
 			Transaction.Instance.HintProvided.Subscribe(this,() => {
-					LogEvent ("requested_hint", $"{Transaction.Instance.State.CurrentHintNumber}", "NA");
+				LogEvent ("requested_hint", $"{Transaction.Instance.State.CurrentHintNumber}", "NA");
 			});
 			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,() => {
-			LogEvent ("submitted_answer", Transaction.Instance.State.UserInputLetters, Transaction.Instance.State.TargetWord);
+				LogEvent ("submitted_answer", Transaction.Instance.State.UserInputLetters, Transaction.Instance.State.TargetWord);
 			});
 			Transaction.Instance.CurrentProblemCompleted.Subscribe(this,() => {
 
-					RecordActivitySolved (
-				Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget, 
-				Transaction.Instance.State.UserInputLetters, 
-				Transaction.Instance.Selector.SolvedOnFirstTry);
+				RecordActivitySolved (
+					Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget, 
+					Transaction.Instance.State.UserInputLetters, 
+					Transaction.Instance.Selector.SolvedOnFirstTry);
 
-			SaveActivityDataAndClearForNext (Transaction.Instance.State.TargetWord, Transaction.Instance.State.PlaceHolderLetters);
+				SaveActivityDataAndClearForNext (Transaction.Instance.State.TargetWord, Transaction.Instance.State.PlaceHolderLetters);
 
 			});
-			
+
 
 			Transaction.Instance.SessionCompleted.Subscribe(this, UpdateUserSessionAndWriteAllUpdatedDataToPlayerPrefs);
 
+
+		}
+
+	}
+
+
+
+		public void Start(){
+			assessmentStartTime = DateTime.Now;
+	
 		}
 
 

@@ -5,17 +5,19 @@ using Extensions;
 using System.Text.RegularExpressions;
 public class HintController : PhonoBlocksSubscriber
 {
-	public override void SubscribeToAll(PhonoBlocksScene scene){}
+	public override void SubscribeToAll(PhonoBlocksScene scene){
+		if(scene != PhonoBlocksScene.Activity) return;
+		if(Transaction.Instance.State.Mode != Mode.STUDENT) return;
+
+		Transaction.Instance.HintRequested.Subscribe(this, ProvideHint);
 
 
-		public void Start ()
-		{
-			Transaction.Instance.HintRequested.Subscribe(this, ProvideHint);
-		}
+	}
+		
 
 
 		public void ProvideHint ()
-		{      
+	{      
 			if (Transaction.Instance.State.CurrentHintNumber >= Parameters.Hints.NUM_HINTS)
 				return;
 
@@ -38,7 +40,8 @@ public class HintController : PhonoBlocksSubscriber
 						for (int letterIndex=0; letterIndex < Parameters.UI.ONSCREEN_LETTER_SPACES; letterIndex++) {
 							ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (
 								letterIndex, 
-								Transaction.Instance.Selector.TargetWordWithBlanksForUnusedPositions [letterIndex]);
+								Transaction.Instance.Selector.TargetWordWithBlanksForUnusedPositions [letterIndex],
+								LetterImageTable.instance.GetLetterImageFromLetter);
 							Colorer.ChangeDisplayColourOfASingleLetter (letterIndex, Transaction.Instance.State.TargetWordColors [letterIndex]);
 						}
 						Transaction.Instance.StudentModeForceCorrectLetterPlacementEntered.Fire ();
@@ -69,7 +72,7 @@ public class HintController : PhonoBlocksSubscriber
 				Match targetSyllable = Transaction.Instance.State.TargetWordSyllables[syllableIndex];
 				for(int i=0;i<targetSyllable.Value.Length;i++){
 					int indexOfLetterInTargetWord = targetSyllable.Index+i;
-					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (indexOfLetterInTargetWord, targetSyllable.Value[i]);
+					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (indexOfLetterInTargetWord, targetSyllable.Value[i], LetterImageTable.instance.GetLetterImageFromLetter);
 					Colorer.ChangeDisplayColourOfASingleLetter (indexOfLetterInTargetWord, Transaction.Instance.State.TargetWordColors[indexOfLetterInTargetWord]);
 				}
 				//todo, when record the syllables- put them here
@@ -81,7 +84,8 @@ public class HintController : PhonoBlocksSubscriber
 		}
 		Transaction.Instance.UIInputUnLocked.Fire ();
 		ArduinoLetterController.instance.PlaceWordInLetterGrid (
-			Transaction.Instance.State.UserInputLetters.Union(Transaction.Instance.State.PlaceHolderLetters)
+			Transaction.Instance.State.UserInputLetters.Union(Transaction.Instance.State.PlaceHolderLetters),
+			LetterImageTable.instance.GetLetterImageFromLetter
 		);
 		Transaction.Instance.State.UILetters.ForEach(UILetter=>UILetter.RevertToInputDerivedColor ()); 
 
@@ -98,7 +102,7 @@ public class HintController : PhonoBlocksSubscriber
 					else {
 						string targetWord = Transaction.Instance.State.TargetWord;
 
-						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, targetWord[letterindex]);
+				ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (letterindex, targetWord[letterindex], LetterImageTable.instance.GetLetterImageFromLetter);
 						Colorer.ChangeDisplayColourOfASingleLetter (letterindex, Transaction.Instance.State.TargetWordColors[letterindex]);
 						string pathTo = $"audio/sounded_out_words/{targetWord}/{targetWord[letterindex]}";
 						AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
@@ -108,7 +112,8 @@ public class HintController : PhonoBlocksSubscriber
 				}
 				Transaction.Instance.UIInputUnLocked.Fire ();
 				ArduinoLetterController.instance.PlaceWordInLetterGrid (
-						Transaction.Instance.State.UserInputLetters.Union(Transaction.Instance.State.PlaceHolderLetters)
+					Transaction.Instance.State.UserInputLetters.Union(Transaction.Instance.State.PlaceHolderLetters),
+						LetterImageTable.instance.GetLetterImageFromLetter
 				);
 				Transaction.Instance.State.UILetters.ForEach(UILetter=>UILetter.RevertToInputDerivedColor ()); 
 			}

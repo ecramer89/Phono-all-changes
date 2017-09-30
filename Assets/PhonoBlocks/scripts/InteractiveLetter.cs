@@ -4,7 +4,7 @@ using System;
 
 
 public class InteractiveLetter : PhonoBlocksSubscriber{
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+	
 		int position; //position of this letter in the on screen word.
 		public int Position{
 			get {
@@ -188,6 +188,7 @@ public class InteractiveLetter : PhonoBlocksSubscriber{
 			//restore default color
 			UpdateDisplayColour (colorFromInput);
 			flashCounter = 0;
+			ResetFlashParameters();
 		}
 		
 		public void UpdateDisplayColour (Color c)
@@ -236,7 +237,7 @@ public class InteractiveLetter : PhonoBlocksSubscriber{
 
 		public void UpdateLetterImage (Texture2D img)
 	{
-		Debug.Log(gameObject);
+
 				texture.mainTexture = img;
 
 		}
@@ -250,15 +251,20 @@ public class InteractiveLetter : PhonoBlocksSubscriber{
 
 		}
 		
-		public void Start(){
-		Debug.Log($"instance id of iletter on start: {GetInstanceID()}");
-			Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
-				if(ReferenceEquals(this, letter)) ToggleSelectHighlight(false);
-			});
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+
+		if(forScene != PhonoBlocksScene.Activity) return;
+
+		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
+			if(ReferenceEquals(this, letter)) ToggleSelectHighlight(false);
+		});
 		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
-				if(ReferenceEquals(this, letter)) ToggleSelectHighlight(true);
-			});
-		}
+			if(ReferenceEquals(this, letter)) ToggleSelectHighlight(true);
+		});
+	}
+
+
+
 		
 		public void Update ()
 	{

@@ -70,11 +70,11 @@ public class LetterImageTable : MonoBehaviour
 
 		if (letter == '_')
 			return without_line_blank;
-		return getBlankLetterImage ();
+		return GetBlankLetterImage ();
 
 	}
 
-		public Texture2D getBlankLetterImage ()
+	public Texture2D GetBlankLetterImage (char letter=' ')
 		{
 				return LETTER_IMAGES [BLANK_IDX];
 		}

@@ -6,15 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(UIButtonMessage))]
 public class CheckWordButton : PhonoBlocksSubscriber {
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-
-
-	void Start(){
-		UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
-		messenger.target = gameObject;
-		messenger.functionName = "CheckWord";
-		messenger.trigger = UIButtonMessage.Trigger.OnClick;
-
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		if(forScene == PhonoBlocksScene.MainMenu) return;
 		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
 			gameObject.SetActive(true);
 		});
@@ -26,9 +19,18 @@ public class CheckWordButton : PhonoBlocksSubscriber {
 			gameObject.SetActive(false);
 		});
 		Transaction.Instance.UIInputUnLocked.Subscribe(this,() => {
-			Debug.Log("ui input unlocked handler for checked word button fired");
 			gameObject.SetActive(true);
 		});
+	}
+
+
+	void Start(){
+		UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
+		messenger.target = gameObject;
+		messenger.functionName = "CheckWord";
+		messenger.trigger = UIButtonMessage.Trigger.OnClick;
+
+	
 	}
 
 	void CheckWord(){

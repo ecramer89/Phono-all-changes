@@ -1,11 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using System;
 public abstract class PhonoBlocksSubscriber : MonoBehaviour {
 
+
+	[SerializeField] int priority;
+	public int Priority{
+		get {
+			return priority;
+		}
+	}
 	public abstract void SubscribeToAll(PhonoBlocksScene scene);
 
 
-	//implement on destroy. unsubscribe. 
-	//but from what?
-	//from all the events that we carre about... oi.
+
 }

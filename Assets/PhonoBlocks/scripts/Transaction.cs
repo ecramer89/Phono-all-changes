@@ -82,24 +82,33 @@ public class Transaction: MonoBehaviour  {
 			}
 
 		}
-
 		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
 
-			//subscribe the selector and the and the state first.
-			PhonoBlocksScene currentScene = scene.name == PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
 
-			if(currentScene == PhonoBlocksScene.MainMenu){
-				state.SubscribeToEvents();
-				selector.SubscribeToEvents();
+			foreach(PhonoBlocksEvent evt in phonoblocksEvents){
+				evt.ClearSubscribers();
 			}
 
+		
+			PhonoBlocksScene currentScene = scene.name == PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
+
 			PhonoBlocksSubscriber[] subscribersInScene = FindObjectsOfType(typeof(PhonoBlocksSubscriber)) as PhonoBlocksSubscriber[];
+			Array.Sort(subscribersInScene, //sort ascending by priorty (higher value => higher priority) so that we subscribe the state and selector first.
+				(PhonoBlocksSubscriber left, PhonoBlocksSubscriber right)=>right.Priority-left.Priority);
+
+		
 			if(subscribersInScene == null) return;  //check safety of cast
 			foreach(PhonoBlocksSubscriber subscriber in subscribersInScene){
-				//check whether the subscriber is the state or selector and skip
-				//or give subscribers concept of priority which defaults to 0 if not specified
-				//andsort by priority
+
 				subscriber.SubscribeToAll(currentScene); 
+				Debug.Log($"Subscriber: {subscriber.GetType()}");
+			}
+
+
+
+		
+			if(currentScene == PhonoBlocksScene.Activity){
+				ActivitySceneLoaded.Fire();
 			}
 
 
@@ -111,16 +120,6 @@ public class Transaction: MonoBehaviour  {
 		events.Enqueue(evt);
 
 	}
-
-	public void ReturnToMainMenu(){
-		foreach(PhonoBlocksEvent evt in phonoblocksEvents){
-			evt.ClearSubscribers();
-		}
-
-		SceneManager.LoadScene("MainMenu");
-
-	}
-
 
 
 
@@ -135,8 +134,17 @@ public class Transaction: MonoBehaviour  {
 		}
 
 		if(events.Count > 0){
-			dispatch = events.Dequeue().Subscribers();
+			dispatch = events.Dequeue().SubscriptionHandlers();
 		}
+
+	}
+
+	public void Restart(){
+
+		foreach(Permanent permanent in GameObject.FindObjectsOfType(typeof(Permanent)) as Permanent[]){
+			Destroy(permanent);
+		}
+		SceneManager.LoadScene(PhonoBlocksScene.MainMenu.ToString());
 
 	}
 

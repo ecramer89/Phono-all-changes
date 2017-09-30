@@ -6,114 +6,119 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using System.Linq;
 public class PhonoBlocksState : PhonoBlocksSubscriber {
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-	public void SubscribeToEvents(){
+	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
+		if(nextToLoad == PhonoBlocksScene.MainMenu){
 
-		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
-			previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-			selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-		});
+			Transaction.Instance.InputTypeSelected.Subscribe(this,
+				(InputType type) => {
+					inputType = type;
+				}
+			);
 
-		Transaction.Instance.InputTypeSelected.Subscribe(this,
-			(InputType type) => {
-				inputType = type;
-			}
-		);
+			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
+				this.activity = activity;
+				if(activity == Activity.SYLLABLE_DIVISION){
+					syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+				}
+			});
 
-		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
-			this.activity = activity;
-			if(activity == Activity.SYLLABLE_DIVISION){
+			Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
+				this.mode = mode;
+			});
+
+			Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
+				this.session = session;
+			});
+
+
+		}
+
+		if(nextToLoad == PhonoBlocksScene.Activity){
+			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
+				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+			});
+			Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters) => {
+				this.uILetters = letters;
+			});
+
+			Transaction.Instance.TargetColorsSet.Subscribe(this,(Color[] targetWordColors) => {
+				this.targetWordColors = targetWordColors;
+			});
+
+			Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
+				placeHolderLetters = problem.initialWord;
+				this.targetWord = problem.targetWord;
+				currentProblemInstrutions = problem.instructions;
+				timesAttemptedCurrentProblem = 0;
+				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				currentHintNumber = 0;
+				//only matters in syllable division activity, but may as well reset whenever.
 				syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
-			}
-		});
 
-		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
-			this.mode = mode;
-		});
+			});
 
-		Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
-			this.session = session;
-		});
+			Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(this,() => {
+				timesAttemptedCurrentProblem++;
+			});
 
-		Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters) => {
-			foreach(InteractiveLetter il in letters){
-				Debug.Log($"instance id of iletter on state: {il.GetInstanceID()}");
 
-			}
-			this.uILetters = letters;
-		});
-			
-		Transaction.Instance.TargetColorsSet.Subscribe(this,(Color[] targetWordColors) => {
-			this.targetWordColors = targetWordColors;
-		});
+			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
+		
+				previousUserInputLetters = userInputLetters;
+				userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
 
-		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
-			placeHolderLetters = problem.initialWord;
-			this.targetWord = problem.targetWord;
-			currentProblemInstrutions = problem.instructions;
-			timesAttemptedCurrentProblem = 0;
-			previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-			userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-			selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
-			currentHintNumber = 0;
-			//only matters in syllable division activity, but may as well reset whenever.
-			syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+			});
 
-		});
-	
-		Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(this,() => {
-			timesAttemptedCurrentProblem++;
-		});
-			
-	 
-		Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
-			previousUserInputLetters = userInputLetters;
-			userInputLetters = userInputLetters.ReplaceAt(atPosition, newLetter);
-				
-		});
-	
-		Transaction.Instance.StudentModeMainActivityEntered.Subscribe(this,() => {
-			studentModeState = StudentModeStates.MAIN_ACTIVITY;
-		});
-		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(this,() => {
-			studentModeState = StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT;
-		});
-		Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(this,() => {
-			studentModeState = StudentModeStates.REMOVE_ALL_LETTERS;
-		});
+			Transaction.Instance.StudentModeMainActivityEntered.Subscribe(this,() => {
+				studentModeState = StudentModeStates.MAIN_ACTIVITY;
+			});
+			Transaction.Instance.StudentModeForceCorrectLetterPlacementEntered.Subscribe(this,() => {
+				studentModeState = StudentModeStates.FORCE_CORRECT_LETTER_PLACEMENT;
+			});
+			Transaction.Instance.StudentModeForceRemoveAllLettersEntered.Subscribe(this,() => {
+				studentModeState = StudentModeStates.REMOVE_ALL_LETTERS;
+			});
 
-		Transaction.Instance.UIInputUnLocked.Subscribe(this,() => {
-			uIInputLocked = false;
-		});
-		Transaction.Instance.UIInputLocked.Subscribe(this,() => {
-			uIInputLocked = true;
-		});
-		Transaction.Instance.UserSubmittedIncorrectAnswer.Subscribe(this,() => {
-			this.hintAvailable=this.currentHintNumber < Parameters.Hints.NUM_HINTS;
-		});
-		Transaction.Instance.HintProvided.Subscribe(this,() => {
-			this.hintAvailable = false;
-			this.currentHintNumber++;
-		});
-		Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,() => {
-			syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
-				SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
-		});
-		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
-			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
-				userInputLetters[letter.Position]);
-		});
-		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
-			selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
-				' ');
-		});
-		Transaction.Instance.TargetWordSyllablesSet.Subscribe(this,(List<Match> syllables) => {
-			this.targetWordSyllables = syllables;
+			Transaction.Instance.UIInputUnLocked.Subscribe(this,() => {
+				uIInputLocked = false;
+			});
+			Transaction.Instance.UIInputLocked.Subscribe(this,() => {
+				uIInputLocked = true;
+			});
+			Transaction.Instance.UserSubmittedIncorrectAnswer.Subscribe(this,() => {
+				this.hintAvailable=this.currentHintNumber < Parameters.Hints.NUM_HINTS;
+			});
+			Transaction.Instance.HintProvided.Subscribe(this,() => {
+				this.hintAvailable = false;
+				this.currentHintNumber++;
+			});
+			Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,() => {
+				syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
+					SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
+			});
+			Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
+				selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
+					userInputLetters[letter.Position]);
+			});
+			Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
+				selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
+					' ');
+			});
+			Transaction.Instance.TargetWordSyllablesSet.Subscribe(this,(List<Match> syllables) => {
+				this.targetWordSyllables = syllables;
 
-		});
-	
+			});
+
+		}
+
+
 	}
+
+
 
 	private InputType inputType;
 	public InputType InputType{

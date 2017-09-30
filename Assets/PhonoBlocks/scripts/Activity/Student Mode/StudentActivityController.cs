@@ -8,7 +8,7 @@ using System.Linq;
 
 public class StudentActivityController : PhonoBlocksSubscriber
 {
-	public override void SubscribeToAll(PhonoBlocksScene scene){}
+	
 		private static StudentActivityController instance;
 		public static StudentActivityController Instance{
 			get {
@@ -29,56 +29,41 @@ public class StudentActivityController : PhonoBlocksSubscriber
 
 		void Start ()
 		{      instance = this;
-		
-		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
-					
-						if (mode == Mode.STUDENT) {
-							Transaction.Instance.UserEnteredNewLetter.Subscribe(this,HandleNewArduinoLetter);
-							Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,HandleSubmittedAnswer);
-							CacheAudioClips ();
-							SubscribeToEvents();
-						} else {
-							gameObject.SetActive (false);
-						}
-				});				
+
 
 		}
 
 
+	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
+		if(nextToLoad == PhonoBlocksScene.MainMenu) {
+			Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
+				if(mode != Mode.STUDENT) gameObject.SetActive (false);	
+				else CacheAudioClips ();
+			});
+			Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
+				ProblemsRepository.Instance.Initialize (session);
+			});
+		}
 
-	void SubscribeToEvents(){
-		Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
-			ProblemsRepository.Instance.Initialize (session);
-		});
-		Transaction.Instance.ActivitySceneLoaded.Subscribe(this,SetUpNextProblem);
+		if(nextToLoad == PhonoBlocksScene.Activity){
+			Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters)=>SetUpNextProblem());
+			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,HandleNewArduinoLetter);
+			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,HandleSubmittedAnswer);
+		
+		
+			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
+				if(activity == Activity.SYLLABLE_DIVISION){
+					Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem)=>{
+						Transaction.Instance.TargetWordSyllablesSet.Fire(SpellingRuleRegex.Syllabify(problem.targetWord));
+					});
+				}
+			});
+				
+		}
 
-		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
-			if(activity == Activity.SYLLABLE_DIVISION){
-				Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem)=>{
-					Transaction.Instance.TargetWordSyllablesSet.Fire(SpellingRuleRegex.Syllabify(problem.targetWord));
-				});
-			}
-		});
 
-		//placeholder letters have the blank letter outline
-		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
-			for(int i=0;i<problem.initialWord.Length;i++){
-				ArduinoLetterController.instance.ChangeTheImageOfASingleCell(i, LetterImageTable.instance.GetLetterOutlineImageFromLetter(problem.initialWord[i]));
-			}
-		});
-		//if the user removes a letter at a position of a place holder letter,
-		//then restore the dashed letter outline for the placeholder.
-		Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
-			if(newLetter!=' ' || atPosition >= Transaction.Instance.State.PlaceHolderLetters.Length) return;
-			char placeholderLetter = Transaction.Instance.State.PlaceHolderLetters[atPosition];
-			if(placeholderLetter == ' ') return;
-
-			ArduinoLetterController.instance.ChangeTheImageOfASingleCell(
-				atPosition, 
-				LetterImageTable.instance.GetLetterOutlineImageFromLetter(placeholderLetter));
-
-		});
 	}
+		
 
 
 	void CacheAudioClips(){
@@ -112,10 +97,24 @@ public class StudentActivityController : PhonoBlocksSubscriber
 		}
 	}
 
+	//if the user removes a letter at a position of a place holder letter,
+	//then restore the dashed letter outline for the placeholder.
+	void RestorePlaceholderLetterOutlineIfPlaceHolderRemoved(char newLetter, int atPosition){
+		if(newLetter!=' ' || atPosition >= Transaction.Instance.State.PlaceHolderLetters.Length) return;
+		char placeholderLetter = Transaction.Instance.State.PlaceHolderLetters[atPosition];
+		if(placeholderLetter == ' ') return;
+
+		ArduinoLetterController.instance.ChangeTheImageOfASingleCell(
+			atPosition, 
+			LetterImageTable.instance.GetLetterOutlineImageFromLetter(placeholderLetter));
+	}
+
 
 	void MainActivityNewLetterHandler(char letter, int atPosition){
-		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
+		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter, LetterImageTable.instance.GetLetterImageFromLetter);
 		Colorer.Instance.ReColor ();
+		RestorePlaceholderLetterOutlineIfPlaceHolderRemoved(letter, atPosition);
+
 	}
 
 	void ForceCorrectPlacementNewLetterHandler(char letter, int atPosition){
@@ -140,7 +139,7 @@ public class StudentActivityController : PhonoBlocksSubscriber
 		if (letter != ' ') //don't bother updating the letter unless the user removed it
 			return;
 
-		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter);
+		ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, letter, LetterImageTable.instance.GetLetterImageFromLetter);
 		//once the user removes all letters from the current problem; automatically turn off the display image and go to the next activity.
 		if(AllUserControlledLettersAreBlank()){ 
 			HandleEndOfActivity ();
@@ -175,7 +174,7 @@ public class StudentActivityController : PhonoBlocksSubscriber
 		       			
 				Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Fire ();
 		
-		if (Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget) {
+				if (Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget) {
 					HandleCorrectAnswer ();
 				} else {
 					HandleIncorrectAnswer ();				

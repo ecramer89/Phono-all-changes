@@ -7,7 +7,7 @@ using System.Linq;
 using Extensions;
 	
 public class Colorer : PhonoBlocksSubscriber   {
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+	
 	private static Colorer instance;
 	public static Colorer Instance{
 		get {
@@ -28,35 +28,36 @@ public class Colorer : PhonoBlocksSubscriber   {
 
 	static RuleBasedColorer ruleBasedColorer; 
 
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		if(forScene == PhonoBlocksScene.MainMenu){
+			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
+				InitializeRuleBasedColorer();
+			});
 
+		}
+
+		if(forScene == PhonoBlocksScene.Activity){
+			
+			Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,ReColor);
+
+
+			Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
+
+				TurnAllLettersOff();
+
+				Transaction.Instance.TargetColorsSet.Fire(
+					ruleBasedColorer.GetColorsOf(
+						new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
+						//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite
+						//indieces that correspond to those of target word.
+						problem.targetWord
+					));
+			});
+
+		}
+	}
 	public void Start(){
 		instance = this;
-
-		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
-			InitializeRuleBasedColorer();
-		});
-
-
-		Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters) => {
-			RegisterLettersToColorer(letters);
-		});
-
-
-		Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
-			
-			TurnAllLettersOff();
-
-			Transaction.Instance.TargetColorsSet.Fire(
-				ruleBasedColorer.GetColorsOf(
-					new Color[Parameters.UI.ONSCREEN_LETTER_SPACES], //note that the target colors array includes the 
-					//"off" color for positions that aren't occupied by the target word. the different rule based colorers only overwrite
-					//indieces that correspond to those of target word.
-					problem.targetWord
-				));
-		});
-			
-
-		Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,ReColor);
 	}
 
 	static Action InitializeRuleBasedColorer = () => {
@@ -103,25 +104,10 @@ public class Colorer : PhonoBlocksSubscriber   {
 	};
 		
 
-	static event Action ResetAllInteractiveLetterFlashConfigurations = () => {};
-	static event Action StartAllInteractiveLetterFlashes = ()=>{};
-
-	//subscribe each interactive letter to the colorer's batch events,
-	//which tell each interactive letter to start the flash routine/clear out old flash configuration.
-	//enables us to start and clear flashes of all letters simultaneously.
-	static void RegisterLettersToColorer(List<InteractiveLetter> letters){
-		Transaction.Instance.State.UILetters.ForEach (UILetter => {
-			StartAllInteractiveLetterFlashes += UILetter.StartFlash;
-			ResetAllInteractiveLetterFlashConfigurations += UILetter.ResetFlashParameters;
-		});
-	}
-
-
 	public void ReColor (){
 		string updatedUserInputLetters = Transaction.Instance.State.UserInputLetters;
 		string previousUserInputLetters = Transaction.Instance.State.PreviousUserInputLetters;
-
-		ResetAllInteractiveLetterFlashConfigurations ();
+	
 	
 		ReapplyDefaultOrOff (
 			updatedUserInputLetters
@@ -149,10 +135,14 @@ public class Colorer : PhonoBlocksSubscriber   {
 				targetWord
 			);
 		}
-			
-		StartAllInteractiveLetterFlashes ();
 
-	
+		StartAllLetterFlashes();
+	}
+
+	static void StartAllLetterFlashes(){
+		foreach(InteractiveLetter letter in Transaction.Instance.State.UILetters){
+			letter.StartFlash();
+		}
 	}
 
 	public static void ChangeDisplayColourOfASingleLetter(int at, Color newDisplayColor){

@@ -38,7 +38,7 @@ public class LetterGridController : MonoBehaviour
 				if (letterImageTable == null)
 						letterImageTable = GameObject.Find ("DataTables").GetComponent<LetterImageTable> ();
 				if (blankLetter == null)
-						blankLetter = letterImageTable.getBlankLetterImage ();
+						blankLetter = letterImageTable.GetBlankLetterImage ();
 				if (letterImageWidth == 0 || letterImageHeight == 0) //you can specify dimensions for the image that are different from those of the grid.
 						MatchLetterImageToGridCellDimensions (); //but if nothing is specified it defaults to make it the same size as the grid cells.
 

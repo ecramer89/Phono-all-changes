@@ -7,12 +7,9 @@ using UnityEngine;
 [RequireComponent(typeof(UIImageButton))]
 public class ModeSelectionButton : PhonoBlocksSubscriber {
 	[SerializeField] Mode mode;
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
-	void Start(){
-		UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
-		messenger.target = gameObject;
-		messenger.functionName = "SelectMode";
-		messenger.trigger = UIButtonMessage.Trigger.OnClick;
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		if(forScene != PhonoBlocksScene.MainMenu) return;
+
 		//any mode selection button (not just the one that was clicked) needs to deactivate 
 		//when any one of them is clicked.
 		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
@@ -23,7 +20,7 @@ public class ModeSelectionButton : PhonoBlocksSubscriber {
 			} else {
 				//todo this doesn't seem to be working; find out why
 				GetComponent<UIImageButton>().enabled = false; //disable sprite change on hover
-				messenger.enabled=false; //leave the student mode button onscreen but 
+				GetComponent<UIButtonMessage> ().enabled=false; //leave the student mode button onscreen but 
 				//disable its click functionality.
 			}
 		});
@@ -34,6 +31,15 @@ public class ModeSelectionButton : PhonoBlocksSubscriber {
 				gameObject.SetActive(false);
 			}
 		});
+	}
+
+
+	void Start(){
+		UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
+		messenger.target = gameObject;
+		messenger.functionName = "SelectMode";
+		messenger.trigger = UIButtonMessage.Trigger.OnClick;
+
 
 	}
 

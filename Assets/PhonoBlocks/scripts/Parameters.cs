@@ -12,7 +12,13 @@ public class Parameters : PhonoBlocksSubscriber {
 	[SerializeField] InputType inputType;
 
 
-	public override void SubscribeToAll(PhonoBlocksScene forScene){}
+	public override void SubscribeToAll(PhonoBlocksScene forScene){
+		if(forScene == PhonoBlocksScene.MainMenu) {
+			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity obj) => {
+				SceneManager.LoadScene("Activity");
+			});
+		}
+	}
 
 
 	void Start ()
@@ -21,11 +27,7 @@ public class Parameters : PhonoBlocksSubscriber {
 		//expedites retrieval of session data from session index.
 		StudentMode.PROBLEM_SETS.Sort((SessionData x, SessionData y) => x.number - y.number);
 		Transaction.Instance.InputTypeSelected.Fire(inputType);
-		//Transaction.Instance.RecordInputTypeSelected (inputType);
-		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity obj) => {
-			SceneManager.LoadScene("Activity");
-			Transaction.Instance.ActivitySceneLoaded.Fire();
-		});
+
 
 
 	}
