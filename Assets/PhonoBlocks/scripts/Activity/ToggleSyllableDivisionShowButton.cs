@@ -30,8 +30,10 @@ public class ToggleSyllableDivisionShowButton : PhonoBlocksSubscriber {
 
 		if (Transaction.Instance.State.UIInputLocked)
 			return;
-		Transaction.Instance.SyllableDivisionShowStateToggled.Fire ();
 
-
+		SyllableDivisionShowStates current = Transaction.Instance.State.SyllableDivisionShowState;
+		Transaction.Instance.SyllableDivisionShowStateSet.Fire (
+			current == SyllableDivisionShowStates.SHOW_DIVISION ?
+			SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION);
 	}
 }

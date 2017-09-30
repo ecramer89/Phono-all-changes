@@ -51,8 +51,8 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 				if(Transaction.Instance.Selector.AllLettersSelected 
 				&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
 				
-					Debug.Log("fiding syllable show state togle");
-					Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
+
+					Transaction.Instance.SyllableDivisionShowStateSet.Fire(SyllableDivisionShowStates.SHOW_DIVISION);
 			}
 		});
 
@@ -60,10 +60,10 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
 				letter.ToggleSelectHighlight(false);
 
-				Debug.Log("all letters deselected: "+Transaction.Instance.Selector.AllLettersDeSelected);
+			
 			if(Transaction.Instance.Selector.AllLettersDeSelected &&
 				Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
-				Transaction.Instance.SyllableDivisionShowStateToggled.Fire();
+					Transaction.Instance.SyllableDivisionShowStateSet.Fire(SyllableDivisionShowStates.SHOW_WHOLE_WORD);
 			}
 		});
 

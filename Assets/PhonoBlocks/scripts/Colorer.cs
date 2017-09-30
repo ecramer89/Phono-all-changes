@@ -38,7 +38,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 
 		if(forScene == PhonoBlocksScene.Activity){
 			
-			Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,ReColor);
+			Transaction.Instance.SyllableDivisionShowStateSet.Subscribe(this,(SyllableDivisionShowStates state) =>ReColor());
 
 
 			Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {

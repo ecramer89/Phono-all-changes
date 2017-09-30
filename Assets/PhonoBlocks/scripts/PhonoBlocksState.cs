@@ -95,10 +95,10 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				this.hintAvailable = false;
 				this.currentHintNumber++;
 			});
-			Transaction.Instance.SyllableDivisionShowStateToggled.Subscribe(this,() => {
-				syllableDivisionShowState = syllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION ?
-					SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION;
+			Transaction.Instance.SyllableDivisionShowStateSet.Subscribe(this,(SyllableDivisionShowStates newState) => {
+				syllableDivisionShowState = newState;
 			});
+		
 			Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
 				selectedUserInputLetters = selectedUserInputLetters.ReplaceAt(letter.Position,
 					userInputLetters[letter.Position]);
