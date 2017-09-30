@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PhonoBlocksState), typeof(PhonoBlocksSelector))]
 public class Transaction: MonoBehaviour  {
-
+	[SerializeField] GameObject destroyOnReturnToMainMenu;
 	private IEnumerator<Action> dispatch; //list of event handler actions for the current event
 	private Queue<PhonoBlocksEvent> events=new Queue<PhonoBlocksEvent>(); //queue of events that are waiting to be dispatched
 
@@ -71,6 +71,7 @@ public class Transaction: MonoBehaviour  {
 
 
 	public void Awake(){
+
 		instance = this;
 		state = GetComponent<PhonoBlocksState>();
 		selector =GetComponent<PhonoBlocksSelector>();
@@ -82,37 +83,37 @@ public class Transaction: MonoBehaviour  {
 			}
 
 		}
-		SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) => {
+		SceneManager.sceneLoaded += TellSubscribersToRegisterToEvents;
+	}
+
+	void TellSubscribersToRegisterToEvents(Scene scene, LoadSceneMode mode){
+		foreach(PhonoBlocksEvent evt in phonoblocksEvents){
+			evt.ClearSubscribers();
+
+		}
 
 
-			foreach(PhonoBlocksEvent evt in phonoblocksEvents){
-				evt.ClearSubscribers();
-			}
+		PhonoBlocksScene currentScene = scene.name == PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
 
-		
-			PhonoBlocksScene currentScene = scene.name == PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
+		PhonoBlocksSubscriber[] subscribersInScene = FindObjectsOfType(typeof(PhonoBlocksSubscriber)) as PhonoBlocksSubscriber[];
+		Array.Sort(subscribersInScene, //sort ascending by priorty (higher value => higher priority) so that we subscribe the state and selector first.
+			(PhonoBlocksSubscriber left, PhonoBlocksSubscriber right)=>right.Priority-left.Priority);
 
-			PhonoBlocksSubscriber[] subscribersInScene = FindObjectsOfType(typeof(PhonoBlocksSubscriber)) as PhonoBlocksSubscriber[];
-			Array.Sort(subscribersInScene, //sort ascending by priorty (higher value => higher priority) so that we subscribe the state and selector first.
-				(PhonoBlocksSubscriber left, PhonoBlocksSubscriber right)=>right.Priority-left.Priority);
 
-		
-			if(subscribersInScene == null) return;  //check safety of cast
-			foreach(PhonoBlocksSubscriber subscriber in subscribersInScene){
+		if(subscribersInScene == null) return;  //check safety of cast
+		foreach(PhonoBlocksSubscriber subscriber in subscribersInScene){
 
-				subscriber.SubscribeToAll(currentScene); 
-				Debug.Log($"Subscriber: {subscriber.GetType()}");
-			}
+			subscriber.SubscribeToAll(currentScene); 
+			Debug.Log($"Subscriber: {subscriber.GetType()}");
+		}
 
 
 
-		
-			if(currentScene == PhonoBlocksScene.Activity){
-				ActivitySceneLoaded.Fire();
-			}
 
+		if(currentScene == PhonoBlocksScene.Activity){
+			ActivitySceneLoaded.Fire();
+		}
 
-		};
 	}
 
 
@@ -140,10 +141,13 @@ public class Transaction: MonoBehaviour  {
 	}
 
 	public void Restart(){
-
-		foreach(Permanent permanent in GameObject.FindObjectsOfType(typeof(Permanent)) as Permanent[]){
-			Destroy(permanent);
+		
+		foreach(PhonoBlocksEvent evt in phonoblocksEvents){
+			evt.ClearSubscribers();
 		}
+		SceneManager.sceneLoaded-=TellSubscribersToRegisterToEvents;
+		Destroy(destroyOnReturnToMainMenu);
+		
 		SceneManager.LoadScene(PhonoBlocksScene.MainMenu.ToString());
 
 	}
