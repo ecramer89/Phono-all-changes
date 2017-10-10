@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PhonoBlocksState), typeof(PhonoBlocksSelector))]
 public class Transaction: MonoBehaviour  {
-	[SerializeField] GameObject destroyOnReturnToMainMenu;
+	[SerializeField] GameObject destroyOnReturnToMainMenu; //Game objects that persist between main menu and activity and which need to be explicitly destroyed before returning to the main menu
 	private IEnumerator<Action> dispatch; //list of event handler actions for the current event
 	private Queue<PhonoBlocksEvent> events=new Queue<PhonoBlocksEvent>(); //queue of events that are waiting to be dispatched
 

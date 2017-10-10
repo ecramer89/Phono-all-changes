@@ -116,7 +116,7 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		{   		InteractiveLetter letter = GetInteractiveLetterAt(atPosition);
 					ChangeTheImageOfASingleCell(atPosition, imageGetter(newLetter[0]));
 					if(newLetter==" ") { //deselect letters that the user removes
-						Transaction.Instance.InteractiveLetterDeselected.Fire(letter);
+						//Transaction.Instance.InteractiveLetterDeselected.Fire(letter);
 					}
 		}
 
