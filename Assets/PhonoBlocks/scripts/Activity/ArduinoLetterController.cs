@@ -60,6 +60,12 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		Transaction.Instance.InteractiveLetterDeselected.Subscribe(this,(InteractiveLetter letter) => {
 				letter.ToggleSelectHighlight(false);
 
+				if(Transaction.Instance.State.UserInputLetters[letter.Position] == ' ') return;
+				//letters cna't be selected if they are blank and 
+				//automatically de select letters when they are removed.
+				//however, since possible to enter show syll. state via button press
+				//don't want to switch back to whole syllable mode in case
+				//select+remove some letter.
 			
 			if(Transaction.Instance.Selector.AllLettersDeSelected &&
 				Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
