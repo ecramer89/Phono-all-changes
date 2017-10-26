@@ -49,16 +49,6 @@ public class StudentActivityController : PhonoBlocksSubscriber
 			Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters)=>SetUpNextProblem());
 			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,HandleNewArduinoLetter);
 			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,HandleSubmittedAnswer);
-		
-		
-			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
-				if(activity == Activity.SYLLABLE_DIVISION){
-					Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem)=>{
-						Transaction.Instance.TargetWordSyllablesSet.Fire(SpellingRuleRegex.Syllabify(problem.targetWord));
-					});
-				}
-			});
-				
 		}
 
 
@@ -147,11 +137,16 @@ public class StudentActivityController : PhonoBlocksSubscriber
 	}
 		
 	 void SetUpNextProblem ()
-		{       ProblemData next = ProblemsRepository.Instance.GetNextProblem ();
-				Transaction.Instance.NewProblemBegun.Fire (next);
-			
+	{       ProblemData nextProblem = ProblemsRepository.Instance.GetNextProblem ();
+				Transaction.Instance.NewProblemBegun.Fire (nextProblem);
 				Transaction.Instance.StudentModeMainActivityEntered.Fire ();
-				AudioSourceController.PushClips (next.instructions);
+	
+			if(Transaction.Instance.State.Activity == Activity.SYLLABLE_DIVISION){
+					Transaction.Instance.TargetWordSyllablesSet.Fire(
+						SpellingRuleRegex.Syllabify(nextProblem.targetWord));
+				}
+
+				AudioSourceController.PushClips (nextProblem.instructions);
 
 		}
 
