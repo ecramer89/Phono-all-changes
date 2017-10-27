@@ -169,7 +169,7 @@ public static class SpellingRuleRegex  {
 		}
 	}
 		
-	static string consonantLeSyllable = $"({anyConsonant})le";
+	static string consonantLeSyllable = $"({anyConsonant})le$";
 
 
 	static string rControlledVowelSyllable=$"{acceptableInitialConsonant}?{rControlledVowel}e?";
@@ -209,9 +209,8 @@ public static class SpellingRuleRegex  {
 	//this way the colorers can use the match indices to determine which range of UI letters to color.
 	static string ExtractAll(Regex rule,String word, List<Match> results){
 		while(true){
-			MatchCollection mathes = rule.Matches(word);
-			if(mathes.Count == 0) return word;
-			Match next = mathes.Longest();
+			Match next = rule.Match(word);
+			if(!next.Success) return word;
 			results.Add(next);
 			word = word.ReplaceRangeWith(' ', next.Index, next.Length);
 		}
