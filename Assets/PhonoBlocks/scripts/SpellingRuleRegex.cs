@@ -184,18 +184,6 @@ public static class SpellingRuleRegex  {
 	static Regex[] closedAndOpenSyllables = new Regex[]{ClosedSyllable,OpenSyllable};
 
 
-	static Func<int,Match,bool> IsPartOfValidUnit = (int index, Match inMatch) => {
-		Match validUnit = index <= inMatch.Index ? anyInitialUnitRegex.Match(inMatch.Value) : anyFinalUnitRegex.Match(inMatch.Value);
-		return (Range.Includes(validUnit.Index, validUnit.Index+validUnit.Length, index-inMatch.Index));
-	};		
-	static Func<Match, Match, int, bool> unitsKeepTogetherLongerBeatShorter = (Match contender, Match currentWinner, int overlapAt) => {
-		//if they're arguing over an index where
-		//for one of the contenders, it's part of a valid multi letter unit,
-		//then that contender wins.
-		//otherwise, pick the longer one.
-		return IsPartOfValidUnit(overlapAt, contender) ? true :  IsPartOfValidUnit(overlapAt, currentWinner) ? false : contender.Length > currentWinner.Length;
-	};
-
 	/*
      * order is important. needs to find stable syllables first, then magic e, then closed, then open.
      * any letters that aren't included in syllables (e.g. randomly interjected consonants) won't be included
