@@ -2,6 +2,7 @@
 using System;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 
@@ -21,6 +22,8 @@ public static class _String{
 		return res.ToString();
 	}
 }
+
+
 		
 
 	public static class Range{
@@ -47,6 +50,15 @@ public static class _String{
 
 
 	public static class PhonoBlocksExtensions {
+
+
+		public static Match Longest(this MatchCollection matches){
+			Match max = null;
+			foreach(Match m in matches){
+				if(max == null || max.Length < m.Length) max = m;
+			}
+			return max;
+		}
 
 		//returns a new string representing the union of this and other.
 		//return string is as long as the longer of this and other

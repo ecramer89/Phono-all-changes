@@ -61,10 +61,11 @@ public static class SpellingRuleRegex  {
 
 	//can only appear at the beginning of a syllable
 	static string[] consonantBlendsInitial = new string[]{
-		"sp", "sl", "spr", "scr", "spl", "squ", "shr", "bl", "gl", "pl", "cl", "fl", "cr", "tr", "dr"
+		"sl", "spr", "scr", "spl", "squ", "shr", 
+		"bl", "gl", "pl", "cl", "fl", "cr", "tr", "dr"
 	};
 
-	static string[] consonantBlendsEither = new string[]{"sh", "sk", "st", "ll"};
+	static string[] consonantBlendsEither = new string[]{"sh", "sp", "sk", "st", "ll"};
 
 	//those defined within initial literal can appear in either position within a syllable.
 	//contenate to initial and final blends for all blends.
@@ -171,7 +172,7 @@ public static class SpellingRuleRegex  {
 	static string consonantLeSyllable = $"({anyConsonant})le";
 
 
-	static string rControlledVowelSyllable=$"{acceptableInitialConsonant}?{rControlledVowel}";
+	static string rControlledVowelSyllable=$"{acceptableInitialConsonant}?{rControlledVowel}e?";
 	static string vowelYSyllable=$"({acceptableInitialConsonant})y";
 
 	static string[] stableSyllables = new string[]{
@@ -207,7 +208,8 @@ public static class SpellingRuleRegex  {
 		List<Match> syllables = new List<Match>();
 		word = ExtractAll(stableSyllableRegex,word,syllables); 
 		word = ExtractAll(MagicERegex, word, syllables);
-		word = ExtractAll(closedAndOpenSyllables, word, syllables, unitsKeepTogetherLongerBeatShorter);
+		word = ExtractAll(ClosedSyllable, word, syllables);
+		word = ExtractAll(OpenSyllable, word, syllables);
 		syllables.Sort((Match x, Match y) => x.Index - y.Index);
 		return syllables;
 	}
@@ -219,45 +221,14 @@ public static class SpellingRuleRegex  {
 	//this way the colorers can use the match indices to determine which range of UI letters to color.
 	static string ExtractAll(Regex rule,String word, List<Match> results){
 		while(true){
-			Match next = rule.Match(word);
-			if(!next.Success) return word;
+			MatchCollection mathes = rule.Matches(word);
+			if(mathes.Count == 0) return word;
+			Match next = mathes.Longest();
 			results.Add(next);
 			word = word.ReplaceRangeWith(' ', next.Index, next.Length);
 		}
 		return word;
 	}
-
-
-	/*
-	 * decider: should return true if the left hand match would be chosen over the right hand match and false
-	 * if the right hand match would return true over the left hand match. Cannot choose both. 
-	 * 
-	 * */
-
-	static string ExtractAll(Regex[] rules, String word, List<Match> results, Func<Match,Match,int,bool> leftWins){
-		while(true){
-			var matches = rules.Select((Regex rule)=>rule.Match(word)).Where(match=>match.Success);
-			if(matches.Count()==0) return word;
-			for(int i=0;i<word.Length;i++){
-				if(matches.Count() == 0) return word;
-				if(word[i]==' ') continue;
-				var contenders = matches.Where(match=>Range.Includes(match.Index, match.Index+match.Length, i));
-				if(contenders.Count() == 0) continue;
-					Match winner=null;
-					foreach(Match contender in contenders){
-					if(winner == null || 
-						leftWins(contender, winner, 
-							Range.IndexOfOverlap(contender.Index, contender.Index + contender.Length, winner.Index, winner.Index+winner.Length))) 
-						winner = contender;
-					}
-					results.Add(winner);
-					word=word.ReplaceRangeWith(' ',winner.Index, winner.Length);
-					matches=matches.Except(contenders);
-			}
-		}
-		return word;
-	}
-
 
 	static string MatchAnyOf(string[] patterns){
 		return patterns.Aggregate((acc, nxt)=>$"{acc}|{nxt}");
@@ -267,6 +238,7 @@ public static class SpellingRuleRegex  {
 	static Regex Make(string pattern){
 		return new Regex (pattern, RegexOptions.IgnoreCase);
 	}
+		
 		
 
 	public static void Test(){

@@ -94,7 +94,8 @@ public class Transaction: MonoBehaviour  {
 		}
 
 
-		PhonoBlocksScene currentScene = scene.name == PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
+		PhonoBlocksScene currentScene = scene.name == 
+			PhonoBlocksScene.MainMenu.ToString() ? PhonoBlocksScene.MainMenu : PhonoBlocksScene.Activity;
 
 		PhonoBlocksSubscriber[] subscribersInScene = FindObjectsOfType(typeof(PhonoBlocksSubscriber)) as PhonoBlocksSubscriber[];
 		Array.Sort(subscribersInScene, //sort ascending by priorty (higher value => higher priority) so that we subscribe the state and selector first.
@@ -107,8 +108,6 @@ public class Transaction: MonoBehaviour  {
 			subscriber.SubscribeToAll(currentScene); 
 			Debug.Log($"Subscriber: {subscriber.GetType()}");
 		}
-
-
 
 
 		if(currentScene == PhonoBlocksScene.Activity){
@@ -140,13 +139,17 @@ public class Transaction: MonoBehaviour  {
 		}
 
 	}
-
+	//invoked when home button press 
+	//home button activity->main menu 
 	public void Restart(){
 		
 		foreach(PhonoBlocksEvent evt in phonoblocksEvents){
 			evt.ClearSubscribers();
 		}
+
 		SceneManager.sceneLoaded-=TellSubscribersToRegisterToEvents;
+
+
 		Destroy(destroyOnReturnToMainMenu);
 		
 		SceneManager.LoadScene(PhonoBlocksScene.MainMenu.ToString());
