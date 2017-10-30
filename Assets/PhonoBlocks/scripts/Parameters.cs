@@ -78,6 +78,7 @@ public class Parameters : PhonoBlocksSubscriber {
 
 		public static Color DEFAULT_ON_COLOR=Color.white;
 		public static Color DEFAULT_OFF_COLOR=Color.gray;
+		public static Color WHOLE_WORD_COLOR=pink;
 
 		public class OpenClosedVowelColors{
 			public static Color SHORT_VOWEL = yellow;
@@ -119,7 +120,6 @@ public class Parameters : PhonoBlocksSubscriber {
 		}
 
 		public class SyllableDivisionColors{
-			public static Color WHOLE_WORD_COLOR=pink;
 			public static Color DIVIDED_FIRST_SYLLABLE_COLOR=blue;
 			public static Color DIVIDED_SECOND_SYLLABLE_COLOR=green;
 		}

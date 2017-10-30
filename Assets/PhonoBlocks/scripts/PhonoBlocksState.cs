@@ -18,6 +18,8 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				this.activity = activity;
 				if(activity == Activity.SYLLABLE_DIVISION){
 					syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+				} else {
+					syllableDivisionShowState = SyllableDivisionShowStates.SHOW_DIVISION;
 				}
 			});
 

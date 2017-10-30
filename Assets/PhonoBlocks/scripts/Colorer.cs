@@ -113,6 +113,39 @@ public class Colorer : PhonoBlocksSubscriber   {
 			updatedUserInputLetters
 		);
 
+		if(Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+			RecolorUnits(updatedUserInputLetters,previousUserInputLetters);
+		} else {
+			RecolorWholeWord(updatedUserInputLetters,previousUserInputLetters);
+		}
+	
+		StartAllLetterFlashes();
+	}
+
+
+	static void RecolorWholeWord(string updatedUserInputLetters, string previousUserInputLetters){
+		if (Transaction.Instance.State.Mode == Mode.TEACHER) {
+			//otherwise we just color the letters pink, provided they are correctly placed.
+			List<InteractiveLetter> letters = Transaction.Instance.State.UILetters;
+			for(int i=0;i<letters.Count;i++){
+				InteractiveLetter letter = letters[i];
+				letter.UpdateInputDerivedAndDisplayColor(Parameters.Colors.WHOLE_WORD_COLOR);
+			}
+		}else {
+			string targetWord = Transaction.Instance.State.TargetWord;
+			//otherwise we just color the letters pink, provided they are correctly placed.
+			List<InteractiveLetter> letters = Transaction.Instance.State.UILetters.GetRange(0, targetWord.Length);
+			for(int i=0;i<letters.Count;i++){
+				InteractiveLetter letter = letters[i];
+				if(updatedUserInputLetters[i] == targetWord[i]){
+					letter.UpdateInputDerivedAndDisplayColor(Parameters.Colors.WHOLE_WORD_COLOR);
+				}
+			}
+		}
+	}
+
+
+	static void RecolorUnits(string updatedUserInputLetters, string previousUserInputLetters){
 		if (Transaction.Instance.State.Mode == Mode.TEACHER) {
 			ruleBasedColorer.ColorAndConfigureFlashForTeacherMode (
 				updatedUserInputLetters, 
@@ -136,7 +169,6 @@ public class Colorer : PhonoBlocksSubscriber   {
 			);
 		}
 
-		StartAllLetterFlashes();
 	}
 
 	static void StartAllLetterFlashes(){
@@ -722,8 +754,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 			for (int i = 0; i < colors.Length; i++) {
 				if( i < magicE.Index && i >= magicE.Index + magicE.Length) colors [i] = Color.white;
 			}
-
-
+				
 			return colors;
 
 		}
@@ -795,8 +826,10 @@ public class Colorer : PhonoBlocksSubscriber   {
 
 	}
 
+
+
+
 	class SyllableDivisionColorer : RuleBasedColorer{
-		static Color wholeWordColor = Parameters.Colors.SyllableDivisionColors.WHOLE_WORD_COLOR;
 		static Color dividedFirstSyllableColor = Parameters.Colors.SyllableDivisionColors.DIVIDED_FIRST_SYLLABLE_COLOR;
 		static Color dividedSecondSyllableColor = Parameters.Colors.SyllableDivisionColors.DIVIDED_SECOND_SYLLABLE_COLOR;
 
@@ -815,9 +848,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 				List<InteractiveLetter> letters = Transaction.Instance.State.UILetters.GetRange(syllable.Index, syllable.Length);
 			
 				foreach(InteractiveLetter letter in letters){
-					letter.UpdateInputDerivedAndDisplayColor(
-						Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD ? 
-						wholeWordColor : AlternateBy(i));
+					letter.UpdateInputDerivedAndDisplayColor(AlternateBy(i));
 				}
 			}
 
@@ -836,22 +867,12 @@ public class Colorer : PhonoBlocksSubscriber   {
 			string previousUserInputLetters,
 			string targetWord){
 
-			//if it's whole word mode, color each letter pink provided it matches the target word.
+
 			//if it's show division mode, then only if the user input letter currently matches target
 			//should we show the divided colors.
-			bool divided=Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION;
-			if(divided && targetWord == updatedUserInputLetters.Trim()){
+			if(targetWord == updatedUserInputLetters.Trim()){
 				colorSyllables(updatedUserInputLetters);
 				return;
-			}
-
-			//otherwise we just color the letters pink, provided they are correctly placed.
-			List<InteractiveLetter> letters = Transaction.Instance.State.UILetters.GetRange(0, targetWord.Length);
-			for(int i=0;i<letters.Count;i++){
-				InteractiveLetter letter = letters[i];
-				if(updatedUserInputLetters[i] == targetWord[i]){
-					letter.UpdateInputDerivedAndDisplayColor(wholeWordColor);
-				}
 			}
 		}
 
