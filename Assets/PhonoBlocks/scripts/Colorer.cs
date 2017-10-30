@@ -206,6 +206,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 		return colors;
 
 	}
+		
 
 
 	static string ColorAllInstancesOfMultiLetterUnit(
