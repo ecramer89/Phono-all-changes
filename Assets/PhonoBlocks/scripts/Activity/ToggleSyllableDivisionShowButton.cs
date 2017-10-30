@@ -7,9 +7,6 @@ public class ToggleSyllableDivisionShowButton : PhonoBlocksSubscriber {
 	public override void SubscribeToAll(PhonoBlocksScene forScene){
 		if(forScene == PhonoBlocksScene.MainMenu) return;
 
-		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
-			gameObject.SetActive(activity == Activity.SYLLABLE_DIVISION);
-		});
 
 		Transaction.Instance.UIInputLocked.Subscribe(this,() => {
 			gameObject.SetActive(false);
