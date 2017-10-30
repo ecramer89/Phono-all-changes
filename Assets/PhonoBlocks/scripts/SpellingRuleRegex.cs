@@ -276,7 +276,7 @@ public static class SpellingRuleRegex  {
 		Debug.Log($"expect ad mit {Syllabify("admit").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect jack et {Syllabify("jacket").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}"); 
 		Debug.Log($"expect rock et {Syllabify("rocket").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
-		Debug.Log($"expect res pond {Syllabify("respond").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+	
 		Debug.Log($"expect banz ban an {Syllabify("banzwbanan").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ma ple {Syllabify("maple").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ter ror {Syllabify("terror").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
@@ -284,7 +284,7 @@ public static class SpellingRuleRegex  {
 		Debug.Log($"expect cree py {Syllabify("creepy").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ca ble {Syllabify("cable").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect o ver {Syllabify("over").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
-		Debug.Log($"expect ang er {Syllabify("anger").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
+		Debug.Log($"expect an ger {Syllabify("anger").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 		Debug.Log($"expect ri der {Syllabify("rider").Aggregate("", (string acc, Match m) => acc+" "+m.Value)}");
 	}
 
