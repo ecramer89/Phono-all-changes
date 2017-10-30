@@ -33,7 +33,10 @@ public class CheckedWordImageController : PhonoBlocksSubscriber
 			 * end the display once all letters have been removed
 			 * */
 			Transaction.Instance.UserEnteredNewLetter.Subscribe(this, (char newLetter,int position)=>{
-					if(newLetter == ' ' && Transaction.Instance.State.UserInputLetters.Trim()==""){
+					if(
+					img.enabled && 
+					newLetter == ' ' && 
+					Transaction.Instance.State.UserInputLetters.Trim()==""){
 						EndDisplay();
 					}
 			});
