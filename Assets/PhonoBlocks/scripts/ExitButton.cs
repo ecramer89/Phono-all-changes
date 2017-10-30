@@ -16,6 +16,7 @@ public class ExitButton : MonoBehaviour {
 	}
 
 
+	//note: this only has effect if running the build; not if just running through the editor.
 	void Exit(){
 		Application.Quit();
 	}
