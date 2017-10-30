@@ -39,19 +39,6 @@ public static class SpellingRuleRegex  {
 		"th","ch","sh"
 	};
 
-
-	static string[] consonantDigraphs = consonantDigraphsEither.Concat(consonantDigraphsInitial).Concat(consonantDigraphsFinal).ToArray();
-	static string consonantDigraph = MatchAnyOf (consonantDigraphs);
-	static Regex consonantDigraphRegex = Make(consonantDigraph);
-	public static Regex ConsonantDigraph{
-		get{
-			return consonantDigraphRegex;
-
-		}
-
-	}
-
-		
 	//Consonant Blend Regex
 	//can only appear at the end of a syllable
 	static string[] consonantBlendsFinal = new string[]{
@@ -66,6 +53,51 @@ public static class SpellingRuleRegex  {
 	};
 
 	static string[] consonantBlendsEither = new string[]{"sh", "sp", "sk", "st", "ll"};
+
+	//I didn't want to use HashSet since it allocates much more space than is required.
+	//just built out own d.s. that serves similar function.
+	//can do fast lookup using the int version of the first letter characters to access the 
+	static readonly int ASCI_a = 97;
+	static bool[] consonantDigraphFirstLetters;
+	static bool[] consonantBlendsFirstLetters;
+	private static void AddFirstLetterOfUnitsToSet(string[] units, bool[] letterLookup){
+		foreach(string unit in units){
+			letterLookup[(int)(unit[0])-ASCI_a]=true;
+		}
+	}
+	public static bool IsFirstLetterOfConsonantDigraph(string letter){
+		//lazily initialize the set
+		if(consonantDigraphFirstLetters==null){
+			consonantDigraphFirstLetters=new bool[26];
+			AddFirstLetterOfUnitsToSet(consonantDigraphsInitial, consonantDigraphFirstLetters);
+			AddFirstLetterOfUnitsToSet(consonantDigraphsFinal, consonantDigraphFirstLetters);
+			AddFirstLetterOfUnitsToSet(consonantDigraphsEither, consonantDigraphFirstLetters);
+		}
+		return consonantDigraphFirstLetters[(int)(letter[0])-ASCI_a];
+	}
+
+	public static bool IsFirstLetterOfConsonantBlend(string letter){
+		//lazily initialize the set
+		if(consonantBlendsFirstLetters==null){
+			consonantBlendsFirstLetters=new bool[26];
+			AddFirstLetterOfUnitsToSet(consonantBlendsFinal, consonantBlendsFirstLetters);
+			AddFirstLetterOfUnitsToSet(consonantBlendsInitial, consonantBlendsFirstLetters);
+			AddFirstLetterOfUnitsToSet(consonantBlendsEither, consonantBlendsFirstLetters);
+		}
+		return consonantBlendsFirstLetters[(int)(letter[0])-ASCI_a];
+	}
+		
+	static string[] consonantDigraphs = consonantDigraphsEither.Concat(consonantDigraphsInitial).Concat(consonantDigraphsFinal).ToArray();
+	static string consonantDigraph = MatchAnyOf (consonantDigraphs);
+	static Regex consonantDigraphRegex = Make(consonantDigraph);
+	public static Regex ConsonantDigraph{
+		get{
+			return consonantDigraphRegex;
+
+		}
+
+	}
+
 
 	//those defined within initial literal can appear in either position within a syllable.
 	//contenate to initial and final blends for all blends.

@@ -207,26 +207,19 @@ public class Colorer : PhonoBlocksSubscriber   {
 
 	}
 
-	//return param is a string copy of input userInputLetters, with all letters that were colored replaced with blanks. 
+
 	static string ColorAllInstancesOfMultiLetterUnit(
 		string updatedUserInputLetters, 
 		string previousUserInputLetters,
 		Regex spellingRuleRegex,
 		Color multiLetterUnitColor){
 		List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
-		//find and match each successive blend.
-		//because some strings could contain blends that cross boundaries (e.g., bll)
-		//input to the regex match is a buffer from which we replace the 
-		//blend letters with blanks on each iteration with blanks
 		string unmatchedUserInputLetters=updatedUserInputLetters;
 		Match multiLetterUnit;
 		while(true){
 			multiLetterUnit = spellingRuleRegex.Match (unmatchedUserInputLetters);
 			if(!multiLetterUnit.Success) break;
 			List<InteractiveLetter> unitLetters = UIletters.GetRange (multiLetterUnit.Index, multiLetterUnit.Length);
-			//remove the blended letters from unmatchedUserInputLetters
-			//replace with blanks (don't use substring) to account for:
-			//"a dr" (example) and to keep the indices between the match data and previous input string aligned.
 			unmatchedUserInputLetters = unmatchedUserInputLetters.ReplaceRangeWith(' ', multiLetterUnit.Index, multiLetterUnit.Length);
 			Match previous = spellingRuleRegex.Match(previousUserInputLetters.Substring(multiLetterUnit.Index, multiLetterUnit.Length));
 			//color each single consonant within the blend.
@@ -315,7 +308,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 		Color singleConsonantColor = Parameters.Colors.ConsonantBlendColors.SINGLE_CONSONANT_COLOR;
 		//apart from coloring single consonants of target blend; we don't otherwise hint them (i.e., 
 		//no flashing for consonant blends)
-		Action<InteractiveLetter> hintNewPartialMatches = (InteractiveLetter letter)=>{return;};
+		Action<InteractiveLetter> hintPartialMatchesToStudentModeTargetUnit = (InteractiveLetter letter)=>{return;};
 
 
 		public Color[] GetColorsOf(Color[] colors, string word){
@@ -344,13 +337,14 @@ public class Colorer : PhonoBlocksSubscriber   {
             );
 
 
-			//after identifying/coloring the blends; color all remaining singleton consonants 
-		    //in the single consonant color.
+			//any consonant that is the first letter of any consonant blends gets colored blue.
+			//otherwise, consonants are white.
 			MatchCollection singleConsonants = SpellingRuleRegex.Consonant.Matches(unmatchedUserInputLetters);
 			foreach (Match consonant in singleConsonants) {
-				InteractiveLetter consonantLetter = Transaction.Instance.State.UILetters.ElementAt (consonant.Index);
-				consonantLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
-
+				if(SpellingRuleRegex.IsFirstLetterOfConsonantBlend(consonant.Value)){
+					InteractiveLetter consonantLetter = Transaction.Instance.State.UILetters.ElementAt (consonant.Index);
+					consonantLetter.UpdateInputDerivedAndDisplayColor (singleConsonantColor);
+				}
 			}
 				
 		}
@@ -370,7 +364,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 				SpellingRuleRegex.ConsonantBlend,
 				blendedColor,
 				singleConsonantColor,
-				hintNewPartialMatches
+				hintPartialMatchesToStudentModeTargetUnit
 			);
 
 
@@ -407,13 +401,25 @@ public class Colorer : PhonoBlocksSubscriber   {
 			string updatedUserInputLetters, 
 			string previousUserInputLetters){
 
-			ColorAllInstancesOfMultiLetterUnit (
+			string unmatchedUserInputLetters = ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
 				SpellingRuleRegex.ConsonantDigraph,
 				digraphColor
 			);
-		
+
+
+			//color remaining leftover consonants.
+			MatchCollection singleConsonants = SpellingRuleRegex.Consonant.Matches(unmatchedUserInputLetters);
+			foreach (Match consonant in singleConsonants) {
+				InteractiveLetter consonantLetter = Transaction.Instance.State.UILetters.ElementAt (consonant.Index);
+				if(SpellingRuleRegex.IsFirstLetterOfConsonantDigraph(consonant.Value)){
+					hintPartialMatch(consonantLetter);
+					consonantLetter.UpdateInputDerivedAndDisplayColor(singleMemberOfTargetDigraphColor);
+				}
+
+			}
+
 		}
 
 		public void ColorAndConfigureFlashForStudentMode(
@@ -456,13 +462,21 @@ public class Colorer : PhonoBlocksSubscriber   {
 			string updatedUserInputLetters, 
 			string previousUserInputLetters){
 
-			ColorAllInstancesOfMultiLetterUnit (
+			string unmatchedUserInputLetters = ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
 				SpellingRuleRegex.VowelDigraph,
 				digraphColor
 			);
 
+			//every vowel is potentially part of a vowel digraph.
+			//so, any single vowels should flash in the vowel digraph color
+			MatchCollection singleVowels = SpellingRuleRegex.AnyVowel.Matches(unmatchedUserInputLetters);
+			foreach (Match vowel in singleVowels) {
+					InteractiveLetter vowelLetter = Transaction.Instance.State.UILetters.ElementAt (vowel.Index);
+					flashCorrectLettersOfTargetMultiLetterUnit(vowelLetter, digraphColor, singleMemberOfTargetDigraphColor);
+					vowelLetter.UpdateInputDerivedAndDisplayColor(singleMemberOfTargetDigraphColor);
+			}
 		}
 
 		public void ColorAndConfigureFlashForStudentMode(
