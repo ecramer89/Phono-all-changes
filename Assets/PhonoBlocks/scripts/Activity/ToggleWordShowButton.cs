@@ -7,7 +7,6 @@ public class ToggleWordShowButton : PhonoBlocksSubscriber {
 	public override void SubscribeToAll(PhonoBlocksScene forScene){
 		if(forScene == PhonoBlocksScene.MainMenu) return;
 
-
 		Transaction.Instance.UIInputLocked.Subscribe(this,() => {
 			gameObject.SetActive(false);
 		});
