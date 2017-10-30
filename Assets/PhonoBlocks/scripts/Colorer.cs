@@ -788,7 +788,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 
 			if (shouldFlash(magicE)) { 
 				ConfigureFlashOnCompletionOfTargetRule (innerVowel,innerVowelColor, onColor);
-				ConfigureFlashOnCompletionOfTargetRule (silentE, silentEColor, onColor);
+				ConfigureFlashOnCompletionOfTargetRule (silentE, silentEColor, innerVowelColor);
 			}
 
 		}
