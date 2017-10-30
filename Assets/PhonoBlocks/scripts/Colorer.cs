@@ -623,7 +623,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 			//color consonants in alternating blue-green.
 			ColorConsonants(updatedUserInputLetters);
 			//color vowels by syllable type.
-			ColorVowels(updatedUserInputLetters);
+			ColorVowels(updatedUserInputLetters,shortVowelColor,longVowelColor);
 
 		}
 
@@ -643,7 +643,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 			}
 		}
 
-		public void ColorVowels(string updatedUserInputLetters){
+		public void ColorVowels(string updatedUserInputLetters, Color shortVowelColor, Color longVowelColor){
 			List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
@@ -770,7 +770,9 @@ public class Colorer : PhonoBlocksSubscriber   {
 				//no match found; switch to open/closed vowel coloring rules.
 				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
 				openClosed.ColorVowels (
-					updatedUserInputLetters
+					updatedUserInputLetters,
+					Parameters.Colors.MagicEColors.VOWEL_NOT_IN_MAGIC_E,
+					Parameters.Colors.MagicEColors.VOWEL_NOT_IN_MAGIC_E
 				);
 				return;
 			}

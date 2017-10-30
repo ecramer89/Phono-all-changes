@@ -90,6 +90,7 @@ public class Parameters : PhonoBlocksSubscriber {
 		public class MagicEColors{
 			public static Color INNER_VOWEL = red;
 			public static Color SILENT_E = Color.gray;
+			public static Color VOWEL_NOT_IN_MAGIC_E = Color.yellow;
 		}
 
 		public class ConsonantDigraphColors{
