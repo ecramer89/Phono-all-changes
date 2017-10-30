@@ -38,7 +38,7 @@ public class Transaction: MonoBehaviour  {
 	public ParameterlessEvent SessionCompleted = new ParameterlessEvent("SessionCompleted");
 
 
-	public UnaryParameterizedEvent<SyllableDivisionShowStates> SyllableDivisionShowStateSet = new UnaryParameterizedEvent<SyllableDivisionShowStates>("SyllableDivisionShowStateSet");
+	public UnaryParameterizedEvent<WordColorShowStates> WordColorShowStateSet = new UnaryParameterizedEvent<WordColorShowStates>("SyllableDivisionShowStateSet");
 	public UnaryParameterizedEvent<InputType> InputTypeSelected = new UnaryParameterizedEvent<InputType>("InputTypeSelected");
 	public UnaryParameterizedEvent<Mode> ModeSelected = new UnaryParameterizedEvent<Mode>("ModeSelected");
 	public UnaryParameterizedEvent<string> StudentNameEntered = new UnaryParameterizedEvent<string>("StudentNameEntered");

@@ -28,9 +28,9 @@ public class ToggleSyllableDivisionShowButton : PhonoBlocksSubscriber {
 		if (Transaction.Instance.State.UIInputLocked)
 			return;
 
-		SyllableDivisionShowStates current = Transaction.Instance.State.SyllableDivisionShowState;
-		Transaction.Instance.SyllableDivisionShowStateSet.Fire (
-			current == SyllableDivisionShowStates.SHOW_DIVISION ?
-			SyllableDivisionShowStates.SHOW_WHOLE_WORD : SyllableDivisionShowStates.SHOW_DIVISION);
+		WordColorShowStates current = Transaction.Instance.State.WordColorShowState;
+		Transaction.Instance.WordColorShowStateSet.Fire (
+			current == WordColorShowStates.SHOW_TARGET_UNITS ?
+			WordColorShowStates.SHOW_WHOLE_WORD : WordColorShowStates.SHOW_TARGET_UNITS);
 	}
 }

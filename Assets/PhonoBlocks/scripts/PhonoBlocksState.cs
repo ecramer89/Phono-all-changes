@@ -17,9 +17,9 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
 				this.activity = activity;
 				if(activity == Activity.SYLLABLE_DIVISION){
-					syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+					wordColorShowState = WordColorShowStates.SHOW_WHOLE_WORD;
 				} else {
-					syllableDivisionShowState = SyllableDivisionShowStates.SHOW_DIVISION;
+					wordColorShowState = WordColorShowStates.SHOW_TARGET_UNITS;
 				}
 			});
 
@@ -58,7 +58,7 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				currentHintNumber = 0;
 				//only matters in syllable division activity, but may as well reset whenever.
-				syllableDivisionShowState = SyllableDivisionShowStates.SHOW_WHOLE_WORD;
+				wordColorShowState = WordColorShowStates.SHOW_WHOLE_WORD;
 
 			});
 
@@ -97,8 +97,8 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				this.hintAvailable = false;
 				this.currentHintNumber++;
 			});
-			Transaction.Instance.SyllableDivisionShowStateSet.Subscribe(this,(SyllableDivisionShowStates newState) => {
-				syllableDivisionShowState = newState;
+			Transaction.Instance.WordColorShowStateSet.Subscribe(this,(WordColorShowStates newState) => {
+				wordColorShowState = newState;
 			});
 		
 			Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
@@ -261,12 +261,12 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 
 	}
 
-
-	//only relevant to syllable division mode
-	private SyllableDivisionShowStates syllableDivisionShowState;
-	public SyllableDivisionShowStates SyllableDivisionShowState{
+	//whether should show the letters in the whole word color
+	//or color code by target unit
+	private WordColorShowStates wordColorShowState;
+	public WordColorShowStates WordColorShowState{
 		get {
-			return syllableDivisionShowState;
+			return wordColorShowState;
 		}
 
 	}

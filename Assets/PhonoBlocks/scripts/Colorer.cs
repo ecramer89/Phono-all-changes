@@ -38,7 +38,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 
 		if(forScene == PhonoBlocksScene.Activity){
 			
-			Transaction.Instance.SyllableDivisionShowStateSet.Subscribe(this,(SyllableDivisionShowStates state) =>ReColor());
+			Transaction.Instance.WordColorShowStateSet.Subscribe(this,(WordColorShowStates state) =>ReColor());
 
 
 			Transaction.Instance.NewProblemBegun.Subscribe(this,(ProblemData problem) => {
@@ -113,7 +113,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 			updatedUserInputLetters
 		);
 
-		if(Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
+		if(Transaction.Instance.State.WordColorShowState == WordColorShowStates.SHOW_TARGET_UNITS){
 			RecolorUnits(updatedUserInputLetters,previousUserInputLetters);
 		} else {
 			RecolorWholeWord(updatedUserInputLetters,previousUserInputLetters);

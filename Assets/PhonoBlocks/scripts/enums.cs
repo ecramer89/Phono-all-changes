@@ -25,7 +25,7 @@ public enum InputType{
 	KEYBOARD, TUI
 }
 
-public enum SyllableDivisionShowStates{
-	SHOW_WHOLE_WORD, SHOW_DIVISION
+public enum WordColorShowStates{
+	SHOW_WHOLE_WORD, SHOW_TARGET_UNITS
 
 }

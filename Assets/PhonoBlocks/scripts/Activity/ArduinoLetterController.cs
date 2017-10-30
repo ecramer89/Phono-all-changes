@@ -49,10 +49,10 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 		Transaction.Instance.InteractiveLetterSelected.Subscribe(this,(InteractiveLetter letter) => {
 				letter.ToggleSelectHighlight(true);
 				if(Transaction.Instance.Selector.AllLettersSelected 
-				&& Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_WHOLE_WORD){
+				&& Transaction.Instance.State.WordColorShowState == WordColorShowStates.SHOW_WHOLE_WORD){
 				
 
-					Transaction.Instance.SyllableDivisionShowStateSet.Fire(SyllableDivisionShowStates.SHOW_DIVISION);
+					Transaction.Instance.WordColorShowStateSet.Fire(WordColorShowStates.SHOW_TARGET_UNITS);
 			}
 		});
 
@@ -68,8 +68,8 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 				//select+remove some letter.
 			
 			if(Transaction.Instance.Selector.AllLettersDeSelected &&
-				Transaction.Instance.State.SyllableDivisionShowState == SyllableDivisionShowStates.SHOW_DIVISION){
-					Transaction.Instance.SyllableDivisionShowStateSet.Fire(SyllableDivisionShowStates.SHOW_WHOLE_WORD);
+				Transaction.Instance.State.WordColorShowState == WordColorShowStates.SHOW_TARGET_UNITS){
+					Transaction.Instance.WordColorShowStateSet.Fire(WordColorShowStates.SHOW_WHOLE_WORD);
 			}
 		});
 
