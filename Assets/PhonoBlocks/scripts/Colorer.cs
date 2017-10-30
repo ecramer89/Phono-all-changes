@@ -118,6 +118,14 @@ public class Colorer : PhonoBlocksSubscriber   {
 		} else {
 			RecolorWholeWord(updatedUserInputLetters,previousUserInputLetters);
 		}
+
+		if(Transaction.Instance.State.Mode == Mode.STUDENT){
+			TurnOffAndConfigureFlashForErroneousLetters (
+				updatedUserInputLetters,
+				previousUserInputLetters,
+				Transaction.Instance.State.TargetWord
+			);
+		}
 	
 		StartAllLetterFlashes();
 	}
@@ -162,11 +170,6 @@ public class Colorer : PhonoBlocksSubscriber   {
 				targetWord
 			);
 
-			TurnOffAndConfigureFlashForErroneousLetters (
-				updatedUserInputLetters,
-				previousUserInputLetters,
-				targetWord
-			);
 		}
 
 	}

@@ -27,5 +27,4 @@ public enum InputType{
 
 public enum WordColorShowStates{
 	SHOW_WHOLE_WORD, SHOW_TARGET_UNITS
-
 }

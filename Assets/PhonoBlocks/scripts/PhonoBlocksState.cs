@@ -16,11 +16,6 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 
 			Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
 				this.activity = activity;
-				if(activity == Activity.SYLLABLE_DIVISION){
-					wordColorShowState = WordColorShowStates.SHOW_WHOLE_WORD;
-				} else {
-					wordColorShowState = WordColorShowStates.SHOW_TARGET_UNITS;
-				}
 			});
 
 			Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
@@ -57,9 +52,9 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				currentHintNumber = 0;
-				//only matters in syllable division activity, but may as well reset whenever.
-				wordColorShowState = WordColorShowStates.SHOW_WHOLE_WORD;
-
+				wordColorShowState = activity == Activity.SYLLABLE_DIVISION ?
+					WordColorShowStates.SHOW_WHOLE_WORD :
+					WordColorShowStates.SHOW_TARGET_UNITS;
 			});
 
 			Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(this,() => {
