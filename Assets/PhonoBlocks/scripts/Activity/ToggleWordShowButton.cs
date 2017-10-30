@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIButtonMessage))]
-public class ToggleSyllableDivisionShowButton : PhonoBlocksSubscriber {
+public class ToggleWordShowButton : PhonoBlocksSubscriber {
 	public override void SubscribeToAll(PhonoBlocksScene forScene){
 		if(forScene == PhonoBlocksScene.MainMenu) return;
 
@@ -18,12 +18,12 @@ public class ToggleSyllableDivisionShowButton : PhonoBlocksSubscriber {
 	void Start(){
 		UIButtonMessage messenger= GetComponent<UIButtonMessage> ();
 		messenger.target = gameObject;
-		messenger.functionName = "ToggleSyllableDivisionShow";
+		messenger.functionName = "ToggleWordShow";
 		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 
 	}
 
-	void ToggleSyllableDivisionShow(){
+	void ToggleWordShow(){
 
 		if (Transaction.Instance.State.UIInputLocked)
 			return;
