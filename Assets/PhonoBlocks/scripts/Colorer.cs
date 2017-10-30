@@ -414,8 +414,9 @@ public class Colorer : PhonoBlocksSubscriber   {
 			foreach (Match consonant in singleConsonants) {
 				InteractiveLetter consonantLetter = Transaction.Instance.State.UILetters.ElementAt (consonant.Index);
 				if(SpellingRuleRegex.IsFirstLetterOfConsonantDigraph(consonant.Value)){
-					hintPartialMatch(consonantLetter);
 					consonantLetter.UpdateInputDerivedAndDisplayColor(singleMemberOfTargetDigraphColor);
+					if(previousUserInputLetters[consonant.Index] == updatedUserInputLetters[consonant.Index]) return;
+					hintPartialMatch(consonantLetter);
 				}
 
 			}
@@ -474,8 +475,10 @@ public class Colorer : PhonoBlocksSubscriber   {
 			MatchCollection singleVowels = SpellingRuleRegex.AnyVowel.Matches(unmatchedUserInputLetters);
 			foreach (Match vowel in singleVowels) {
 					InteractiveLetter vowelLetter = Transaction.Instance.State.UILetters.ElementAt (vowel.Index);
-					flashCorrectLettersOfTargetMultiLetterUnit(vowelLetter, digraphColor, singleMemberOfTargetDigraphColor);
 					vowelLetter.UpdateInputDerivedAndDisplayColor(singleMemberOfTargetDigraphColor);
+					//don't bother flashing if the letter hasnt changed.
+					if(previousUserInputLetters[vowel.Index] == updatedUserInputLetters[vowel.Index]) return;
+					flashCorrectLettersOfTargetMultiLetterUnit(vowelLetter, digraphColor, singleMemberOfTargetDigraphColor);
 			}
 		}
 
@@ -520,12 +523,23 @@ public class Colorer : PhonoBlocksSubscriber   {
 			string updatedUserInputLetters, 
 			string previousUserInputLetters){
 
-			ColorAllInstancesOfMultiLetterUnit (
+			string unmatchedUserInputLetters =ColorAllInstancesOfMultiLetterUnit (
 				updatedUserInputLetters,
 				previousUserInputLetters,
 				SpellingRuleRegex.RControlledVowel,
 				rControlledVowelColor
 			);
+			//every vowel is potentially part of an r controlled vowel.
+			//so, any single vowels should flash in the r controlled vowel color
+			MatchCollection singleVowels = SpellingRuleRegex.AnyVowel.Matches(unmatchedUserInputLetters);
+			foreach (Match vowel in singleVowels) {
+				InteractiveLetter vowelLetter = Transaction.Instance.State.UILetters.ElementAt (vowel.Index);
+				vowelLetter.UpdateInputDerivedAndDisplayColor(singleMemberOfRControlledVowelColor);
+				//don't bother flashing if the letter hasnt changed.
+				if(previousUserInputLetters[vowel.Index] == updatedUserInputLetters[vowel.Index]) return;
+				flashCorrectLettersOfTargetMultiLetterUnit(vowelLetter, rControlledVowelColor, singleMemberOfRControlledVowelColor);
+			
+			}
 
 		}
 
