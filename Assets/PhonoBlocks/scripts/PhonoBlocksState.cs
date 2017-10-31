@@ -9,6 +9,10 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
 		if(nextToLoad == PhonoBlocksScene.MainMenu){
 
+			Transaction.Instance.MainMenuNavigationStateChanged.Subscribe(this,(Action navback)=>{
+				mainMenuNavigationStack.Push(navback);
+			});
+
 			Transaction.Instance.InputTypeSelected.Subscribe(this,
 				(InputType type) => {
 					inputType = type;
@@ -32,6 +36,8 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 
 		if(nextToLoad == PhonoBlocksScene.Activity){
 			Transaction.Instance.ActivitySceneLoaded.Subscribe(this,() => {
+				mainMenuNavigationStack = new Stack<Action>(); //clear stack, though it should never be accessed
+				//within activity mode regardless
 				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
@@ -278,7 +284,7 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 
 
 	/*stack of actions that would undo the last main menu navigation state change */
-	private Stack<Action> mainMenuNavigationStack;
+	private Stack<Action> mainMenuNavigationStack = new Stack<Action>();
 	public Stack<Action> MainMenuNavigationStack{
 		get {
 			return mainMenuNavigationStack;//probably not best form to return entire stack, 
