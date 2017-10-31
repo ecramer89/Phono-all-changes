@@ -17,6 +17,7 @@ public class BackButton : MonoBehaviour {
 
 
 	void GoBack(){
+		Debug.Log("called go back");
 		Stack<Action> mainMenuNavStack = Transaction.Instance.State.MainMenuNavigationStack;
 		if(mainMenuNavStack.Count>0) mainMenuNavStack.Pop()();
 	}
