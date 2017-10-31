@@ -4,17 +4,13 @@ using UnityEngine;
 
 public class TeacherModeController : PhonoBlocksSubscriber {
 	public override void SubscribeToAll(PhonoBlocksScene scene){
-		if(scene == PhonoBlocksScene.MainMenu){
-
-			Transaction.Instance.ModeSelected.Subscribe(this,
-				(Mode mode) => {
-					if(mode != Mode.TEACHER) gameObject.SetActive(false); 
-				}
-			);
-		}
+		if(scene == PhonoBlocksScene.MainMenu) return;
 
 			if(scene == PhonoBlocksScene.Activity){
-				if(Transaction.Instance.State.Mode != Mode.TEACHER) return; 
+				if(Transaction.Instance.State.Mode != Mode.TEACHER) {
+					gameObject.SetActive(false); 
+					return; 
+				}
 
 				Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
 				ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, newLetter, LetterImageTable.instance.GetLetterImageFromLetter);

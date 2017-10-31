@@ -29,23 +29,21 @@ public class StudentActivityController : PhonoBlocksSubscriber
 
 		void Start ()
 		{      instance = this;
-
-
 		}
 
 
 	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
-		if(nextToLoad == PhonoBlocksScene.MainMenu) {
-			Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
-				if(mode != Mode.STUDENT) gameObject.SetActive (false);	
-				else CacheAudioClips ();
-			});
-			Transaction.Instance.SessionSelected.Subscribe(this,(int session) => {
-				ProblemsRepository.Instance.Initialize (session);
-			});
-		}
-
+		if(nextToLoad == PhonoBlocksScene.MainMenu) return;
+	
 		if(nextToLoad == PhonoBlocksScene.Activity){
+			
+			if(Transaction.Instance.State.Mode != Mode.STUDENT) {
+				gameObject.SetActive (false);	
+				return;
+			}
+
+			ProblemsRepository.Instance.Initialize (Transaction.Instance.State.Session);
+			CacheAudioClips ();
 			Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters)=>SetUpNextProblem());
 			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,HandleNewArduinoLetter);
 			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,HandleSubmittedAnswer);

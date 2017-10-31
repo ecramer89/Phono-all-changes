@@ -9,15 +9,10 @@ public class SpellingRuleSelectionButton : PhonoBlocksSubscriber {
 
 	public override void SubscribeToAll(PhonoBlocksScene forScene){
 		Transaction.Instance.ModeSelected.Subscribe(this,(Mode mode) => {
-			if (mode == Mode.TEACHER) {
-				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
-				messenger.target = gameObject;
-				messenger.functionName = "SelectActivity";
-				messenger.trigger = UIButtonMessage.Trigger.OnClick;
-				gameObject.SetActive(true);
-			} else {
-				gameObject.SetActive(false);
-			}
+			 gameObject.SetActive(mode == Mode.TEACHER);
+		});
+		Transaction.Instance.UndoModeSelected.Subscribe(this, ()=>{
+			gameObject.SetActive(false);
 		});
 		Transaction.Instance.ActivitySelected.Subscribe(this,(Activity activity) => {
 			gameObject.SetActive(false);
@@ -27,9 +22,11 @@ public class SpellingRuleSelectionButton : PhonoBlocksSubscriber {
 
 
 	void Start(){
+		UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
+		messenger.target = gameObject;
+		messenger.functionName = "SelectActivity";
+		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 		gameObject.SetActive(false);
-	
-
 	}
 
 

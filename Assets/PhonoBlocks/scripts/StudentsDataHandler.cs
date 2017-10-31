@@ -41,6 +41,7 @@ public class StudentsDataHandler: PhonoBlocksSubscriber
 
 					if (wasStoredDataForName) {
 						Transaction.Instance.StudentDataRetrieved.Fire ();
+						Transaction.Instance.MainMenuNavigationStateChanged.Fire(Transaction.Instance.UndoStudentDataRetrieved);
 
 					} else {
 						Debug.Log ("No data recorded for this student");

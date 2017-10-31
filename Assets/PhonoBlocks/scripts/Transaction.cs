@@ -19,6 +19,21 @@ public class Transaction: MonoBehaviour  {
 
 		}
 	}
+
+
+	//a handful of main menu events are 'undoable', because users can click the back button and as such
+	//"undo" events that resulted from pressing the buttons in the first place.
+	//Ideally, I would wrap the handful of events that are undoable in a different class,
+	//undoable, which would serve as decorator to the wrapped event class and implement the same interface
+	//the only difficulty here is how to manage the different parameter types that would be needed for
+	//the subscribe method to work?
+	//would require just duplicated undoable classes, same as we have duplicated event classes, to deal
+	//with different numbers of generic parameters to the typed events.
+	//anyway, in absence of a better idea, 
+	//I have just listed all of the undoable Main menu UI events here.
+	public ParameterlessEvent UndoStudentDataRetrieved = new ParameterlessEvent("UndoStudentDataRetrieved");
+	public ParameterlessEvent UndoModeSelected = new ParameterlessEvent("UndoModeSelected");
+
 		
 	public ParameterlessEvent StudentDataRetrieved = new ParameterlessEvent("StudentDataRetrieved");
 	public ParameterlessEvent TimesAttemptedCurrentProblemIncremented = new ParameterlessEvent("TimesAttemptedCurrentProblemIncremented");
@@ -37,10 +52,11 @@ public class Transaction: MonoBehaviour  {
 	public ParameterlessEvent UserAddedWordToHistory = new ParameterlessEvent("UserAddedWordToHistory");
 	public ParameterlessEvent SessionCompleted = new ParameterlessEvent("SessionCompleted");
 
-	public UnaryParameterizedEvent<Action> MainMenuNavigationStateChanged = new UnaryParameterizedEvent<Action>("MainMenuNavigationStateChanged");
+	public UnaryParameterizedEvent<ParameterlessEvent> MainMenuNavigationStateChanged = new UnaryParameterizedEvent<ParameterlessEvent>("MainMenuNavigationStateChanged");
 	public UnaryParameterizedEvent<WordColorShowStates> WordColorShowStateSet = new UnaryParameterizedEvent<WordColorShowStates>("SyllableDivisionShowStateSet");
 	public UnaryParameterizedEvent<InputType> InputTypeSelected = new UnaryParameterizedEvent<InputType>("InputTypeSelected");
 	public UnaryParameterizedEvent<Mode> ModeSelected = new UnaryParameterizedEvent<Mode>("ModeSelected");
+
 	public UnaryParameterizedEvent<string> StudentNameEntered = new UnaryParameterizedEvent<string>("StudentNameEntered");
 	public UnaryParameterizedEvent<int> SessionSelected = new UnaryParameterizedEvent<int>("SessionSelected");
 	public UnaryParameterizedEvent<List<InteractiveLetter>> InteractiveLettersCreated = new UnaryParameterizedEvent<List<InteractiveLetter>>("InteractiveLettersCreated");
@@ -106,8 +122,11 @@ public class Transaction: MonoBehaviour  {
 		foreach(PhonoBlocksSubscriber subscriber in subscribersInScene){
 
 			subscriber.SubscribeToAll(currentScene); 
-			Debug.Log($"Subscriber: {subscriber.GetType()}");
+		
 		}
+
+
+
 
 
 		if(currentScene == PhonoBlocksScene.Activity){

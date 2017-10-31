@@ -8,15 +8,10 @@ public class SessionButton : PhonoBlocksSubscriber {
 	public override void SubscribeToAll(PhonoBlocksScene forScene){
 		if(forScene != PhonoBlocksScene.MainMenu) return;
 		Transaction.Instance.StudentDataRetrieved.Subscribe(this,() => {
-			if (Transaction.Instance.State.Mode == Mode.STUDENT) {
-				UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
-				messenger.target = gameObject;
-				messenger.functionName = "SelectSession";
-				messenger.trigger = UIButtonMessage.Trigger.OnClick;
-				gameObject.SetActive(true);
-			} else {
-				gameObject.SetActive(false);
-			}
+				gameObject.SetActive(Transaction.Instance.State.Mode == Mode.STUDENT);
+		});
+		Transaction.Instance.UndoStudentDataRetrieved.Subscribe(this, ()=>{
+			gameObject.SetActive(false);
 		});
 		//need -every- session selection button to deactivate when a session is selected.
 		//as such, just subscribe to the event here.
@@ -27,9 +22,11 @@ public class SessionButton : PhonoBlocksSubscriber {
 
 
 	void Start(){
+		UIButtonMessage messenger = GetComponent<UIButtonMessage> ();
+		messenger.target = gameObject;
+		messenger.functionName = "SelectSession";
+		messenger.trigger = UIButtonMessage.Trigger.OnClick;
 		gameObject.SetActive(false);
-
-
 
 	}
 

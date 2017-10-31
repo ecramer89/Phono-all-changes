@@ -19,8 +19,14 @@ public class NameInputField : PhonoBlocksSubscriber {
 				gameObject.SetActive(true);
 			}
 		});
+		Transaction.Instance.UndoModeSelected.Subscribe(this, ()=>{
+			gameObject.SetActive(false);
+		});
 		Transaction.Instance.StudentDataRetrieved.Subscribe(this,() => {
 			gameObject.SetActive(false);
+		});
+		Transaction.Instance.UndoStudentDataRetrieved.Subscribe(this, ()=>{
+			gameObject.SetActive(true);
 		});
 
 	}

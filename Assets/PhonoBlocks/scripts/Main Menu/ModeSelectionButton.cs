@@ -18,11 +18,15 @@ public class ModeSelectionButton : PhonoBlocksSubscriber {
 			if(mode == Mode.TEACHER || this.mode == Mode.TEACHER){
 				gameObject.SetActive(false);
 			} else {
-				//todo this doesn't seem to be working; find out why
 				GetComponent<UIImageButton>().enabled = false; //disable sprite change on hover
 				GetComponent<UIButtonMessage> ().enabled=false; //leave the student mode button onscreen but 
 				//disable its click functionality.
 			}
+		});
+		Transaction.Instance.UndoModeSelected.Subscribe(this, ()=>{
+			gameObject.SetActive(true);
+			GetComponent<UIImageButton>().enabled = true; 
+			GetComponent<UIButtonMessage> ().enabled=true;
 		});
 		//teacher mode button stays on while students enter name;
 		//disappears after name entered+data successfully loaded or created.
@@ -30,6 +34,9 @@ public class ModeSelectionButton : PhonoBlocksSubscriber {
 			if(this.mode == Mode.STUDENT){
 				gameObject.SetActive(false);
 			}
+		});
+		Transaction.Instance.UndoStudentDataRetrieved.Subscribe(this, ()=>{
+				gameObject.SetActive(this.mode == Mode.STUDENT);
 		});
 	}
 
@@ -46,7 +53,7 @@ public class ModeSelectionButton : PhonoBlocksSubscriber {
 
 	void SelectMode(){
 		Transaction.Instance.ModeSelected.Fire (mode);
-
-
+		//push the event that will undo the changes resulting from mode selection to the stack.
+		Transaction.Instance.MainMenuNavigationStateChanged.Fire(Transaction.Instance.UndoModeSelected);
 	}
 }

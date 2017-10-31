@@ -16,12 +16,13 @@ public interface PhonoBlocksEvent  {
 public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 	private Dictionary<PhonoBlocksSubscriber, Action<T>> subscribers = new Dictionary<PhonoBlocksSubscriber, Action<T>>();
 	private List<Action> generifiedSubscribers;
-
 	string name;
 
 	public UnaryParameterizedEvent(string name){
 		this.name = name;
 	}
+
+
 
 	public string Name(){
 		return name;
@@ -60,11 +61,10 @@ public class UnaryParameterizedEvent<T> : PhonoBlocksEvent{
 }
 
 
-
-//dictionaries shold be turned back into lists asap
 public class ParameterlessEvent : PhonoBlocksEvent{
 	Dictionary<PhonoBlocksSubscriber, Action> subscribers = new Dictionary<PhonoBlocksSubscriber, Action>();
 	private string name;
+
 
 	public ParameterlessEvent(string name){
 		this.name = name;
@@ -82,7 +82,7 @@ public class ParameterlessEvent : PhonoBlocksEvent{
 
 
 	public void Fire(){
-		//Debug.Log($"Firing event: {name}");
+		Debug.Log($"Firing event: {name}");
 		Transaction.Instance.EnqueueEvent(this);
 	}
 
@@ -147,5 +147,26 @@ public class BinaryParameterizedEvent<T,V> : PhonoBlocksEvent{
 	}
 
 }
+
+//UndoablebinaryParam...
+//UndoableParameterless...
+//this is a classic case for decorator but it is hard to wrap the subscribe method of the two different wrapped classes
+//becuase they differ wrt the NUBER of generic parameters that are neded for the argument to subscribe
 	
+/*mightbe an interesting problem for c# user group-
+	composition
+	have events, they difer wrt the type and number of params
+	wnted to add in undo funcitonality
+	some events are undoable
+	wanted to force subscribers of undoable events to have to provide a
+	handler for 'undo'
+		the undoable 'wrpaper; would impelemtn the phone blocks even tinterface'
+		and basiclaly delegate to it, it would wrap the subscribe method
+		and force clients to produce the arguments expected of the wrapped evnet
+		and also an extra onewhich is an undi handler
+		then it would delegate to the wrappee
+		and also save the undo handler in its own list.
+		it exoses a public undo method
+		when called
+		it invokes the undo handler of each subscriber.*/
  
