@@ -105,7 +105,7 @@ public class InteractiveLetter : MonoBehaviour{
 
 
 		const int NOT_AN_ARDUINO_CONTROLLED_LETTER = -1;
-		int idxAsArduinoControlledLetter = NOT_AN_ARDUINO_CONTROLLED_LETTER; //i.e., if it's a word history controlled letter. you have to "opt in" to be an arduino controlled letter.
+		int idxAsArduinoControlledLetter = NOT_AN_ARDUINO_CONTROLLED_LETTER; 
 
 		public int IdxAsArduinoControlledLetter {
 				set {
@@ -214,19 +214,21 @@ public class InteractiveLetter : MonoBehaviour{
 			UpdateDisplayColour (c);
 		}
 
-	//todo, this should be responsibility of the colorer, not of the i letters sine i letters used to grids also
-		public void ChangeColourOfTangibleCounterpartIfThereIsOne (Color c)
-		{
- 
-        //on the screen, blank letters are just clear.
-        //but we issue the black (0,0,0) colour to the arduino
-		/*if (IdxAsArduinoControlledLetter != NOT_AN_ARDUINO_CONTROLLED_LETTER &&
-		      State.Current.InputType == InputType.TUI) {
-			ArduinoUnityInterface.Instance.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c);
-		}*/
 
+	/*
+	 * as I recall, the Unity-Arduino interface we are using sometimes had issues displaying 
+	 * color values between 0 and 1. if this is the case, then you will probably want to
+	 * run the color argument through a function that would convert float to integer values
+	 * for the r, g, b channels.
+	 * */
+		public void ChangeColourOfTangibleCounterpartIfThereIsOne (Color c)
+	{   	if(IdxAsArduinoControlledLetter == NOT_AN_ARDUINO_CONTROLLED_LETTER) return;
+			if(Transaction.Instance.State.InputType != InputType.TUI) return;
+			ArduinoUnityInterface.Instance.ColorNthTangibleLetter (IdxAsArduinoControlledLetter, c);
 
 		}
+
+
 		public void UpdateLetterImageAndInputDerivedColor (Texture2D img, Color c)
 	{   	
 			UpdateLetterImage (img);

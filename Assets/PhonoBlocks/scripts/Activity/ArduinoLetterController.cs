@@ -32,7 +32,7 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 				letterGrid = GameObject.Find("ArduinoLetterGrid").GetComponent<LetterGridController> ();
 				letterGrid.InitializeBlankLetterSpaces (Parameters.UI.ONSCREEN_LETTER_SPACES);
 				List<InteractiveLetter> UILetters = letterGrid.GetLetters ();
-				SubscribeToInteractiveLetterEvents(UILetters);
+				ConfigureInteractiveLetters(UILetters);
 				Transaction.Instance.InteractiveLettersCreated.Fire (UILetters);
 			});
 
@@ -84,10 +84,20 @@ public class ArduinoLetterController : PhonoBlocksSubscriber{
 
 
 
-
-	void SubscribeToInteractiveLetterEvents (List<InteractiveLetter> UILetters)
+	/*
+	 * assign arduino controlled letters to tangible counterparts and subscribe to interactive letter
+	 * selection event
+	 * */
+	void ConfigureInteractiveLetters (List<InteractiveLetter> UILetters)
 	{
+		int arduinoLetterIndex = 0;
 		foreach(InteractiveLetter letter in UILetters){
+			
+			//assign each interactive letter to its tangible counterpart
+			letter.IdxAsArduinoControlledLetter=arduinoLetterIndex++;
+
+
+			//subscribe to interactive letter selection events
 			letter.OnInteractiveLetterSelectToggled += (bool wasSelected, InteractiveLetter l) => {
 				if(Transaction.Instance.State.Activity != Activity.SYLLABLE_DIVISION) return;
 				if(Transaction.Instance.State.UserInputLetters[l.Position] == ' ') return;

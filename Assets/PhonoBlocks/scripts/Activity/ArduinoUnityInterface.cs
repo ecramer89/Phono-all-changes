@@ -116,24 +116,6 @@ public class ArduinoUnityInterface : PhonoBlocksSubscriber
 
 		public void Start(){
 				instance = this;
-				
-	
-
-
-
-				/*Transaction.Instance.OnInputTypeSelected += (InputType type) => {
-					if(type == InputType.KEYBOARD) {
-						gameObject.SetActive(false);
-						uniduino.SetActive(false);
-				} else {
-					
-					uniduino.GetComponent<Uniduino.Arduino> ().Connect ();
-					change = new ArduinoLetterData ();
-					arduino = Arduino.global;
-					arduino.Setup (ConfigurePins);
-
-				}
-			};*/
 
 		}
 		
@@ -254,10 +236,18 @@ public class ArduinoUnityInterface : PhonoBlocksSubscriber
 
 		}
 
-		public void ColorNthTangibleLetter (int position, Color color)
+
+	/*
+	 * might need to run the screen position argument through AdjustScreenPostionForArduino. 
+	 * to be honest I'm not entirely certain I remember why the arduino letter positions start counting at 1.
+	 * may have been a quirk with the Uniduino interface and the way the physical circuit board was wired.
+	 * or may not actually be relevant any longer
+	 * we will just need to test this see.
+	 * */
+		public void ColorNthTangibleLetter (int screenPosition, Color color)
 		{
-      
-				ApplyNewColorTo (position, color);
+                
+				ApplyNewColorTo (screenPosition, color);
 			
 
 		}
@@ -266,7 +256,7 @@ public class ArduinoUnityInterface : PhonoBlocksSubscriber
 		{
                 
 				for (int colorChannel=0; colorChannel<NUM_VALUES_PER_COLOR; colorChannel++) {
-						//int valueAtChannel = ScaledColorChannel (color, colorChannel);//CategoricalColorChannel (color, colorChannel);
+
 						int valueAtChannel = CategoricalColorChannel (color, colorChannel);
 
 						int rescaledChannel = (2 - colorChannel);
@@ -291,6 +281,10 @@ public class ArduinoUnityInterface : PhonoBlocksSubscriber
 		}
 
 
+	//screen starts counting at 0; arduino starts counting at 1.
+		int AdjustScreenPostionForArduino(int screenLetterPosition){
+			return screenLetterPosition + 1;
+		}
 
 		int AdjustArduinoPositionForScreen (int arduinoPlatformPosition)
 		{
@@ -426,36 +420,6 @@ public class ArduinoUnityInterface : PhonoBlocksSubscriber
 				return letter;
 		}
 
-
-
-
-
-		
-
-
-       
-		//the word will have at most 6 letters.
-		//we need to put these letters in the indexes 1 to 6
-		/*public void UpdateColoursOfTangibleLetters (UserWord newWord)
-		{
-		
-		
-				for (int positionOfLetter=0; positionOfLetter<newWord.Count; positionOfLetter++) {
-						LetterSoundComponent p = newWord.Get (positionOfLetter);
-						Color color = p.GetColour();
-                    
-
-						// int positionOfLetter_ = NUM_LETTER_POSITIONS - positionOfLetter;
-						positionOfLetter = positionOfLetter + 1;
-						ApplyNewColorTo (positionOfLetter, color);
-
-			
-				}
-			
-
-			
-			
-		}*/
 
 		int CategoricalColorChannel (Color c, int channel)
 		{
