@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Extensions;
+using System;
 using System.Text.RegularExpressions;
 using System.Linq;
 public class PhonoBlocksState : PhonoBlocksSubscriber {
@@ -271,6 +272,17 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 		get {
 			return targetWordSyllables;
 
+		}
+
+	}
+
+
+	/*stack of actions that would undo the last main menu navigation state change */
+	private Stack<Action> mainMenuNavigationStack;
+	public Stack<Action> MainMenuNavigationStack{
+		get {
+			return mainMenuNavigationStack;//probably not best form to return entire stack, 
+			//which is mutable, but...
 		}
 
 	}

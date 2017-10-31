@@ -4,17 +4,9 @@ using System.Collections.Generic;
 using Uniduino;
 using System.Text;
 
-//receives inputs from the arduino.
-//converts them into letters.
-//sends the letter data to the arduinoLettersController.
-//for now it will just print an array of letters.
 
-//..receives new color data back from the controller and uses it to update the arduino letters.
-//(implement this later)
 public class ArduinoUnityInterface : PhonoBlocksSubscriber
 {
-
-
 		private static ArduinoUnityInterface instance;
 		public static ArduinoUnityInterface Instance{
 			get {
