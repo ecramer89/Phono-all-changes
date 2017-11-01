@@ -658,7 +658,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 			//color consonants in alternating blue-green.
 			ColorConsonants(updatedUserInputLetters);
 			//color vowels by syllable type.
-			ColorVowels(updatedUserInputLetters,shortVowelColor,longVowelColor);
+			ColorVowels(updatedUserInputLetters);
 
 		}
 
@@ -678,7 +678,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 			}
 		}
 
-		public void ColorVowels(string updatedUserInputLetters, Color shortVowelColor, Color longVowelColor){
+		public void ColorVowels(string updatedUserInputLetters){
 			List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 			//color vowels according to syllable type.
 			string unMatchedUserInputLetters = updatedUserInputLetters;
@@ -728,7 +728,7 @@ public class Colorer : PhonoBlocksSubscriber   {
 	class MagicEColorer : RuleBasedColorer {
 		static Color innerVowelColor = Parameters.Colors.MagicEColors.INNER_VOWEL;
 		static Color silentEColor = Parameters.Colors.MagicEColors.SILENT_E;
-
+		static Color vowelNotInMagicE = Parameters.Colors.MagicEColors.VOWEL_NOT_IN_MAGIC_E;
 
 		public Color[] GetColorsOf(Color[] colors, string word){
 			//assumes there would just be one instance of a magic e word in input.
@@ -801,13 +801,18 @@ public class Colorer : PhonoBlocksSubscriber   {
 			List<InteractiveLetter> UIletters = Transaction.Instance.State.UILetters;
 			Match magicE = SpellingRuleRegex.MagicERegex.Match (updatedUserInputLetters);
 			if (!magicE.Success){
-				//no match found; switch to open/closed vowel coloring rules.
-				OpenClosedVowelColorer openClosed = (OpenClosedVowelColorer)openClosedVowelColorer;
-				openClosed.ColorVowels (
-					updatedUserInputLetters,
-					Parameters.Colors.MagicEColors.VOWEL_NOT_IN_MAGIC_E,
-					Parameters.Colors.MagicEColors.VOWEL_NOT_IN_MAGIC_E
-				);
+				//no match found; color vowels yellow and flash any that are new.
+				MatchCollection vowels = SpellingRuleRegex.AnyVowel.Matches(updatedUserInputLetters);
+				foreach(Match m in vowels){
+					int at = m.Index;
+					InteractiveLetter letter = UIletters[at];
+					letter.UpdateInputDerivedAndDisplayColor(vowelNotInMagicE);
+					if(updatedUserInputLetters[at] == previousUserInputLetters[at]) continue; //don't bother flashing unless it is new
+					letter.ConfigureFlashParameters (vowelNotInMagicE, Parameters.Colors.DEFAULT_OFF_COLOR, 
+						Parameters.Flash.Durations.HINT_TARGET_COLOR, Parameters.Flash.Durations.HINT_OFF, 
+						Parameters.Flash.Times.TIMES_TO_FLASH_ON_COMPLETE_TARGET_GRAPHEME
+					);
+				}
 				return;
 			}
 
@@ -837,7 +842,6 @@ public class Colorer : PhonoBlocksSubscriber   {
 		static Color dividedSecondSyllableColor = Parameters.Colors.SyllableDivisionColors.DIVIDED_SECOND_SYLLABLE_COLOR;
 
 		static Func<int, Color> AlternateBy = (int seed) => seed%2==0 ? dividedFirstSyllableColor : dividedSecondSyllableColor;
-
 
 
 		static Action<string> colorSyllables = (string updatedUserInputLetters)=>{
