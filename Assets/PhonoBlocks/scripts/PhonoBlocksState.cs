@@ -6,6 +6,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Linq;
 public class PhonoBlocksState : PhonoBlocksSubscriber {
+
 	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
 		if(nextToLoad == PhonoBlocksScene.MainMenu){
 
@@ -41,6 +42,7 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				previousUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
+				resetWordColorShowState();
 			});
 			Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters) => {
 				this.uILetters = letters;
@@ -59,9 +61,7 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 				userInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				selectedUserInputLetters = _String.Fill(" ", Parameters.UI.ONSCREEN_LETTER_SPACES);
 				currentHintNumber = 0;
-				wordColorShowState = activity == Activity.SYLLABLE_DIVISION ?
-					WordColorShowStates.SHOW_WHOLE_WORD :
-					WordColorShowStates.SHOW_TARGET_UNITS;
+				resetWordColorShowState();
 			});
 
 			Transaction.Instance.TimesAttemptedCurrentProblemIncremented.Subscribe(this,() => {
@@ -120,6 +120,13 @@ public class PhonoBlocksState : PhonoBlocksSubscriber {
 
 
 	}
+
+	void resetWordColorShowState(){
+		wordColorShowState = activity == Activity.SYLLABLE_DIVISION ?
+			WordColorShowStates.SHOW_WHOLE_WORD :
+			WordColorShowStates.SHOW_TARGET_UNITS;
+	}
+
 
 
 
