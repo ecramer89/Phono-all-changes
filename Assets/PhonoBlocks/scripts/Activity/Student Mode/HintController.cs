@@ -61,6 +61,7 @@ public class HintController : PhonoBlocksSubscriber
 
 
 	IEnumerator PresentTargetSyllablesAndSyllableSoundsOneAtATime(){
+		AudioSourceController.PushClip (AudioSourceController.GetSoundedOutWordFromResources (Transaction.Instance.State.TargetWord));
 		int syllableIndex = -1;
 		int numSyllables = Transaction.Instance.State.TargetWordSyllables.Count;
 		while(true){
@@ -75,10 +76,6 @@ public class HintController : PhonoBlocksSubscriber
 					ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (indexOfLetterInTargetWord, targetSyllable.Value[i], LetterImageTable.instance.GetLetterImageFromLetter);
 					Colorer.ChangeDisplayColourOfASingleLetter (indexOfLetterInTargetWord, Transaction.Instance.State.TargetWordColors[indexOfLetterInTargetWord]);
 				}
-				//todo, when record the syllables- put them here
-				//string pathTo = $"audio/sounded_out_syllables/{targetWord}/{targetWord[syllableIndex]}";
-				//AudioClip targetSound = AudioSourceController.GetClipFromResources (pathTo);
-				//AudioSourceController.PushClip (targetSound);
 				yield return new WaitForSeconds (Parameters.Hints.LEVEL_2_SECONDS_DURATION_EACH_CORRECT_LETTER);
 			}
 		}

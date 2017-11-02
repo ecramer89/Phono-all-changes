@@ -146,14 +146,14 @@ public class Parameters : PhonoBlocksSubscriber {
 			new SessionData(
 				0,
 				Activity.OPEN_CLOSED_SYLLABLE, 
-				new string[]{"bet","dad","tin"}, //target words
-				new string[]{"bt","dd","tn"} //placeholder letters initially placed
+				new string[]{"bet","sad","tin"}, //target words
+				new string[]{"bt","sd","tn"} //placeholder letters initially placed
 			),
 			new SessionData(
 				1,
 				Activity.OPEN_CLOSED_SYLLABLE, 
-				new string[]{"pup","hit","web"},
-				new string[]{"pp","ht","wb"}
+				new string[]{"pup","fit","web"},
+				new string[]{"pp","ft","wb"}
 			),
 			new SessionData(
 				2,
@@ -194,8 +194,8 @@ public class Parameters : PhonoBlocksSubscriber {
 			new SessionData(
 				8,
 				Activity.VOWEL_DIGRAPHS,
-				new string[]{"eat","boat","paid"},
-				new string[]{"t","bt","pd"}
+				new string[]{"meal","boat","paid"},
+				new string[]{"ml","bt","pd"}
 			),
 			new SessionData(
 				9,
@@ -206,8 +206,8 @@ public class Parameters : PhonoBlocksSubscriber {
 			new SessionData(
 				10,
 				Activity.R_CONTROLLED_VOWELS,
-				new string[]{"car","jar","fir"},
-				new string[]{"c","j","f"}
+				new string[]{"harm","jar","fir"},
+				new string[]{"h","j","f"}
 			),
 			new SessionData(
 				11,

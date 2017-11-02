@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TeacherModeController : PhonoBlocksSubscriber {
-	public override void SubscribeToAll(PhonoBlocksScene scene){
-		if(scene == PhonoBlocksScene.MainMenu) return;
 
+	//todo move to instructionsAudio
+	[SerializeField] AudioClip trySoundingOutWordYourself;
+	[SerializeField] AudioClip tryReadingWholeWordYourself;
+
+
+	public override void SubscribeToAll(PhonoBlocksScene scene){
 			if(scene == PhonoBlocksScene.Activity){
 				if(Transaction.Instance.State.Mode != Mode.TEACHER) {
 					gameObject.SetActive(false); 
@@ -20,26 +24,22 @@ public class TeacherModeController : PhonoBlocksSubscriber {
 				Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,() => {
 					Transaction.Instance.UserAddedWordToHistory.Fire ();
 				});
+				
+		
+			Transaction.Instance.WordColorShowStateSet.Subscribe(this, (WordColorShowStates newWordState)=>{
+				string trimmedCurrentUserWord=Transaction.Instance.State.UserInputLetters.Trim(); 
+				AudioClip clip = null;
+				AudioClip alternative = null;
+				if(newWordState == WordColorShowStates.SHOW_TARGET_UNITS){
+					clip = AudioSourceController.GetSoundedOutWordFromResources(trimmedCurrentUserWord);
+					alternative = trySoundingOutWordYourself;
+				} else {
+					clip= AudioSourceController.GetWordFromResources(trimmedCurrentUserWord);
+					alternative = tryReadingWholeWordYourself;
+				}
+				AudioSourceController.PushClip(clip == null ? alternative : clip);
+			});   
 
 		}
 	}
-	/*void Start () {
-		Transaction.Instance.ModeSelected.Subscribe(this,
-			(Mode mode) => {
-				if(mode == Mode.TEACHER){
-					Transaction.Instance.UserEnteredNewLetter.Subscribe(this,(char newLetter, int atPosition) => {
-						ArduinoLetterController.instance.ChangeTheLetterOfASingleCell (atPosition, newLetter);
-						Colorer.Instance.ReColor ();
-					});
-
-					Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,() => {
-						Transaction.Instance.UserAddedWordToHistory.Fire ();
-					});
-				}else {
-					gameObject.SetActive(false);
-				}
-			}
-		);
-
-}*/
 }

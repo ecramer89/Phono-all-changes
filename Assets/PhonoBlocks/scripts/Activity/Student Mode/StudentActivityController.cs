@@ -8,7 +8,9 @@ using System.Linq;
 
 public class StudentActivityController : PhonoBlocksSubscriber
 {
-	
+
+	     //todo move to instructionsAudio
+		[SerializeField] AudioClip yourWordIsntQuiteRightYet;
 		private static StudentActivityController instance;
 		public static StudentActivityController Instance{
 			get {
@@ -33,8 +35,6 @@ public class StudentActivityController : PhonoBlocksSubscriber
 
 
 	public override void SubscribeToAll(PhonoBlocksScene nextToLoad){
-		if(nextToLoad == PhonoBlocksScene.MainMenu) return;
-	
 		if(nextToLoad == PhonoBlocksScene.Activity){
 			
 			if(Transaction.Instance.State.Mode != Mode.STUDENT) {
@@ -47,6 +47,25 @@ public class StudentActivityController : PhonoBlocksSubscriber
 			Transaction.Instance.InteractiveLettersCreated.Subscribe(this,(List<InteractiveLetter> letters)=>SetUpNextProblem());
 			Transaction.Instance.UserEnteredNewLetter.Subscribe(this,HandleNewArduinoLetter);
 			Transaction.Instance.UserSubmittedTheirLetters.Subscribe(this,HandleSubmittedAnswer);
+		
+
+			Transaction.Instance.WordColorShowStateSet.Subscribe(this, (WordColorShowStates newWordState)=>{
+				AudioClip clip;
+
+				if(Transaction.Instance.Selector.CurrentStateOfInputMatchesTarget){
+					clip = Transaction.Instance.State.WordColorShowState == WordColorShowStates.SHOW_TARGET_UNITS ? 
+						AudioSourceController.GetSoundedOutWordFromResources(Transaction.Instance.State.TargetWord) :
+						AudioSourceController.GetWordFromResources(Transaction.Instance.State.TargetWord);
+
+
+
+				} else clip = yourWordIsntQuiteRightYet;
+
+				AudioSourceController.PushClip(clip);
+
+			});
+		
+		
 		}
 
 
