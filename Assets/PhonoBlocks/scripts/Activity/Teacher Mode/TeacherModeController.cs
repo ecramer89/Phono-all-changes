@@ -23,6 +23,8 @@ public class TeacherModeController : PhonoBlocksSubscriber {
 				
 		
 			Transaction.Instance.WordColorShowStateSet.Subscribe(this, (WordColorShowStates newWordState)=>{
+
+			
 				string trimmedCurrentUserWord=Transaction.Instance.State.UserInputLetters.Trim(); 
 				AudioClip clip = null;
 				AudioClip alternative = null;
@@ -33,6 +35,7 @@ public class TeacherModeController : PhonoBlocksSubscriber {
 					clip= AudioSourceController.GetWordFromResources(trimmedCurrentUserWord);
 					alternative = InstructionsAudio.instance.tryReadingWholeWordYourself;
 				}
+		
 				AudioSourceController.PushClip(clip == null ? alternative : clip);
 			});   
 
