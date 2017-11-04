@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class TeacherModeController : PhonoBlocksSubscriber {
 
-	//todo move to instructionsAudio
-	[SerializeField] AudioClip trySoundingOutWordYourself;
-	[SerializeField] AudioClip tryReadingWholeWordYourself;
-
 
 	public override void SubscribeToAll(PhonoBlocksScene scene){
 			if(scene == PhonoBlocksScene.Activity){
@@ -32,10 +28,10 @@ public class TeacherModeController : PhonoBlocksSubscriber {
 				AudioClip alternative = null;
 				if(newWordState == WordColorShowStates.SHOW_TARGET_UNITS){
 					clip = AudioSourceController.GetSoundedOutWordFromResources(trimmedCurrentUserWord);
-					alternative = trySoundingOutWordYourself;
+					alternative = InstructionsAudio.instance.trySoundingOutWordYourself;
 				} else {
 					clip= AudioSourceController.GetWordFromResources(trimmedCurrentUserWord);
-					alternative = tryReadingWholeWordYourself;
+					alternative = InstructionsAudio.instance.tryReadingWholeWordYourself;
 				}
 				AudioSourceController.PushClip(clip == null ? alternative : clip);
 			});   

@@ -9,8 +9,6 @@ using System.Linq;
 public class StudentActivityController : PhonoBlocksSubscriber
 {
 
-	     //todo move to instructionsAudio
-		[SerializeField] AudioClip yourWordIsntQuiteRightYet;
 		private static StudentActivityController instance;
 		public static StudentActivityController Instance{
 			get {
@@ -56,10 +54,7 @@ public class StudentActivityController : PhonoBlocksSubscriber
 					clip = Transaction.Instance.State.WordColorShowState == WordColorShowStates.SHOW_TARGET_UNITS ? 
 						AudioSourceController.GetSoundedOutWordFromResources(Transaction.Instance.State.TargetWord) :
 						AudioSourceController.GetWordFromResources(Transaction.Instance.State.TargetWord);
-
-
-
-				} else clip = yourWordIsntQuiteRightYet;
+				} else clip = InstructionsAudio.instance.yourWordIsntQuiteRightYet;
 
 				AudioSourceController.PushClip(clip);
 

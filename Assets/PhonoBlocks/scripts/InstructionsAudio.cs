@@ -7,8 +7,7 @@ using System.Collections;
  * */
 public class InstructionsAudio : MonoBehaviour
 {
-
-		public static InstructionsAudio instance;
+		public AudioClip yourWordIsntQuiteRightYet;
 		public AudioClip makeTheWord;
 		public AudioClip soundOutTheWord;
 		public AudioClip excellent;
@@ -18,7 +17,13 @@ public class InstructionsAudio : MonoBehaviour
 		public AudioClip youDidIt;
 		public AudioClip correctSoundEffect;
 		public AudioClip removeAllLetters;
-	    public AudioClip allDoneSession;
+		public AudioClip allDoneSession;
+		public AudioClip trySoundingOutWordYourself;
+		public AudioClip tryReadingWholeWordYourself;
+
+
+		public static InstructionsAudio instance;
+
 
 		void Awake ()
 		{
